@@ -8,61 +8,28 @@ const MAX_DISPLAY = 5
 export default function Home({ posts }) {
   return (
     <>
-      <div className="divide-y divide-gray-200 dark:divide-gray-700">
-        <div className="space-y-2 pb-8 pt-6 md:space-y-5">
-          {/* <h1 className="text-3xl font-extrabold leading-9 tracking-tight text-gray-900 dark:text-gray-100 sm:text-4xl sm:leading-10 md:text-6xl md:leading-14">
-            Latest
-          </h1> */}
-          <p className="text-lg leading-7 text-gray-500 dark:text-gray-400">
-            {siteMetadata.description}
-          </p>
-        </div>
-        <ul className="divide-y divide-gray-200 dark:divide-gray-700">
-          {!posts.length && 'No posts found.'}
-          {posts.slice(0, MAX_DISPLAY).map((post) => {
-            const { slug, date, title, summary, tags } = post
-            return (
-              <li key={slug} className="py-12">
-                <article>
-                  <div className="space-y-2 xl:grid xl:grid-cols-4 xl:items-baseline xl:space-y-0">
-                    <div className="space-y-5 xl:col-span-3">
-                      <div className="space-y-6">
-                        <div>
-                          <h2 className="text-2xl font-bold leading-8 tracking-tight">
-                            <Link
-                              href={`/blog/${slug}`}
-                              className="text-gray-900 dark:text-gray-100"
-                            >
-                              {title}
-                            </Link>
-                          </h2>
-                          <dl>
-                            <dt className="sr-only">Published on</dt>
-                            <dd className="text-base font-medium leading-6 text-gray-500 dark:text-gray-400">
-                              <time dateTime={date}>{formatDate(date, siteMetadata.locale)}</time>
-                            </dd>
-                          </dl>
-                        </div>
-                        <div className="prose max-w-none text-gray-500 dark:text-gray-400">
-                          {summary}
-                        </div>
-                      </div>
-                      <div className="text-base font-medium leading-6">
-                        <Link
-                          href={`/blog/${slug}`}
-                          className="text-primary-700 hover:text-primary-800 dark:hover:text-primary-400"
-                          aria-label={`Read more: "${title}"`}
-                        >
-                          Read more &rarr;
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                </article>
-              </li>
-            )
-          })}
+      <div className="flex flex-col">
+        <p className="mt-8">
+          The Argot Collective is a new non-profit maintaining Ethereum's core infrastructure formed
+          by 25 former Ethereum Foundation employees. Operating democratically and transparently,
+          they aim to provide stable, long-term support for crucial projects, free from commercial
+          pressures.
+        </p>
+        <p className="mt-8">
+          Initially, the Argot collective will be home to the following projects:
+        </p>
+        <ul className="mt-2 list-inside list-disc">
+          <li>Act: Formal specification language for smart contracts</li>
+          <li>Ethdebug: Standardized debug info format for the EVM</li>
+          <li>Fe: Smart contract language</li>
+          <li>Hevm: Symbolic execution engine for the EVM</li>
+          <li>Solidity: Smart contract language</li>
+          <li>Sourcify: Open-source and decentralized source-code verification service</li>
         </ul>
+        <p className="mt-8">
+          Read more about Argot Collective in our{' '}
+          <Link href="/blog/hello-world">announcement post</Link>.
+        </p>
       </div>
       {posts.length > MAX_DISPLAY && (
         <div className="flex justify-end text-base font-medium leading-6">
