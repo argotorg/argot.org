@@ -28,7 +28,10 @@ export default function Home({ posts }) {
         </ul>
         <p className="mt-8">
           Read more about Argot Collective in our{' '}
-          <Link href="/blog/hello-world">announcement post</Link>.
+          <Link href="/blog/hello-world" className="underline">
+            <span className="font-bold underline">announcement post</span>
+          </Link>
+          .
         </p>
       </div>
       {posts.length > MAX_DISPLAY && (
