@@ -2,7 +2,7 @@ import 'css/tailwind.css'
 import 'pliny/search/algolia.css'
 import 'remark-github-blockquote-alert/alert.css'
 
-import { IBM_Plex_Mono, Fira_Code } from 'next/font/google'
+import { Inconsolata } from 'next/font/google'
 import { Roboto_Mono } from 'next/font/google'
 import { Analytics, AnalyticsConfig } from 'pliny/analytics'
 import { SearchProvider, SearchConfig } from 'pliny/search'
@@ -13,15 +13,7 @@ import siteMetadata from '@/data/siteMetadata'
 import { ThemeProviders } from './theme-providers'
 import { Metadata } from 'next'
 
-// const defaultMono = IBM_Plex_Mono({
-//   weight: ['400', '700'],
-//   subsets: ['latin'],
-//   display: 'swap',
-//   variable: '--font-default-mono',
-// })
-
-const defaultMono = Fira_Code({
-  weight: ['400', '700'],
+const defaultMono = Inconsolata({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-default-mono',
