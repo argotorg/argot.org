@@ -11,8 +11,8 @@ export default function Home({ posts }) {
       <div className="flex flex-col">
         <p className="mt-8">
           The Argot Collective is a new non-profit maintaining Ethereum's core infrastructure formed
-          by 25 former Ethereum Foundation employees. Operating democratically and transparently,
-          they aim to provide stable, long-term support for crucial projects, free from commercial
+          by 25 former Ethereum Foundation employees. Operating democratically and transparently, we
+          aim to provide stable, long-term support for crucial projects, free from commercial
           pressures.
         </p>
         <p className="mt-8">
