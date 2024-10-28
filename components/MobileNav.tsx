@@ -27,8 +27,25 @@ const MobileNav = () => {
   })
 
   return (
-    <>
-      <button aria-label="Toggle Menu" onClick={onToggleNav} className="sm:hidden">
+    <div className="sm:hidden">
+      <nav
+      // ref={navRef}
+      // className="mt-8 flex h-full basis-0 flex-col items-start overflow-y-auto pl-12 pt-2 text-left"
+      >
+        {headerNavLinks.map((link) =>
+          link.title === 'Home' ? null : (
+            <Link
+              key={link.title}
+              href={link.href}
+              className="py-2 text-base font-bold tracking-widest text-gray-900 outline outline-0 hover:text-primary-500 dark:text-gray-100 dark:hover:text-primary-400"
+              onClick={onToggleNav}
+            >
+              {link.title}
+            </Link>
+          )
+        )}
+      </nav>
+      {/* <button aria-label="Toggle Menu" onClick={onToggleNav} className="sm:hidden">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 20 20"
@@ -41,8 +58,9 @@ const MobileNav = () => {
             clipRule="evenodd"
           />
         </svg>
-      </button>
-      <Transition appear show={navShow} as={Fragment} unmount={false}>
+      </button> */}
+
+      {/* <Transition appear show={navShow} as={Fragment} unmount={false}>
         <Dialog as="div" onClose={onToggleNav} unmount={false}>
           <Transition.Child
             as={Fragment}
@@ -100,8 +118,8 @@ const MobileNav = () => {
             </Dialog.Panel>
           </Transition.Child>
         </Dialog>
-      </Transition>
-    </>
+      </Transition> */}
+    </div>
   )
 }
 
