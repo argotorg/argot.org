@@ -14,7 +14,7 @@ const siteMetadata = {
   // mastodon: 'https://mastodon.social/@mastodonuser',
   email: 'hello@argot.org',
   github: 'https://github.com/argotorg',
-  x: 'https://twitter.com/argotorg',
+  x: 'https://x.com/argotorg',
   farcaster: 'https://warpcast.com/argotorg',
   // twitter: 'https://twitter.com/Twitter',
   // facebook: 'https://facebook.com',
