@@ -46,9 +46,11 @@ module.exports = {
             'h1,h2': {
               fontWeight: '700',
               letterSpacing: theme('letterSpacing.tight'),
+              marginBottom: '0.5rem',
             },
             h3: {
               fontWeight: '600',
+              marginBottom: '0.5rem',
             },
             code: {
               color: theme('colors.indigo.500'),
