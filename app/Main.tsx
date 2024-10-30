@@ -10,10 +10,10 @@ export default function Home({ posts }) {
     <>
       <div className="prose max-w-none dark:prose-invert">
         <p className="mt-8">
-          The Argot Collective is a new non-profit maintaining Ethereum's core infrastructure formed
-          by 25 former Ethereum Foundation employees. Operating democratically and transparently, we
-          aim to provide stable, long-term support for crucial projects, free from commercial
-          pressures.
+          The Argot Collective is a new non-profit organization maintaining Ethereum's core
+          infrastructure formed by 25 former Ethereum Foundation employees. Operating democratically
+          and transparently, we aim to provide stable, long-term support for crucial projects, free
+          from commercial pressures.
         </p>
         <p className="mt-8">
           Initially, the Argot collective will be home to the following projects:
