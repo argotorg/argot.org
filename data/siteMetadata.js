@@ -9,7 +9,7 @@ const siteMetadata = {
   siteUrl: 'https://argot.org',
   siteRepo: 'https://github.com/argotorg/argot.org',
   siteLogo: `${process.env.BASE_PATH || ''}/static/images/logo.png`,
-  socialBanner: `${process.env.BASE_PATH || ''}/static/images/twitter-card.png`,
+  socialBanner: `${process.env.BASE_PATH || ''}/static/images/argot-og-image.png`,
   // mastodon: 'https://mastodon.social/@mastodonuser',
   email: 'hello@argot.org',
   github: 'https://github.com/argotorg',
