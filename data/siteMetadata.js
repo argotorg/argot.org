@@ -3,13 +3,14 @@ const siteMetadata = {
   title: 'Argot Collective',
   author: 'Argot Collective',
   headerTitle: 'Argot Collective',
-  description: 'Website for the Argot Collective',
+  description:
+    "The Argot Collective is a new non-profit organization maintaining Ethereum's core infrastructure formed by 25 former Ethereum Foundation employees. Operating democratically and transparently, we aim to provide stable, long-term support for crucial projects, free from commercial pressures.",
   language: 'en-us',
   theme: 'dark', // system, dark or light
   siteUrl: 'https://argot.org',
   siteRepo: 'https://github.com/argotorg/argot.org',
   siteLogo: `${process.env.BASE_PATH || ''}/static/images/logo.png`,
-  socialBanner: `${process.env.BASE_PATH || ''}/static/images/argot-og-image.png`,
+  socialBanner: `${process.env.BASE_PATH || ''}/static/images/argot-og-image?cache-break.png`,
   // mastodon: 'https://mastodon.social/@mastodonuser',
   email: 'hello@argot.org',
   github: 'https://github.com/argotorg',
