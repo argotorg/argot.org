@@ -14,6 +14,7 @@ const siteMetadata = {
   email: 'hello@argot.org',
   github: 'https://github.com/argotorg',
   x: 'https://twitter.com/argotorg',
+  farcaster: 'https://warpcast.com/argotorg',
   // twitter: 'https://twitter.com/Twitter',
   // facebook: 'https://facebook.com',
   // youtube: 'https://youtube.com',
