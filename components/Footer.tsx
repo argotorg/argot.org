@@ -1,7 +1,9 @@
 import Link from './Link'
 import siteMetadata from '@/data/siteMetadata'
 import SocialIcon from '@/components/social-icons'
+import CurrentYear from './CurrentYear'
 
+// Server component for the footer
 export default function Footer() {
   return (
     <footer className="mt-auto">
@@ -21,7 +23,7 @@ export default function Footer() {
         <div className="mb-2 flex space-x-2 text-sm text-gray-500 dark:text-gray-400">
           <div>{siteMetadata.author}</div>
           <div>{` • `}</div>
-          <div>{`© ${new Date().getFullYear()}`}</div>
+          <CurrentYear />
           <div>{` • `}</div>
           <Link href="/">{siteMetadata.title}</Link>
         </div>
