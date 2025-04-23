@@ -14,15 +14,16 @@ module.exports = {
   ],
   darkMode: 'class',
   theme: {
+    fontFamily: {
+      sans: ['var(--font-karla)', ...fontFamily.sans],
+      mono: ['var(--font-inconsolata)', ...fontFamily.mono],
+    },
     extend: {
       lineHeight: {
         11: '2.75rem',
         12: '3rem',
         13: '3.25rem',
         14: '3.5rem',
-      },
-      fontFamily: {
-        sans: ['var(--font-default-mono)', ...fontFamily.sans],
       },
       colors: {
         primary: {

@@ -2,7 +2,7 @@ import 'css/tailwind.css'
 import 'pliny/search/algolia.css'
 import 'remark-github-blockquote-alert/alert.css'
 
-import { Inconsolata } from 'next/font/google'
+import { Inconsolata, Karla } from 'next/font/google'
 import { Roboto_Mono } from 'next/font/google'
 import { Analytics, AnalyticsConfig } from 'pliny/analytics'
 import { SearchProvider, SearchConfig } from 'pliny/search'
@@ -16,7 +16,12 @@ import { Metadata } from 'next'
 const defaultMono = Inconsolata({
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-default-mono',
+  variable: '--font-inconsolata',
+})
+
+const karla = Karla({
+  subsets: ['latin'],
+  variable: '--font-karla',
 })
 
 export const metadata: Metadata = {
@@ -65,7 +70,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang={siteMetadata.language}
-      className={`${defaultMono.variable} scroll-smooth`}
+      className={`${defaultMono.variable} ${karla.variable} scroll-smooth`}
       suppressHydrationWarning
     >
       <link
