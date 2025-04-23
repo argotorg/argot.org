@@ -25,8 +25,38 @@ module.exports = {
         sans: ['var(--font-default-mono)', ...fontFamily.sans],
       },
       colors: {
-        primary: colors.gray,
-        gray: colors.gray,
+        primary: {
+          DEFAULT: '#2D2725',
+          300: '#5B4D49',
+          400: '#423835',
+          500: '#2D2725',
+          600: '#24201E',
+          700: '#1A1717',
+        },
+        anthracite: {
+          DEFAULT: '#2D2725',
+          300: '#5B4D49',
+          400: '#423835',
+          500: '#2D2725',
+          600: '#24201E',
+          700: '#1A1717',
+        },
+        amber: {
+          DEFAULT: '#D49B3F',
+          300: '#F3CC88',
+          400: '#E7B865',
+          500: '#D49B3F',
+          600: '#BA7F19',
+          700: '#966316',
+        },
+        ecru: {
+          DEFAULT: '#EADBCA', // Different color from below
+          300: '#F6EADD',
+          400: '#E9DED2',
+          500: '#DBCCBB',
+          600: '#BEAC97',
+          700: '#A1907C',
+        },
       },
       zIndex: {
         60: '60',
@@ -37,11 +67,11 @@ module.exports = {
         DEFAULT: {
           css: {
             a: {
-              color: theme('colors.primary.500'),
+              color: theme('colors.anthracite.500'),
               '&:hover': {
-                color: `${theme('colors.primary.600')}`,
+                color: `${theme('colors.anthracite.600')}`,
               },
-              code: { color: theme('colors.primary.400') },
+              code: { color: theme('colors.anthracite.400') },
             },
             'h1,h2': {
               fontWeight: '700',
@@ -60,11 +90,11 @@ module.exports = {
         invert: {
           css: {
             a: {
-              color: theme('colors.primary.500'),
+              color: theme('colors.anthracite.500'),
               '&:hover': {
-                color: `${theme('colors.primary.400')}`,
+                color: `${theme('colors.anthracite.400')}`,
               },
-              code: { color: theme('colors.primary.400') },
+              code: { color: theme('colors.anthracite.400') },
             },
             'h1,h2,h3,h4,h5,h6': {
               color: theme('colors.gray.100'),
