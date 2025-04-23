@@ -44,7 +44,6 @@ export const projects: Project[] = [
     longDescription:
       'Hevm is a specialized symbolic execution engine and testing framework for Ethereum smart contracts. It enables developers to perform detailed analysis of contract behavior, find edge cases, and verify properties of their code through symbolic manipulation. This powerful tool helps ensure contract correctness and security.',
     url: 'https://hevm.dev',
-    logo: '/static/projects/hevm.svg',
   },
   {
     title: 'Sourcify',
