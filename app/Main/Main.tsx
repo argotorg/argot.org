@@ -1,5 +1,6 @@
 import ProjectCard from './components/ProjectCard'
 import { projects } from './data/projects'
+import AnnouncementBanner from './components/AnnouncementBanner'
 
 export default function Home() {
   return (
@@ -31,6 +32,11 @@ export default function Home() {
             <ProjectCard key={project.title} {...project} />
           ))}
         </div>
+      </section>
+
+      {/* Announcement Banner */}
+      <section>
+        <AnnouncementBanner />
       </section>
     </>
   )
