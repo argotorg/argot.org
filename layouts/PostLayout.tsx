@@ -54,8 +54,8 @@ export default function PostLayout({ content, authorDetails, next, prev, childre
               </div>
             </div>
           </header>
-          <div className="divide-anthracite-300 dark:divide-ecru-300 grid-rows-[auto_1fr] divide-y pb-8 xl:grid xl:grid-cols-4 xl:gap-x-6 xl:divide-y-0">
-            <dl className="xl:border-anthracite-300 xl:dark:border-ecru-300 pb-10 pt-6 xl:border-b xl:pt-11">
+          <div className="grid-rows-[auto_1fr] divide-y divide-anthracite-300 pb-8 dark:divide-ecru-300 xl:grid xl:grid-cols-4 xl:gap-x-6 xl:divide-y-0">
+            <dl className="pb-10 pt-6 xl:border-b xl:border-anthracite-300 xl:pt-11 xl:dark:border-ecru-300">
               <dt className="sr-only">Authors</dt>
               <dd>
                 <ul className="flex flex-wrap justify-center gap-4 sm:space-x-12 xl:block xl:space-x-0 xl:space-y-8">

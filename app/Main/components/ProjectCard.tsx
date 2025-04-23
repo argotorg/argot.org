@@ -23,18 +23,18 @@ export default function ProjectCard({ title, description, longDescription, url, 
         }}
         className="group w-full cursor-pointer text-left focus:outline-none focus:ring-2 focus:ring-amber-500"
       >
-        <div className="bg-ecru-300 dark:bg-anthracite relative h-full overflow-hidden rounded-lg p-6">
+        <div className="relative h-full overflow-hidden rounded-lg bg-ecru-300 p-6 dark:bg-anthracite">
           <div className="relative z-10">
-            <h3 className="text-anthracite dark:text-ecru mb-4 text-3xl font-bold tracking-tight">
+            <h3 className="mb-4 text-3xl font-bold tracking-tight text-anthracite dark:text-ecru">
               {title}
             </h3>
-            <p className="text-anthracite-400 dark:text-ecru-400 text-lg">{description}</p>
+            <p className="text-lg text-anthracite-400 dark:text-ecru-400">{description}</p>
           </div>
 
           {/* Overlay */}
           <div className="absolute bottom-0 right-0 z-20 h-full w-full translate-y-full bg-amber-500/95 transition-transform duration-300 ease-in-out group-hover:translate-y-0 group-focus:translate-y-0">
             <div className="flex h-full items-center justify-center">
-              <span className="text-anthracite text-2xl font-bold">Read More</span>
+              <span className="text-2xl font-bold text-anthracite">Read More</span>
             </div>
           </div>
         </div>
@@ -46,7 +46,7 @@ export default function ProjectCard({ title, description, longDescription, url, 
           {/* Backdrop */}
           <button
             onClick={() => setIsModalOpen(false)}
-            className="bg-anthracite/50 fixed inset-0 backdrop-blur-sm transition-opacity duration-300 ease-out"
+            className="fixed inset-0 bg-anthracite/50 backdrop-blur-sm transition-opacity duration-300 ease-out"
             aria-label="Close modal"
           />
 
@@ -55,7 +55,7 @@ export default function ProjectCard({ title, description, longDescription, url, 
             role="dialog"
             aria-modal="true"
             aria-labelledby="modal-title"
-            className="bg-ecru dark:bg-anthracite relative z-50 mx-4 max-w-2xl translate-y-full rounded-lg p-6 opacity-0 transition-all duration-300 ease-out md:p-8"
+            className="relative z-50 mx-4 max-w-2xl translate-y-full rounded-lg bg-ecru p-6 opacity-0 transition-all duration-300 ease-out dark:bg-anthracite md:p-8"
             style={{
               animation: 'modalIn 0.3s ease-out forwards',
             }}
@@ -75,7 +75,7 @@ export default function ProjectCard({ title, description, longDescription, url, 
 
             <button
               onClick={() => setIsModalOpen(false)}
-              className="text-anthracite-400 hover:text-anthracite dark:text-ecru-400 dark:hover:text-ecru absolute right-4 top-4 p-1 transition-colors"
+              className="absolute right-4 top-4 p-1 text-anthracite-400 transition-colors hover:text-anthracite dark:text-ecru-400 dark:hover:text-ecru"
               aria-label="Close modal"
             >
               <BiX className="h-8 w-8" />
@@ -93,17 +93,17 @@ export default function ProjectCard({ title, description, longDescription, url, 
                   />
                 </div>
               )}
-              <h2 id="modal-title" className="text-anthracite dark:text-ecru text-3xl font-bold">
+              <h2 id="modal-title" className="text-3xl font-bold text-anthracite dark:text-ecru">
                 {title}
               </h2>
             </div>
 
-            <p className="text-anthracite-400 dark:text-ecru-400 mb-6 text-lg">{longDescription}</p>
+            <p className="mb-6 text-lg text-anthracite-400 dark:text-ecru-400">{longDescription}</p>
 
             <div>
               <Link
                 href={url}
-                className="text-anthracite inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2 transition-colors hover:bg-amber-600"
+                className="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2 text-anthracite transition-colors hover:bg-amber-600"
               >
                 <BiLinkExternal className="h-5 w-5" />
                 <span className="font-bold">Website</span>
