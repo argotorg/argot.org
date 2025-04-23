@@ -2,7 +2,7 @@ import ProjectCard from './components/ProjectCard'
 import { projects } from './data/projects'
 import AnnouncementBanner from './components/AnnouncementBanner'
 
-export default function Home() {
+export default function Main() {
   return (
     <>
       <section className="flex min-h-[60vh] w-full items-center justify-center">
