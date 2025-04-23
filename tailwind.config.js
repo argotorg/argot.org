@@ -86,6 +86,14 @@ module.exports = {
             code: {
               color: theme('colors.indigo.500'),
             },
+            'ul > li': {
+              '&::marker': {
+                color: theme('colors.anthracite.500'),
+              },
+            },
+            hr: {
+              borderColor: theme('colors.anthracite.300'),
+            },
           },
         },
         invert: {
@@ -100,10 +108,24 @@ module.exports = {
             'h1,h2,h3,h4,h5,h6': {
               color: theme('colors.gray.100'),
             },
+            'ul > li': {
+              '&::marker': {
+                color: theme('colors.ecru.500'),
+              },
+            },
+            hr: {
+              borderColor: theme('colors.ecru.300'),
+            },
           },
         },
       }),
     },
   },
   plugins: [require('@tailwindcss/forms'), require('@tailwindcss/typography')],
+  safelist: [
+    'divide-anthracite-300',
+    'dark:divide-ecru-300',
+    'border-anthracite-300',
+    'dark:border-ecru-300',
+  ],
 }
