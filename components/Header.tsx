@@ -25,14 +25,14 @@ const Header = () => {
               <Link
                 key={link.title}
                 href={link.href}
-                className="block font-medium text-gray-900 hover:text-anthracite-500 dark:text-gray-100 dark:hover:text-anthracite-400"
+                className="hover:text-anthracite-500 dark:hover:text-anthracite-400 block font-medium text-gray-900 dark:text-gray-100"
               >
                 {link.title}
               </Link>
             ))}
         </div>
         <SearchButton />
-        {/* <ThemeSwitch /> */}
+        <ThemeSwitch />
         <MobileNav />
       </div>
     </header>
