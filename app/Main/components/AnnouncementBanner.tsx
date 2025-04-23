@@ -2,7 +2,7 @@ import Image from 'next/image'
 import Link from '@/components/Link'
 
 function LineRow({ direction = 'right', index }: { direction: 'left' | 'right'; index: number }) {
-  // Generate 2 lines with widths between 15px and 80px
+  // Generate random lines
   const widths = Array.from(
     { length: Math.floor(Math.random() * 15) + 2 }, // Random number of lines between
     () => Math.floor(Math.random() * 100) + 35 // Width between 35px and 135px
@@ -65,13 +65,13 @@ export default function AnnouncementBanner() {
 
       {/* Content Side */}
       <div className="flex h-[300px] flex-col justify-center p-12">
-        <h2 className="mb-4 text-3xl font-bold text-anthracite">We are live!</h2>
-        <p className="mb-8 text-xl text-anthracite">
+        <h2 className="text-anthracite mb-4 text-3xl font-bold">We are live!</h2>
+        <p className="text-anthracite mb-8 text-xl">
           Argot Collective just launched! Read our manifesto to learn more.
         </p>
         <Link
           href="/blog/hello-world"
-          className="inline-flex w-fit items-center rounded-lg bg-anthracite px-6 py-2 font-bold text-ecru transition-colors hover:bg-anthracite/90"
+          className="bg-anthracite text-ecru hover:bg-anthracite/90 inline-flex w-fit items-center rounded-lg px-6 py-2 font-bold transition-colors"
         >
           Read the announcement
         </Link>
