@@ -88,7 +88,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fff" />
       <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000" />
       <link rel="alternate" type="application/rss+xml" href={`${basePath}/feed.xml`} />
-      <body className="bg-ecru text-anthracite dark:bg-anthracite dark:text-ecru mx-auto max-w-screen-xl px-4 antialiased md:px-8">
+      <body className="mx-auto max-w-screen-xl bg-ecru px-4 text-anthracite antialiased dark:bg-anthracite dark:text-ecru md:px-8">
         <ThemeProviders>
           {/* <Analytics analyticsConfig={siteMetadata.analytics as AnalyticsConfig} /> */}
           <SearchProvider searchConfig={siteMetadata.search as SearchConfig}>

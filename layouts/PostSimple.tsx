@@ -24,11 +24,11 @@ export default function PostLayout({ content, next, prev, children }: LayoutProp
       <article>
         <div>
           <header>
-            <div className="border-ecru-600 dark:border-ecru-300 space-y-1 border-b pb-10 text-center">
+            <div className="space-y-1 border-b border-ecru-600 pb-10 text-center dark:border-ecru-300">
               <dl>
                 <div>
                   <dt className="sr-only">Published on</dt>
-                  <dd className="text-anthracite-300 dark:text-ecru-400 text-base font-medium leading-6">
+                  <dd className="text-base font-medium leading-6 text-anthracite-300 dark:text-ecru-400">
                     <time dateTime={date}>{formatDate(date, siteMetadata.locale)}</time>
                   </dd>
                 </div>
@@ -38,8 +38,8 @@ export default function PostLayout({ content, next, prev, children }: LayoutProp
               </div>
             </div>
           </header>
-          <div className="divide-anthracite-300 dark:divide-ecru-300 grid-rows-[auto_1fr] divide-y pb-8 xl:grid xl:grid-cols-4 xl:gap-x-6 xl:divide-y-0">
-            <div className="divide-anthracite-300 dark:divide-ecru-300 divide-y xl:col-span-3 xl:row-span-2 xl:pb-0">
+          <div className="grid-rows-[auto_1fr] divide-y divide-anthracite-300 pb-8 dark:divide-ecru-300 xl:grid xl:grid-cols-4 xl:gap-x-6 xl:divide-y-0">
+            <div className="divide-y divide-anthracite-300 dark:divide-ecru-300 xl:col-span-3 xl:row-span-2 xl:pb-0">
               <div className="prose max-w-none pb-8 pt-10 dark:prose-invert">{children}</div>
             </div>
             {siteMetadata.comments && (
