@@ -3,9 +3,12 @@ import Link from '@/components/Link'
 
 function LineRow({ direction = 'right', index }: { direction: 'left' | 'right'; index: number }) {
   // Generate 2 lines with widths between 15px and 80px
-  const widths = Array.from({ length: 20 }, () => Math.floor(Math.random() * 100) + 35)
+  const widths = Array.from(
+    { length: Math.floor(Math.random() * 15) + 2 }, // Random number of lines between
+    () => Math.floor(Math.random() * 100) + 35 // Width between 35px and 135px
+  )
   // Generate random gaps between 4px and 12px
-  const gaps = Array.from({ length: 20 }, () => Math.floor(Math.random() * 60) + 4)
+  const gaps = Array.from({ length: 20 }, () => Math.floor(Math.random() * 60) + 12)
 
   return (
     <div className="flex h-[30px] items-center">
