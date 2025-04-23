@@ -16,7 +16,7 @@ function LineRow({ direction = 'right', index }: { direction: 'left' | 'right'; 
         {widths.map((width, i) => (
           <div key={i} className="flex items-center">
             <svg height="30" width={width} className="text-anthracite">
-              <rect width={width} height="30" rx="4" fill="currentColor" />
+              <rect width={width} height="30" rx="2.5" fill="currentColor" />
             </svg>
             {i < gaps.length && <div style={{ width: `${gaps[i]}px` }} />}
           </div>
