@@ -3,8 +3,6 @@ import 'pliny/search/algolia.css'
 import 'remark-github-blockquote-alert/alert.css'
 
 import { Inconsolata, Karla } from 'next/font/google'
-import { Roboto_Mono } from 'next/font/google'
-import { Analytics, AnalyticsConfig } from 'pliny/analytics'
 import { SearchProvider, SearchConfig } from 'pliny/search'
 import Header from '@/components/Header'
 import SectionContainer from '@/components/SectionContainer'
@@ -91,7 +89,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fff" />
       <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000" />
       <link rel="alternate" type="application/rss+xml" href={`${basePath}/feed.xml`} />
-      <body className="bg-white pl-[calc(100vw-100%)] text-black antialiased dark:bg-zinc-800 dark:text-zinc-300">
+      <body className="bg-ecru text-anthracite dark:bg-anthracite dark:text-ecru antialiased">
         <ThemeProviders>
           {/* <Analytics analyticsConfig={siteMetadata.analytics as AnalyticsConfig} /> */}
           <SectionContainer>
