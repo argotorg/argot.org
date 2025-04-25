@@ -15,7 +15,20 @@ const Header = () => {
   return (
     <header className={headerClass}>
       <Link href="/" aria-label={siteMetadata.headerTitle}>
-        <Image src="/static/argot.png" alt="logo" className="h-10 w-auto" width={300} height={63} />
+        <Image
+          src="/static/argot.png"
+          alt="logo"
+          className="h-10 w-auto dark:hidden"
+          width={300}
+          height={63}
+        />
+        <Image
+          src="/static/argot-light.png"
+          alt="logo"
+          className="hidden h-10 w-auto dark:block"
+          width={300}
+          height={63}
+        />
       </Link>
       <div className="flex items-center space-x-4 leading-5 sm:space-x-6">
         <div className="no-scrollbar hidden max-w-40 items-center space-x-4 overflow-x-auto sm:flex sm:space-x-6 md:max-w-72 lg:max-w-96">
