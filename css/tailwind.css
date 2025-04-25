@@ -91,3 +91,14 @@ input:-webkit-autofill:focus {
 .animate-slide-left {
   animation: slide-left 60s linear infinite;
 }
+
+.link-underline {
+  background-image: linear-gradient(transparent calc(100% - 3px), #d49b3f 3px);
+  background-repeat: no-repeat;
+  background-size: 0% 100%;
+  transition: background-size 0.3s;
+}
+
+.link-underline:hover {
+  background-size: 100% 100%;
+}
