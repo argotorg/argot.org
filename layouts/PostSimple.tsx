@@ -38,9 +38,11 @@ export default function PostLayout({ content, next, prev, children }: LayoutProp
               </div>
             </div>
           </header>
-          <div className="grid-rows-[auto_1fr] divide-y divide-anthracite-300 pb-8 dark:divide-ecru-300 xl:grid xl:grid-cols-4 xl:gap-x-6 xl:divide-y-0">
+          <div className="mx-auto max-w-screen-lg grid-rows-[auto_1fr] divide-y divide-anthracite-300 pb-8 dark:divide-ecru-300">
             <div className="divide-y divide-anthracite-300 dark:divide-ecru-300 xl:col-span-3 xl:row-span-2 xl:pb-0">
-              <div className="prose max-w-none pb-8 pt-10 dark:prose-invert">{children}</div>
+              <div className="prose mx-auto max-w-none pb-8 pt-10 dark:prose-invert">
+                {children}
+              </div>
             </div>
             {siteMetadata.comments && (
               <div className="pb-6 pt-6 text-center text-gray-700 dark:text-gray-300" id="comment">

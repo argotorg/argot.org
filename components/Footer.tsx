@@ -1,38 +1,31 @@
 import Link from './Link'
 import siteMetadata from '@/data/siteMetadata'
 import SocialIcon from '@/components/social-icons'
-import CurrentYear from './CurrentYear'
 
-// Server component for the footer
-export default function Footer() {
+const Footer = () => {
   return (
-    <footer className="mt-auto">
-      <div className="mt-16 flex flex-col items-center">
-        <div className="mb-3 flex space-x-4">
-          <SocialIcon kind="mail" href={`mailto:${siteMetadata.email}`} size={6} />
-          <SocialIcon kind="github" href={siteMetadata.github} size={6} />
-          <SocialIcon kind="facebook" href={siteMetadata.facebook} size={6} />
-          <SocialIcon kind="youtube" href={siteMetadata.youtube} size={6} />
-          <SocialIcon kind="linkedin" href={siteMetadata.linkedin} size={6} />
-          <SocialIcon kind="twitter" href={siteMetadata.twitter} size={6} />
-          <SocialIcon kind="x" href={siteMetadata.x} size={6} />
-          <SocialIcon kind="instagram" href={siteMetadata.instagram} size={6} />
-          <SocialIcon kind="threads" href={siteMetadata.threads} size={6} />
-          <SocialIcon kind="farcaster" href={siteMetadata.farcaster} size={6} />
+    <footer className="mt-auto pb-12">
+      <div className="mt-16 flex flex-col">
+        <div className="flex items-center justify-between py-4 dark:border-gray-700">
+          <div className="flex items-center space-x-4 text-xl font-medium text-anthracite-700 dark:text-ecru-300">
+            <span className="mr-8 font-bold">ARGOT © {new Date().getFullYear()}</span>
+            <Link className="link-underline" href="/terms">
+              Terms of use
+            </Link>
+            <Link className="link-underline" href="/brand">
+              Brand assets
+            </Link>
+          </div>
+          <div className="flex items-center space-x-1">
+            <SocialIcon kind="mail" href={`mailto:${siteMetadata.email}`} size={5} />
+            <SocialIcon kind="github" href={siteMetadata.github} size={5} />
+            <SocialIcon kind="farcaster" href={siteMetadata.farcaster} size={5} />
+            <SocialIcon kind="x" href={siteMetadata.x} size={5} />
+          </div>
         </div>
-        <div className="mb-2 flex space-x-2 text-sm text-gray-500 dark:text-gray-400">
-          <div>{siteMetadata.author}</div>
-          <div>{` • `}</div>
-          <CurrentYear />
-          <div>{` • `}</div>
-          <Link href="/">{siteMetadata.title}</Link>
-        </div>
-        {/* <div className="mb-8 text-sm text-gray-500 dark:text-gray-400">
-          <Link href="https://github.com/timlrx/tailwind-nextjs-starter-blog">
-            Tailwind Nextjs Theme
-          </Link>
-        </div> */}
       </div>
     </footer>
   )
 }
+
+export default Footer
