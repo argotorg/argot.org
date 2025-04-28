@@ -12,6 +12,9 @@ const Footer = () => {
             <Link className="link-underline" href="/terms">
               Terms of use
             </Link>
+            <Link className="link-underline" href="/imprint">
+              Imprint
+            </Link>
             <Link className="link-underline" href="/brand">
               Brand assets
             </Link>
