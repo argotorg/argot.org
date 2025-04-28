@@ -67,6 +67,7 @@ module.exports = {
       typography: ({ theme }) => ({
         DEFAULT: {
           css: {
+            color: theme('colors.anthracite.700'),
             a: {
               color: theme('colors.anthracite.500'),
               '&:hover': {
@@ -98,6 +99,7 @@ module.exports = {
         },
         invert: {
           css: {
+            color: theme('colors.ecru.300'),
             a: {
               color: theme('colors.anthracite.500'),
               '&:hover': {
