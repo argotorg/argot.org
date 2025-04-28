@@ -18,14 +18,14 @@ const Header = () => {
         <Image
           src="/static/argot.png"
           alt="logo"
-          className="h-10 w-auto dark:hidden"
+          className="h-8 w-auto dark:hidden md:h-10"
           width={300}
           height={63}
         />
         <Image
           src="/static/argot-light.png"
           alt="logo"
-          className="hidden h-10 w-auto dark:block"
+          className="hidden h-8 w-auto dark:block md:h-10"
           width={300}
           height={63}
         />
@@ -45,8 +45,8 @@ const Header = () => {
             ))}
         </div>
         <SearchButton />
-        <ThemeSwitch />
         <MobileNav />
+        <ThemeSwitch />
       </div>
     </header>
   )
