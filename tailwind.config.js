@@ -69,9 +69,9 @@ module.exports = {
           css: {
             color: theme('colors.anthracite.700'),
             a: {
-              color: theme('colors.anthracite.500'),
+              color: theme('colors.amber.600'),
               '&:hover': {
-                color: `${theme('colors.anthracite.600')}`,
+                color: `${theme('colors.amber.600')}`,
               },
               code: { color: theme('colors.anthracite.400') },
             },
@@ -79,10 +79,12 @@ module.exports = {
               fontWeight: '700',
               letterSpacing: theme('letterSpacing.tight'),
               marginBottom: '0.5rem',
+              color: theme('colors.anthracite.DEFAULT'),
             },
-            h3: {
+            'h3,h4,h5,h6': {
               fontWeight: '600',
               marginBottom: '0.5rem',
+              color: theme('colors.anthracite.DEFAULT'),
             },
             code: {
               color: theme('colors.indigo.500'),
@@ -101,19 +103,19 @@ module.exports = {
           css: {
             color: theme('colors.ecru.300'),
             a: {
-              color: theme('colors.anthracite.500'),
+              color: theme('colors.amber.500'),
               '&:hover': {
-                color: `${theme('colors.anthracite.400')}`,
+                color: `${theme('colors.amber.600')}`,
               },
               code: { color: theme('colors.anthracite.400') },
-            },
-            'h1,h2,h3,h4,h5,h6': {
-              color: theme('colors.gray.100'),
             },
             'ul > li': {
               '&::marker': {
                 color: theme('colors.ecru.500'),
               },
+            },
+            'h1,h2,h3,h4,h5,h6': {
+              color: theme('colors.ecru.300'),
             },
             hr: {
               borderColor: theme('colors.ecru.300'),
