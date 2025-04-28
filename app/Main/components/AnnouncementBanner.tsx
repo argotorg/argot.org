@@ -31,9 +31,9 @@ function LineRow({ direction = 'right', index }: { direction: 'left' | 'right'; 
 
 export default function AnnouncementBanner() {
   return (
-    <div className="grid grid-cols-2 rounded-lg bg-amber-500">
+    <div className="grid grid-cols-1 rounded-lg bg-amber-500 md:grid-cols-2">
       {/* Logo Side */}
-      <div className="flex items-center justify-center p-8">
+      <div className="flex items-center justify-center p-4 md:p-8">
         <div className="flex w-full items-center justify-between overflow-hidden rounded-xl bg-amber-400/50 py-8">
           {/* Left Lines Container */}
           <div className="flex h-[150px] flex-1 flex-col justify-between overflow-hidden">
@@ -64,9 +64,9 @@ export default function AnnouncementBanner() {
       </div>
 
       {/* Content Side */}
-      <div className="flex h-[300px] flex-col justify-center p-12">
+      <div className="mb-6 mt-4 flex flex-col items-center justify-center px-6 text-center md:h-[300px] md:items-start md:px-12 md:text-left">
         <h2 className="mb-4 text-3xl font-bold text-anthracite">We are live!</h2>
-        <p className="mb-8 text-xl text-anthracite">
+        <p className="mb-4 text-xl text-anthracite md:mb-8">
           Argot Collective just launched! Read our manifesto to learn more.
         </p>
         <Link
