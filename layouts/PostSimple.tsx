@@ -13,15 +13,16 @@ interface LayoutProps {
   children: ReactNode
   next?: { path: string; title: string }
   prev?: { path: string; title: string }
+  className?: string
 }
 
-export default function PostLayout({ content, next, prev, children }: LayoutProps) {
+export default function PostLayout({ content, next, prev, className, children }: LayoutProps) {
   const { path, slug, date, title } = content
 
   return (
     <>
       <ScrollTopAndComment />
-      <article>
+      <article className={className}>
         <div>
           <header>
             <div className="space-y-1 border-b border-ecru-600 pb-10 text-center dark:border-ecru-300">

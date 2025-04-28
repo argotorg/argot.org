@@ -14,18 +14,19 @@ interface LayoutProps {
   children: ReactNode
   next?: { path: string; title: string }
   prev?: { path: string; title: string }
+  className?: string
 }
 
 const DEFAULT_IMAGE = '/static/argot-banner-default.png'
 
-export default function PostMinimal({ content, next, prev, children }: LayoutProps) {
+export default function PostMinimal({ content, next, prev, children, className }: LayoutProps) {
   const { slug, title, images } = content
   const displayImage = images && images.length > 0 ? images[0] : DEFAULT_IMAGE
 
   return (
     <>
       <ScrollTopAndComment />
-      <article>
+      <article className={className}>
         <div>
           <div className="space-y-1 pb-10 text-center dark:border-gray-700">
             {displayImage !== DEFAULT_IMAGE && (
