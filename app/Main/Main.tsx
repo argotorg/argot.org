@@ -25,8 +25,8 @@ export default function Main() {
         </p>
       </section>
 
-      <section className="space-y-4 py-12 text-xl">
-        <h2 className="text-3xl font-extrabold">Our Projects</h2>
+      <section className="space-y-4 py-12">
+        <h2 className="text-center text-3xl font-extrabold md:text-left">Our Projects</h2>
         <div className="mt-16 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {projects.map((project) => (
             <ProjectCard key={project.title} {...project} />
