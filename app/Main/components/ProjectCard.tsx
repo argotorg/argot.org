@@ -83,14 +83,16 @@ export default function ProjectCard({ title, description, longDescription, url, 
 
             <div className="mb-6 flex items-center gap-4">
               {logo && (
-                <div className="h-12 w-12 overflow-hidden rounded-lg md:h-16 md:w-16">
-                  <Image
-                    src={logo}
-                    alt={`${title} logo`}
-                    className="h-full w-full object-contain"
-                    width={64}
-                    height={64}
-                  />
+                <div className="flex items-center rounded-lg dark:bg-ecru dark:p-4">
+                  <div className="h-12 w-12 overflow-hidden rounded-lg md:h-16 md:w-16">
+                    <Image
+                      src={logo}
+                      alt={`${title} logo`}
+                      className="h-full w-full object-contain"
+                      width={64}
+                      height={64}
+                    />
+                  </div>
                 </div>
               )}
               <h2
