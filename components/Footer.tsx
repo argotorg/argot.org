@@ -4,7 +4,7 @@ import SocialIcon from '@/components/social-icons'
 
 const Footer = () => {
   return (
-    <footer className="mt-auto pb-12">
+    <footer className="mt-auto pb-4">
       <div className="mt-16 flex flex-col">
         <div className="flex items-center justify-between py-4 dark:border-gray-700">
           <div className="flex items-center space-x-4 text-xl font-medium text-anthracite-700 dark:text-ecru-300">
