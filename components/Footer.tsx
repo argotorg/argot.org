@@ -5,10 +5,10 @@ import SocialIcon from '@/components/social-icons'
 const Footer = () => {
   return (
     <footer className="mt-auto pb-4">
-      <div className="mt-16 flex flex-col">
-        <div className="flex items-center justify-between py-4 dark:border-gray-700">
-          <div className="flex items-center space-x-4 text-xl font-medium text-anthracite-700 dark:text-ecru-300">
-            <span className="mr-8 font-bold">ARGOT © {new Date().getFullYear()}</span>
+      <div className="mt-8 flex flex-col md:mt-16">
+        <div className="flex flex-col items-center space-y-4 py-4 dark:border-gray-700 md:flex-row md:items-center md:justify-between md:space-y-0">
+          <div className="flex flex-col items-center space-y-2 text-xl font-medium text-anthracite-700 dark:text-ecru-300 md:flex-row md:space-x-4 md:space-y-0">
+            <span className="font-bold md:mr-8">ARGOT © {new Date().getFullYear()}</span>
             <Link className="link-underline" href="/terms">
               Terms of use
             </Link>
