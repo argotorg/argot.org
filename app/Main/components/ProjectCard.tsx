@@ -42,7 +42,7 @@ export default function ProjectCard({ title, description, longDescription, url, 
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 flex w-screen items-center justify-center">
           {/* Backdrop */}
           <button
             onClick={() => setIsModalOpen(false)}
@@ -83,7 +83,7 @@ export default function ProjectCard({ title, description, longDescription, url, 
 
             <div className="mb-6 flex items-center gap-4">
               {logo && (
-                <div className="h-16 w-16 overflow-hidden rounded-lg">
+                <div className="h-12 w-12 overflow-hidden rounded-lg md:h-16 md:w-16">
                   <Image
                     src={logo}
                     alt={`${title} logo`}
@@ -93,12 +93,17 @@ export default function ProjectCard({ title, description, longDescription, url, 
                   />
                 </div>
               )}
-              <h2 id="modal-title" className="text-3xl font-bold text-anthracite dark:text-ecru">
+              <h2
+                id="modal-title"
+                className="text-2xl font-bold text-anthracite dark:text-ecru md:text-3xl"
+              >
                 {title}
               </h2>
             </div>
 
-            <p className="mb-6 text-lg text-anthracite-400 dark:text-ecru-400">{longDescription}</p>
+            <p className="mb-6 text-anthracite-400 dark:text-ecru-400 md:text-lg">
+              {longDescription}
+            </p>
 
             <div>
               <Link
