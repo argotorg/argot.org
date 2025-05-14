@@ -10,7 +10,7 @@ export default function Hero() {
   const bottomRowCount = 4 // Number of rows for the bottom grid
 
   // Show borders on grid squares during development (set to false for production)
-  const showGridBorders = false
+  const showGridBorders = true
 
   return (
     <section className="relative flex min-h-[60vh] w-full flex-col items-center justify-center">

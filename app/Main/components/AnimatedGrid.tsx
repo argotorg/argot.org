@@ -11,12 +11,7 @@ type AnimatedGridProps = {
   className?: string
 }
 
-type SquareData = {
-  id: string
-  initialColor: 'anthracite' | 'amber' | 'transparent'
-  changeInterval: number
-  animationDuration: number
-}
+type ColorType = 'anthracite' | 'amber' | 'transparent'
 
 export default function AnimatedGrid({
   position,
@@ -26,7 +21,7 @@ export default function AnimatedGrid({
   className = '',
 }: AnimatedGridProps) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const [squareSize, setSquareSize] = useState(20) // Default fallback
+  const [squareSize, setSquareSize] = useState<number | null>(null) // Default fallback
 
   // Update square size when container width changes
   useEffect(() => {
@@ -35,7 +30,7 @@ export default function AnimatedGrid({
     const calculateSquareSize = () => {
       const containerWidth = containerRef.current?.offsetWidth || window.innerWidth
       // Calculate square size to fit exactly columnCount squares
-      const newSize = Math.floor(containerWidth / columnCount)
+      const newSize = containerWidth / columnCount
       setSquareSize(newSize)
     }
 
@@ -49,54 +44,49 @@ export default function AnimatedGrid({
     return () => window.removeEventListener('resize', calculateSquareSize)
   }, [columnCount])
 
-  // Generate grid data
-  const gridData = useMemo(() => {
-    const data: SquareData[][] = []
+  // Generate grid data as a 2D array of colors
+  const gridColors = useMemo(() => {
+    // Create a 2D array initialized with transparent
+    const grid: ColorType[][] = Array(rowCount)
+      .fill(null)
+      .map(() => Array(columnCount).fill('transparent' as ColorType))
 
-    for (let row = 0; row < rowCount; row++) {
-      const rowData: SquareData[] = []
-      for (let col = 0; col < columnCount; col++) {
-        // Randomize initial color and change intervals for organic feel
-        const initialColorRand = Math.random()
-        let initialColor: 'anthracite' | 'amber' | 'transparent' = 'transparent'
-
-        // 10% chance of having a colored square initially
-        if (initialColorRand > 0.9) {
-          initialColor = initialColorRand > 0.95 ? 'amber' : 'anthracite'
+    // For now, we'll just create a simple pattern to verify it works
+    // We can add more complex patterns later
+    if (position === 'top') {
+      // Put a single line of colors in the middle row
+      const middleRow = Math.floor(rowCount / 2)
+      if (rowCount > 1) {
+        for (let col = 0; col < columnCount; col++) {
+          grid[middleRow][col] = col % 3 === 0 ? 'amber' : 'anthracite'
         }
-
-        // Randomize change interval (between 2-6 seconds)
-        const changeInterval = 2000 + Math.random() * 4000
-
-        // Also randomize animation duration (between 0.8-1.2 seconds)
-        const animationDuration = 800 + Math.random() * 400
-
-        rowData.push({
-          id: `${row}-${col}`,
-          initialColor,
-          changeInterval,
-          animationDuration: Math.round(animationDuration),
-        })
       }
-      data.push(rowData)
+    } else {
+      // Put a diagonal pattern in the bottom grid
+      for (let row = 0; row < rowCount; row++) {
+        for (let col = 0; col < columnCount; col++) {
+          if ((row + col) % 5 === 0) {
+            grid[row][col] = 'anthracite'
+          }
+        }
+      }
     }
 
-    return data
-  }, [rowCount, columnCount])
+    return grid
+  }, [rowCount, columnCount, position])
 
   return (
     <div ref={containerRef} className={`w-full overflow-hidden ${className}`}>
       <div className="flex flex-col">
-        {gridData.map((row, rowIndex) => (
+        {gridColors.map((row, rowIndex) => (
           <div key={`row-${rowIndex}`} className="flex flex-row flex-nowrap">
-            {row.map((square) => (
-              <div key={square.id} className="flex-none">
+            {row.map((color, colIndex) => (
+              <div key={`${rowIndex}-${colIndex}`} className="flex-none">
                 <GridSquare
                   size={squareSize}
                   showBorder={showBorders}
-                  initialColor={square.initialColor}
-                  changeInterval={square.changeInterval}
-                  animationDuration={square.animationDuration}
+                  color={color}
+                  animationDuration={800}
                 />
               </div>
             ))}
