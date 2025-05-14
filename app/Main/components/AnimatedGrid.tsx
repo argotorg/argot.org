@@ -16,7 +16,7 @@ type ColorType = 'anthracite' | 'amber' | 'transparent'
 export default function AnimatedGrid({
   position,
   columnCount = 25,
-  rowCount = 4,
+  rowCount = 5,
   showBorders = false,
   className = '',
 }: AnimatedGridProps) {
