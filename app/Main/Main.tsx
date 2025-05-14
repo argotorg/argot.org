@@ -1,19 +1,12 @@
 import ProjectCard from './components/ProjectCard'
 import { projects } from './data/projects'
 import AnnouncementBanner from './components/AnnouncementBanner'
+import Hero from './components/Hero'
 
 export default function Main() {
   return (
     <>
-      <section className="flex min-h-[60vh] w-full items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold leading-tight tracking-tight sm:text-4xl md:text-5xl lg:text-6xl">
-            A credible neutral home
-            <br />
-            for Ethereum infrastructure
-          </h1>
-        </div>
-      </section>
+      <Hero />
 
       <section className="mx-auto min-h-[40vh] max-w-3xl space-y-4 py-12 text-xl">
         <p className="mx-auto max-w-prose text-center">
