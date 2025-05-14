@@ -6,26 +6,25 @@ import AnimatedGrid from './AnimatedGrid'
 export default function Hero() {
   // Configuration for the grid
   const columnCount = 25 // Number of squares horizontally
-  const topRowCount = 4 // Number of rows for the top grid
-  const bottomRowCount = 4 // Number of rows for the bottom grid
+  const rowCount = 5 // Number of rows for the grids
 
   // Show borders on grid squares during development (set to false for production)
   const showGridBorders = true
 
   return (
-    <section className="relative flex min-h-[60vh] w-full flex-col items-center justify-center">
+    <section className="flex w-full flex-col items-center justify-between">
       {/* Top grid */}
-      <div className="absolute left-0 right-0 top-0 w-full">
+      <div className="w-full">
         <AnimatedGrid
           position="top"
           columnCount={columnCount}
-          rowCount={topRowCount}
+          rowCount={rowCount}
           showBorders={showGridBorders}
         />
       </div>
 
       {/* Main content */}
-      <div className="z-10 text-center">
+      <div className="my-8 text-center">
         <h1 className="text-4xl font-bold leading-tight tracking-tight sm:text-4xl md:text-5xl lg:text-6xl">
           A credible neutral home
           <br />
@@ -34,11 +33,11 @@ export default function Hero() {
       </div>
 
       {/* Bottom grid */}
-      <div className="absolute bottom-0 left-0 right-0 w-full">
+      <div className="w-full">
         <AnimatedGrid
           position="bottom"
           columnCount={columnCount}
-          rowCount={bottomRowCount}
+          rowCount={rowCount}
           showBorders={showGridBorders}
         />
       </div>
