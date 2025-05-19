@@ -27,6 +27,12 @@ const directionVectors = {
   left: { dx: -1, dy: 0 },
 }
 
+type Line = {
+  dots: { x: number; y: number }[]
+  length: number
+  direction: Direction
+}
+
 // Function to get orthogonal directions to the current direction
 const getOrthogonalDirections = (dir: Direction): Direction[] => {
   switch (dir) {
@@ -49,46 +55,28 @@ export default function AnimatedGrid({
   const containerRef = useRef<HTMLDivElement>(null)
   const [squareSize, setSquareSize] = useState(20) // Default fallback
   const [grid, setGrid] = useState<SqColor[][] | null>(null)
+  const [lines, setLines] = useState<Line[]>([])
 
-  // Update square size when container width changes
-  useEffect(() => {
-    console.log('containerRef', containerRef.current)
-    if (!containerRef.current) return
+  const isOutsideGrid = useCallback(
+    (x: number, y: number) => {
+      return x < 0 || x >= columnCount || y < 0 || y >= rowCount
+    },
+    [columnCount, rowCount]
+  )
 
-    const calculateSquareSize = () => {
-      const containerWidth = containerRef.current?.offsetWidth || window.innerWidth
-      // Calculate square size to fit exactly columnCount squares
-      const newSize = Math.floor(containerWidth / columnCount)
-      setSquareSize(newSize)
-    }
-
-    // Calculate on mount
-    calculateSquareSize()
-    setGrid(initialLines(rowCount, columnCount))
-
-    // Recalculate when window is resized
-    window.addEventListener('resize', calculateSquareSize)
-
-    // Cleanup
-    return () => window.removeEventListener('resize', calculateSquareSize)
-  }, [columnCount, rowCount])
-
-  const isOutsideGrid = (x: number, y: number) => {
-    return x < 0 || x >= columnCount || y < 0 || y >= rowCount
-  }
-
-  const isFilled = (x: number, y: number, newGrid: SqColor[][]) => {
+  const isFilled = useCallback((x: number, y: number, newGrid: SqColor[][]) => {
     return newGrid[y][x] !== SqColor.Transparent
-  }
+  }, [])
 
   // Function to generate grid with random lines and dots
   const initialLines = useCallback(
-    (rows: number, cols: number): SqColor[][] => {
+    (rows: number, cols: number): Line[] => {
       // Initialize empty grid with transparent squares
       const newGrid: SqColor[][] = Array(rows)
         .fill(null)
         .map(() => Array(cols).fill(SqColor.Transparent))
       console.log('newGrid', newGrid)
+      const newLines: Line[] = []
 
       // Generate random number of lines (4-8)
       // const numLines = 4 + Math.floor(Math.random() * 4)
@@ -127,6 +115,13 @@ export default function AnimatedGrid({
           Math.floor(Math.random() * 4)
         ] as Direction
 
+        // Initialize the line object before using it
+        newLines[i] = {
+          dots: [],
+          length: lineLength,
+          direction,
+        }
+
         // Draw the line
         for (let j = 0; j < lineLength; j++) {
           // When outside grid, take modulo of x and y to wrap around
@@ -135,7 +130,7 @@ export default function AnimatedGrid({
           if (y < 0) y = rows - 1
           if (y >= rows) y = 0
           console.log(`line ${i}, dot ${j} direction:${direction} drawing x:${x},y:${y}`)
-          newGrid[y][x] = SqColor.Anthracite
+          newLines[i].dots.push({ x, y })
 
           // Decide next direction (80% same, 20% orthogonal)
           if (Math.random() < 0.2) {
@@ -150,12 +145,57 @@ export default function AnimatedGrid({
           x += vector.dx
           y += vector.dy
         }
+
+        newLines[i].direction = direction
       }
 
-      return newGrid
+      return newLines
     },
-    [columnCount, rowCount]
+    [isOutsideGrid, isFilled]
   )
+
+  // Update square size when container width changes
+  useEffect(() => {
+    console.log('containerRef', containerRef.current)
+    if (!containerRef.current) return
+
+    const calculateSquareSize = () => {
+      const containerWidth = containerRef.current?.offsetWidth || window.innerWidth
+      // Calculate square size to fit exactly columnCount squares
+      const newSize = Math.floor(containerWidth / columnCount)
+      setSquareSize(newSize)
+    }
+
+    // Calculate on mount
+    calculateSquareSize()
+
+    // Initialize grid
+    const newLines = initialLines(rowCount, columnCount)
+    setLines(newLines)
+
+    // Recalculate when window is resized
+    window.addEventListener('resize', calculateSquareSize)
+
+    // Cleanup
+    return () => window.removeEventListener('resize', calculateSquareSize)
+  }, [columnCount, rowCount, initialLines])
+
+  // Update grid when lines change
+  useEffect(() => {
+    if (lines.length === 0) return
+
+    // Initialize empty grid with transparent squares
+    const newGrid: SqColor[][] = Array(rowCount)
+      .fill(null)
+      .map(() => Array(columnCount).fill(SqColor.Transparent))
+
+    for (const line of lines) {
+      for (const dot of line.dots) {
+        newGrid[dot.y][dot.x] = SqColor.Anthracite
+      }
+    }
+    setGrid(newGrid)
+  }, [lines, rowCount, columnCount])
 
   return (
     <div ref={containerRef} className={`w-full overflow-hidden ${className}`}>
