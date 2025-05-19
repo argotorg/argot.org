@@ -7,6 +7,7 @@ type GridSquareProps = {
   showBorder?: boolean
   color: SqColor
   animationDuration?: number
+  className?: string
 }
 
 export default function GridSquare({
@@ -14,6 +15,7 @@ export default function GridSquare({
   showBorder = false,
   color = SqColor.Transparent,
   animationDuration = 800,
+  className = '',
 }: GridSquareProps) {
   if (!size) {
     return null
@@ -42,6 +44,7 @@ export default function GridSquare({
         ${getBackgroundColor()}
         transition-colors
         ${showBorder ? 'border border-red-500' : ''}
+        ${className}
       `}
     />
   )

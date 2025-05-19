@@ -57,6 +57,45 @@ export default function AnimatedGrid({
   const [grid, setGrid] = useState<SqColor[][] | null>(null)
   const [lines, setLines] = useState<Line[]>([])
 
+  // Function to move a single line
+  const moveLine = useCallback(
+    (line: Line): Line => {
+      // Get the first dot (head of the line)
+      const head = line.dots[0]
+      const vector = directionVectors[line.direction]
+
+      // Calculate new head position
+      let newX = head.x + vector.dx
+      let newY = head.y + vector.dy
+
+      // Wrap around edges
+      if (newX < 0) newX = columnCount - 1
+      if (newX >= columnCount) newX = 0
+      if (newY < 0) newY = rowCount - 1
+      if (newY >= rowCount) newY = 0
+
+      // Create new dots array with new head and all dots except the last one
+      const newDots = [{ x: newX, y: newY }, ...line.dots.slice(0, -1)]
+
+      return {
+        ...line,
+        dots: newDots,
+      }
+    },
+    [columnCount, rowCount]
+  )
+
+  // Animation effect
+  useEffect(() => {
+    if (lines.length === 0) return
+
+    const interval = setInterval(() => {
+      setLines((currentLines) => currentLines.map((line) => moveLine(line)))
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [lines.length, moveLine])
+
   const isOutsideGrid = useCallback(
     (x: number, y: number) => {
       return x < 0 || x >= columnCount || y < 0 || y >= rowCount
@@ -209,7 +248,8 @@ export default function AnimatedGrid({
                     size={squareSize}
                     showBorder={showBorders}
                     color={color}
-                    animationDuration={800}
+                    animationDuration={300}
+                    className="transition-all ease-linear"
                   />
                 </div>
               ))}
