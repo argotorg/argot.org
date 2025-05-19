@@ -1,16 +1,18 @@
 'use client'
 
+import { SqColor } from './AnimatedGrid'
+
 type GridSquareProps = {
   size: number | null
   showBorder?: boolean
-  color: 'anthracite' | 'amber' | 'transparent'
+  color: SqColor
   animationDuration?: number
 }
 
 export default function GridSquare({
   size,
   showBorder = false,
-  color = 'transparent',
+  color = SqColor.Transparent,
   animationDuration = 800,
 }: GridSquareProps) {
   if (!size) {
@@ -19,11 +21,11 @@ export default function GridSquare({
 
   const getBackgroundColor = () => {
     switch (color) {
-      case 'anthracite':
+      case SqColor.Anthracite:
         return 'bg-anthracite dark:bg-anthracite-600'
-      case 'amber':
+      case SqColor.Amber:
         return 'bg-amber-500'
-      case 'transparent':
+      case SqColor.Transparent:
       default:
         return 'bg-transparent'
     }

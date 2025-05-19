@@ -33,14 +33,14 @@ export default function Hero() {
       </div>
 
       {/* Bottom grid */}
-      <div className="w-full">
+      {/* <div className="w-full">
         <AnimatedGrid
           position="bottom"
           columnCount={columnCount}
           rowCount={rowCount}
           showBorders={showGridBorders}
         />
-      </div>
+      </div> */}
     </section>
   )
 }
