@@ -1,26 +1,18 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import AnimatedGrid from './AnimatedGrid'
+import AnimatedLines from './AnimatedLines'
 
 export default function Hero() {
   // Configuration for the grid
   const columnCount = 25 // Number of squares horizontally
   const rowCount = 5 // Number of rows for the grids
 
-  // Show borders on grid squares during development (set to false for production)
-  const showGridBorders = true
-
   return (
     <section className="flex w-full flex-col items-center justify-between">
       {/* Top grid */}
       <div className="w-full">
-        <AnimatedGrid
-          position="top"
-          columnCount={columnCount}
-          rowCount={rowCount}
-          showBorders={showGridBorders}
-        />
+        <AnimatedLines position="top" columnCount={columnCount} rowCount={rowCount} />
       </div>
 
       {/* Main content */}
@@ -33,14 +25,9 @@ export default function Hero() {
       </div>
 
       {/* Bottom grid */}
-      {/* <div className="w-full">
-        <AnimatedGrid
-          position="bottom"
-          columnCount={columnCount}
-          rowCount={rowCount}
-          showBorders={showGridBorders}
-        />
-      </div> */}
+      <div className="w-full">
+        <AnimatedLines position="bottom" columnCount={columnCount} rowCount={rowCount} />
+      </div>
     </section>
   )
 }
