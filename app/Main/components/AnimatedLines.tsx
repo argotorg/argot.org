@@ -43,7 +43,7 @@ export default function AnimatedLines({
     })
   }
 
-  // Check if a line's new position would overlap with any other line
+  // Check if a line's new position would overlap with any other line or go out of bounds
   const wouldOverlap = (newLine: Line, lines: Line[]) => {
     const { x, y, isHorizontal, length } = newLine
 
@@ -153,49 +153,18 @@ export default function AnimatedLines({
           const maxAttempts = 10
 
           do {
-            // Random movement (-1, 0, or 1 unit)
-            let moveX, moveY
-            if (line.isHorizontal) {
-              // 25% chance to move vertically
-              if (Math.random() < 0.25) {
-                moveX = 0
-                // Ensure vertical movement stays within bounds
-                const newY = line.y + (Math.floor(Math.random() * 3) - 1)
-                moveY = newY < 0 ? 0 : newY >= rowCount - 1 ? 0 : Math.floor(Math.random() * 3) - 1
-              } else {
-                // Ensure horizontal movement stays within bounds
-                const newX = line.x + (Math.floor(Math.random() * 3) - 1)
-                moveX =
-                  newX < 0
-                    ? 0
-                    : newX + line.length > columnCount
-                      ? 0
-                      : Math.floor(Math.random() * 3) - 1
-                moveY = 0
-              }
-            } else {
-              // 25% chance to move horizontally
-              if (Math.random() < 0.25) {
-                // Ensure horizontal movement stays within bounds
-                const newX = line.x + (Math.floor(Math.random() * 3) - 1)
-                moveX =
-                  newX < 0 ? 0 : newX >= columnCount - 1 ? 0 : Math.floor(Math.random() * 3) - 1
-                moveY = 0
-              } else {
-                moveX = 0
-                // Ensure vertical movement stays within bounds
-                const newY = line.y + (Math.floor(Math.random() * 3) - 1)
-                moveY =
-                  newY < 0
-                    ? 0
-                    : newY + line.length > rowCount
-                      ? 0
-                      : Math.floor(Math.random() * 3) - 1
-              }
-            }
+            // Calculate movement for a line
+            const calculateMovement = (isHorizontal: boolean) => ({
+              moveX: isHorizontal
+                ? calculatePrimaryMovement(line.x, line.length, columnCount - 1)
+                : calculateSecondaryMovement(line.x, columnCount - 1),
+              moveY: isHorizontal
+                ? calculateSecondaryMovement(line.y, rowCount - 1)
+                : calculatePrimaryMovement(line.y, line.length, rowCount - 1),
+            })
 
-            // Random length between 1 and 5
-            newLength = 1 + Math.floor(Math.random() * 5)
+            const { moveX, moveY } = calculateMovement(line.isHorizontal)
+            newLength = randomLength()
 
             // If length is 1, randomly reassign orientation with 75% chance of being horizontal
             newIsHorizontal = newLength === 1 ? Math.random() < 0.75 : line.isHorizontal
@@ -246,7 +215,7 @@ export default function AnimatedLines({
   return (
     <div
       ref={containerRef}
-      className={`relative ${className} overflow-hidden border border-red-500`}
+      className={`relative ${className} border border-red-500`}
       style={{
         width: '100%',
         height: rowCount * squareSize,
@@ -271,4 +240,59 @@ export default function AnimatedLines({
       ))}
     </div>
   )
+}
+
+function calculatePrimaryMovement(current: number, length: number, max: number) {
+  // Random movement (-1, 0, or 1 unit)
+  const move = Math.floor(Math.random() * 3) - 1
+  const newPos = current + move
+  // If position is less than 0, return 0
+  if (newPos < 0) return 0
+
+  // If position plus length exceeds max, return 0
+  if (newPos + length > max) return 0
+
+  return move
+}
+
+function calculateSecondaryMovement(current: number, max: number) {
+  // 25% chance to move in opposite direction
+  if (Math.random() < 0.25) {
+    // Calculate new position. Either -1 or +1 since we already had 25% random movement
+    const move = Math.random() < 0.5 ? -1 : 1
+    const newPos = current + move
+
+    // If new position is less than 0, return 0
+    if (newPos < 0) return 0
+
+    // If new position exceeds max, return 0
+    if (newPos >= max) return 0
+
+    return move
+  }
+  // no movement
+  return 0
+}
+
+function randomLength() {
+  let newLength
+  // Random length between 1 and 5 with weighted probabilities
+  const random = Math.random()
+  if (random < 0.1) {
+    // 10% chance for length 1
+    newLength = 1
+  } else if (random < 0.25) {
+    // 15% chance for length 2
+    newLength = 2
+  } else if (random < 0.55) {
+    // 30% chance for length 3
+    newLength = 3
+  } else if (random < 0.8) {
+    // 25% chance for length 4
+    newLength = 4
+  } else {
+    // 20% chance for length 5
+    newLength = 5
+  }
+  return newLength
 }
