@@ -85,7 +85,7 @@ export default function AnimatedLines({
     const calculateSquareSize = () => {
       const containerWidth = containerRef.current?.offsetWidth || window.innerWidth
       // Calculate square size to fit exactly columnCount squares
-      const newSize = Math.floor(containerWidth / columnCount)
+      const newSize = containerWidth / columnCount
       setSquareSize(newSize)
     }
 
