@@ -159,19 +159,38 @@ export default function AnimatedLines({
               // 25% chance to move vertically
               if (Math.random() < 0.25) {
                 moveX = 0
-                moveY = Math.floor(Math.random() * 3) - 1
+                // Ensure vertical movement stays within bounds
+                const newY = line.y + (Math.floor(Math.random() * 3) - 1)
+                moveY = newY < 0 ? 0 : newY >= rowCount - 1 ? 0 : Math.floor(Math.random() * 3) - 1
               } else {
-                moveX = Math.floor(Math.random() * 3) - 1
+                // Ensure horizontal movement stays within bounds
+                const newX = line.x + (Math.floor(Math.random() * 3) - 1)
+                moveX =
+                  newX < 0
+                    ? 0
+                    : newX + line.length > columnCount
+                      ? 0
+                      : Math.floor(Math.random() * 3) - 1
                 moveY = 0
               }
             } else {
               // 25% chance to move horizontally
               if (Math.random() < 0.25) {
-                moveX = Math.floor(Math.random() * 3) - 1
+                // Ensure horizontal movement stays within bounds
+                const newX = line.x + (Math.floor(Math.random() * 3) - 1)
+                moveX =
+                  newX < 0 ? 0 : newX >= columnCount - 1 ? 0 : Math.floor(Math.random() * 3) - 1
                 moveY = 0
               } else {
                 moveX = 0
-                moveY = Math.floor(Math.random() * 3) - 1
+                // Ensure vertical movement stays within bounds
+                const newY = line.y + (Math.floor(Math.random() * 3) - 1)
+                moveY =
+                  newY < 0
+                    ? 0
+                    : newY + line.length > rowCount
+                      ? 0
+                      : Math.floor(Math.random() * 3) - 1
               }
             }
 
@@ -184,6 +203,13 @@ export default function AnimatedLines({
             // Calculate new position
             newX = line.x + moveX
             newY = line.y + moveY
+
+            // Ensure the new position and length don't exceed grid boundaries
+            if (newIsHorizontal) {
+              if (newX + newLength > columnCount) newX = columnCount - newLength
+            } else {
+              if (newY + newLength > rowCount) newY = rowCount - newLength
+            }
 
             attempts++
           } while (
