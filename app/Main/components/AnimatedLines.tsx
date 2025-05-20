@@ -154,8 +154,26 @@ export default function AnimatedLines({
 
           do {
             // Random movement (-1, 0, or 1 unit)
-            const moveX = line.isHorizontal ? Math.floor(Math.random() * 3) - 1 : 0
-            const moveY = line.isHorizontal ? 0 : Math.floor(Math.random() * 3) - 1
+            let moveX, moveY
+            if (line.isHorizontal) {
+              // 25% chance to move vertically
+              if (Math.random() < 0.25) {
+                moveX = 0
+                moveY = Math.floor(Math.random() * 3) - 1
+              } else {
+                moveX = Math.floor(Math.random() * 3) - 1
+                moveY = 0
+              }
+            } else {
+              // 25% chance to move horizontally
+              if (Math.random() < 0.25) {
+                moveX = Math.floor(Math.random() * 3) - 1
+                moveY = 0
+              } else {
+                moveX = 0
+                moveY = Math.floor(Math.random() * 3) - 1
+              }
+            }
 
             // Random length between 1 and 5
             newLength = 1 + Math.floor(Math.random() * 5)
