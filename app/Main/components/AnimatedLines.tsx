@@ -156,11 +156,11 @@ export default function AnimatedLines({
             // Calculate movement for a line
             const calculateMovement = (isHorizontal: boolean) => ({
               moveX: isHorizontal
-                ? calculatePrimaryMovement(line.x, line.length, columnCount - 1)
-                : calculateSecondaryMovement(line.x, columnCount - 1),
+                ? calculatePrimaryMovement(line.x, line.length, columnCount)
+                : calculateSecondaryMovement(line.x, columnCount),
               moveY: isHorizontal
-                ? calculateSecondaryMovement(line.y, rowCount - 1)
-                : calculatePrimaryMovement(line.y, line.length, rowCount - 1),
+                ? calculateSecondaryMovement(line.y, rowCount)
+                : calculatePrimaryMovement(line.y, line.length, rowCount),
             })
 
             const { moveX, moveY } = calculateMovement(line.isHorizontal)
@@ -215,7 +215,7 @@ export default function AnimatedLines({
   return (
     <div
       ref={containerRef}
-      className={`relative ${className} border border-red-500`}
+      className={`relative ${className}`}
       style={{
         width: '100%',
         height: rowCount * squareSize,

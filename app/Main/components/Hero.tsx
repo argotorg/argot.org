@@ -16,9 +16,9 @@ export default function Hero() {
       </div>
 
       {/* Main content */}
-      <div className="my-1 text-center">
+      <div className="my-8 text-center">
         <h1 className="text-4xl font-bold leading-tight tracking-tight sm:text-4xl md:text-5xl lg:text-6xl">
-          A credible neutral home
+          A credibly neutral home
           <br />
           for Ethereum infrastructure
         </h1>
