@@ -58,3 +58,47 @@ input:-webkit-autofill:focus {
   display: inline-block;
   vertical-align: middle;
 }
+
+/* Line animation styles */
+@keyframes slide-right {
+  0% {
+    transform: translateX(-50%);
+  }
+  50% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes slide-left {
+  0% {
+    transform: translateX(0%);
+  }
+  50% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+.animate-slide-right {
+  animation: slide-right 60s linear infinite;
+}
+
+.animate-slide-left {
+  animation: slide-left 60s linear infinite;
+}
+
+.link-underline {
+  background-image: linear-gradient(transparent calc(100% - 3px), #d49b3f 3px);
+  background-repeat: no-repeat;
+  background-size: 0% 100%;
+  transition: background-size 0.3s;
+}
+
+.link-underline:hover {
+  background-size: 100% 100%;
+}
