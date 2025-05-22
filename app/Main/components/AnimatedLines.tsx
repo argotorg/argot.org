@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { useState, useEffect, useRef } from 'react'
+import { useTheme } from 'next-themes'
 
 type AnimatedLinesProps = {
   position: 'top' | 'bottom'
@@ -16,7 +17,7 @@ type Line = {
   y: number
   isHorizontal: boolean
   length: number
-  color: 'anthracite' | 'amber'
+  color: 'anthracite' | 'amber' | 'ecru'
 }
 
 export default function AnimatedLines({
@@ -28,6 +29,13 @@ export default function AnimatedLines({
   const containerRef = useRef<HTMLDivElement>(null)
   const [squareSize, setSquareSize] = useState(20) // Default fallback
   const [lines, setLines] = useState<Line[]>([])
+  const { theme } = useTheme()
+  const [lineColor, setLineColor] = useState<'ecru' | 'anthracite'>('anthracite')
+
+  // Update line color when theme changes
+  useEffect(() => {
+    setLineColor(theme === 'dark' ? 'ecru' : 'anthracite')
+  }, [theme])
 
   // Check if a position is occupied by any line
   const isPositionOccupied = (x: number, y: number, currentLineId: string, lines: Line[]) => {
@@ -120,7 +128,14 @@ export default function AnimatedLines({
         attempts++
       } while (
         wouldOverlap(
-          { id: `line-${i}`, x, y, isHorizontal, length, color: 'anthracite' },
+          {
+            id: `line-${i}`,
+            x,
+            y,
+            isHorizontal,
+            length,
+            color: lineColor,
+          },
           initialLines
         ) &&
         attempts < maxAttempts
@@ -135,12 +150,12 @@ export default function AnimatedLines({
         y,
         isHorizontal,
         length,
-        color: 'anthracite',
+        color: length === 1 ? 'amber' : lineColor,
       })
     }
 
     setLines(initialLines)
-  }, [columnCount, rowCount])
+  }, [columnCount, rowCount, lineColor])
 
   // Move lines randomly
   useEffect(() => {
@@ -203,14 +218,14 @@ export default function AnimatedLines({
             y: newY,
             length: newLength,
             isHorizontal: newIsHorizontal,
-            color: isSquare ? 'amber' : 'anthracite',
+            color: isSquare ? 'amber' : lineColor,
           }
         })
       )
     }, 1000) // Move every second
 
     return () => clearInterval(interval)
-  }, [columnCount, rowCount])
+  }, [columnCount, rowCount, lineColor])
 
   return (
     <div
@@ -230,7 +245,8 @@ export default function AnimatedLines({
             y: line.y * squareSize,
             width: line.isHorizontal ? line.length * squareSize : squareSize,
             height: line.isHorizontal ? squareSize : line.length * squareSize,
-            backgroundColor: line.color === 'amber' ? '#D49B3F' : '#2D2725',
+            backgroundColor:
+              line.color === 'amber' ? '#D49B3F' : line.color === 'ecru' ? '#EADBCA' : '#2D2725',
           }}
           transition={{
             duration: 0.3,
