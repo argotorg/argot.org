@@ -273,7 +273,7 @@ function calculatePrimaryMovement(current: number, length: number, max: number) 
 
 function calculateSecondaryMovement(current: number, max: number) {
   // 25% chance to move in opposite direction
-  if (Math.random() < 0.25) {
+  if (Math.random() < 0.1) {
     // Calculate new position. Either -1 or +1 since we already had 25% random movement
     const move = Math.random() < 0.5 ? -1 : 1
     const newPos = current + move
