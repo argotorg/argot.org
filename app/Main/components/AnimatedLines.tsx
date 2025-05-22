@@ -198,7 +198,7 @@ export default function AnimatedLines({
             newLength = randomLength()
 
             // If length is 1, randomly reassign orientation with 75% chance of being horizontal
-            newIsHorizontal = newLength === 1 ? Math.random() < 0.9 : line.isHorizontal
+            newIsHorizontal = newLength === 1 ? Math.random() < 0.75 : line.isHorizontal
 
             // Calculate new position
             newX = line.x + moveX
