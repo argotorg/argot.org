@@ -182,7 +182,7 @@ export default function AnimatedLines({
             newLength = randomLength()
 
             // If length is 1, randomly reassign orientation with 75% chance of being horizontal
-            newIsHorizontal = newLength === 1 ? Math.random() < 0.75 : line.isHorizontal
+            newIsHorizontal = newLength === 1 ? Math.random() < 0.9 : line.isHorizontal
 
             // Calculate new position
             newX = line.x + moveX
@@ -222,7 +222,7 @@ export default function AnimatedLines({
           }
         })
       )
-    }, 1000) // Move every second
+    }, 1250) // Move every 1.25 second
 
     return () => clearInterval(interval)
   }, [columnCount, rowCount, lineColor])
@@ -273,7 +273,7 @@ function calculatePrimaryMovement(current: number, length: number, max: number) 
 
 function calculateSecondaryMovement(current: number, max: number) {
   // 25% chance to move in opposite direction
-  if (Math.random() < 0.1) {
+  if (Math.random() < 0.0) {
     // Calculate new position. Either -1 or +1 since we already had 25% random movement
     const move = Math.random() < 0.5 ? -1 : 1
     const newPos = current + move
@@ -294,14 +294,14 @@ function randomLength() {
   let newLength
   // Random length between 1 and 5 with weighted probabilities
   const random = Math.random()
-  if (random < 0.1) {
+  if (random < 0.05) {
     // 10% chance for length 1
     newLength = 1
-  } else if (random < 0.25) {
+  } else if (random < 0.2) {
     // 15% chance for length 2
     newLength = 2
   } else if (random < 0.55) {
-    // 30% chance for length 3
+    // 35% chance for length 3
     newLength = 3
   } else if (random < 0.8) {
     // 25% chance for length 4
