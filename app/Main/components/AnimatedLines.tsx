@@ -111,6 +111,7 @@ export default function AnimatedLines({
   useEffect(() => {
     const initialLines: Line[] = []
     const numLines = 8
+    const usedRows = new Set<number>()
 
     for (let i = 0; i < numLines; i++) {
       // 75% chance of being horizontal
@@ -124,7 +125,22 @@ export default function AnimatedLines({
 
       do {
         x = Math.floor(Math.random() * (columnCount - (isHorizontal ? length : 1)))
-        y = Math.floor(Math.random() * (rowCount - (isHorizontal ? 1 : length)))
+
+        // For horizontal lines, try to use an unused row first
+        if (isHorizontal && usedRows.size < rowCount) {
+          // Find first unused row
+          for (let row = 0; row < rowCount; row++) {
+            if (!usedRows.has(row)) {
+              y = row
+              usedRows.add(row)
+              break
+            }
+          }
+        } else {
+          // If all rows are used or it's a vertical line, use random position
+          y = Math.floor(Math.random() * (rowCount - (isHorizontal ? 1 : length)))
+        }
+
         attempts++
       } while (
         wouldOverlap(
@@ -150,7 +166,7 @@ export default function AnimatedLines({
         y,
         isHorizontal,
         length,
-        color: length === 1 ? 'amber' : lineColor,
+        color: lineColor,
       })
     }
 
