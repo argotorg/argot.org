@@ -37,7 +37,7 @@ Edit the layout in `app` or content in `data`. With live reloading, the pages au
 
 ## Adding blog posts
 
-You can write blog posts in Extended Markdown (`.mdx`) format nicely. Create a `.mdx` file under `data/blog`. The file name will be the slug of the post. E.g. if you create `my-blog-post.mdx` the post will be at `powdr.org/blog/my-blog.post.mdx`. Alternatively you can create a folder `/my-blog-post` and add an `my-blog-post/index.mdx`.
+You can write blog posts in Extended Markdown (`.mdx`) format nicely. Create a `.mdx` file under `data/blog`. The file name will be the slug of the post. E.g. if you create `my-blog-post.mdx` the post will be at `argot.org/blog/my-blog.post.mdx`. Alternatively you can create a folder `/my-blog-post` and add an `my-blog-post/index.mdx`.
 
 Easisest is to check out some examples. See https://tailwind-nextjs-starter-blog.vercel.app/ for example posts. Source code of the posts are [here](https://github.com/timlrx/tailwind-nextjs-starter-blog/tree/main/data/blog).
 
@@ -61,7 +61,7 @@ Each post must contain a `title` and a `date`, rest is optional.
 Some additional notes about blog posts:
 
 - you can set `draft:true` to see it in your developement environment but not publish it.
-- The default author is "Powdr Labs", you can add additional authors in `data/authors` and refer them in `authors` in the frontmatter.
+- The default author is "Argot Collective", you can add additional authors in `data/authors` and refer them in `authors` in the frontmatter.
 - The default post layout is `PostLayout`. You can see the layouts in directory `layouts/`.
   To have a post with a banner image use `layout: PostBanner` and add images (typically only one image) in `images: ['/static/images/canada/mountains.jpg']`. The images should be under the directory `public/static`.
 
