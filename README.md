@@ -60,7 +60,8 @@ Each post must contain a `title` and a `date`, rest is optional.
 
 Some additional notes about blog posts:
 
-- you can set `draft:true` to see it in your developement environment but not publish it.
+
+- you can set `draft:true` to see it in your development environment but not publish it.
 - The default author is "Argot Collective", you can add additional authors in `data/authors` and refer them in `authors` in the frontmatter.
 - The default post layout is `PostLayout`. You can see the layouts in directory `layouts/`.
   To have a post with a banner image use `layout: PostBanner` and add images (typically only one image) in `images: ['/static/images/canada/mountains.jpg']`. The images should be under the directory `public/static`.
