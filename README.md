@@ -60,6 +60,7 @@ Each post must contain a `title` and a `date`, rest is optional.
 
 Some additional notes about blog posts:
 
+
 - you can set `draft:true` to see it in your development environment but not publish it.
 - The default author is "Argot Collective", you can add additional authors in `data/authors` and refer them in `authors` in the frontmatter.
 - The default post layout is `PostLayout`. You can see the layouts in directory `layouts/`.
