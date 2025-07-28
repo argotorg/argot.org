@@ -103,7 +103,7 @@ export default function ProjectCard({ title, description, longDescription, url, 
               </h2>
             </div>
 
-            <p className="mb-6 text-anthracite-400 dark:text-ecru-400 md:text-lg">
+            <p className="mb-6 whitespace-pre-line text-anthracite-400 dark:text-ecru-400 md:text-lg">
               {longDescription}
             </p>
 
