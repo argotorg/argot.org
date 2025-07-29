@@ -8,6 +8,7 @@ import Link from '@/components/Link'
 import PageTitle from '@/components/PageTitle'
 import siteMetadata from '@/data/siteMetadata'
 import ScrollTopAndComment from '@/components/ScrollTopAndComment'
+import { formatDate } from 'pliny/utils/formatDate'
 
 interface LayoutProps {
   content: CoreContent<Blog>
@@ -20,7 +21,7 @@ interface LayoutProps {
 const DEFAULT_IMAGE = '/static/argot-banner-default.png'
 
 export default function PostMinimal({ content, next, prev, children, className }: LayoutProps) {
-  const { slug, title, images } = content
+  const { slug, title, images, date } = content
   const displayImage = images && images.length > 0 ? images[0] : DEFAULT_IMAGE
 
   return (
@@ -41,6 +42,14 @@ export default function PostMinimal({ content, next, prev, children, className }
             <div className="relative pt-10">
               <PageTitle>{title}</PageTitle>
             </div>
+            <dl>
+              <div>
+                <dt className="sr-only">Published on</dt>
+                <dd className="text-base font-medium leading-6 text-anthracite-300 dark:text-ecru-400">
+                  <time dateTime={date}>{formatDate(date, siteMetadata.locale)}</time>
+                </dd>
+              </div>
+            </dl>
           </div>
           <div className="prose max-w-none py-4 dark:prose-invert">{children}</div>
           {siteMetadata.comments && (
