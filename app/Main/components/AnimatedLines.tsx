@@ -181,34 +181,69 @@ export default function AnimatedLines({
           // Try to find a valid new position
           let newX, newY, newLength, newIsHorizontal
           let attempts = 0
-          const maxAttempts = 10
+          const maxAttempts = 20 // Increased from 10 to handle larger movement ranges
 
           do {
-            // Calculate movement for a line
+            // Calculate movement for a line - respect orientation unless it's a dot
+            const isDot = line.length === 1
             const calculateMovement = (isHorizontal: boolean) => ({
-              moveX: isHorizontal
-                ? calculatePrimaryMovement(line.x, line.length, columnCount)
-                : calculateSecondaryMovement(line.x, columnCount),
-              moveY: isHorizontal
-                ? calculateSecondaryMovement(line.y, rowCount)
-                : calculatePrimaryMovement(line.y, line.length, rowCount),
+              moveX: isDot 
+                ? calculateSecondaryMovement(line.x, columnCount) // Dots can move in any direction
+                : isHorizontal
+                ? calculatePrimaryMovement(line.x, line.length, columnCount) // Horizontal lines move horizontally
+                : 0, // Vertical lines don't move horizontally
+              moveY: isDot
+                ? calculateSecondaryMovement(line.y, rowCount) // Dots can move in any direction  
+                : isHorizontal
+                ? 0 // Horizontal lines don't move vertically
+                : calculatePrimaryMovement(line.y, line.length, rowCount), // Vertical lines move vertically
             })
 
             const { moveX, moveY } = calculateMovement(line.isHorizontal)
-            newLength = randomLength()
+            
+            // 60% chance to change length, allowing more dynamic growth/shrinking
+            const shouldChangeLength = Math.random() < 0.6
+            if (shouldChangeLength) {
+              newLength = randomLength()
+            } else {
+              newLength = line.length
+            }
 
             // If length is 1, randomly reassign orientation with 75% chance of being horizontal
             newIsHorizontal = newLength === 1 ? Math.random() < 0.75 : line.isHorizontal
 
-            // Calculate new position
-            newX = line.x + moveX
-            newY = line.y + moveY
+            // Allow bidirectional growth/shrinking
+            // 50% chance to grow/shrink from the beginning vs the end
+            const growFromStart = Math.random() < 0.5
+            
+            if (shouldChangeLength && newLength !== line.length) {
+              if (growFromStart && newLength < line.length) {
+                // Shrinking from start: move position forward
+                const shrinkAmount = line.length - newLength
+                newX = line.x + moveX + (line.isHorizontal ? shrinkAmount : 0)
+                newY = line.y + moveY + (!line.isHorizontal ? shrinkAmount : 0)
+              } else {
+                // Growing from start or shrinking/growing from end
+                newX = line.x + moveX
+                newY = line.y + moveY
+              }
+            } else {
+              // Normal movement without length change
+              newX = line.x + moveX
+              newY = line.y + moveY
+            }
 
             // Ensure the new position and length don't exceed grid boundaries
             if (newIsHorizontal) {
-              if (newX + newLength > columnCount) newX = columnCount - newLength
+              if (newX + newLength > columnCount) {
+                newX = Math.max(0, columnCount - newLength)
+              }
+              if (newX < 0) newX = 0
             } else {
-              if (newY + newLength > rowCount) newY = rowCount - newLength
+              if (newY + newLength > rowCount) {
+                newY = Math.max(0, rowCount - newLength)
+              }
+              if (newY < 0) newY = 0
             }
 
             attempts++
@@ -275,34 +310,51 @@ export default function AnimatedLines({
 }
 
 function calculatePrimaryMovement(current: number, length: number, max: number) {
-  // Random movement (-1, 0, or 1 unit)
-  const move = Math.floor(Math.random() * 3) - 1
+  // 75% chance for small movement (-1, 0, 1), 25% chance for larger jump (-2 to 2)
+  const isLargeMove = Math.random() < 0.25
+  
+  let move
+  if (isLargeMove) {
+    // Larger movement range: -2 to +2 (reduced for better collision avoidance)
+    move = Math.floor(Math.random() * 5) - 2
+  } else {
+    // Small movement: -1, 0, or +1
+    move = Math.floor(Math.random() * 3) - 1
+  }
+  
   const newPos = current + move
-  // If position is less than 0, return 0
-  if (newPos < 0) return 0
-
-  // If position plus length exceeds max, return 0
-  if (newPos + length > max) return 0
-
+  
+  // Check bounds
+  if (newPos < 0) return -current // Move to edge if out of bounds
+  if (newPos + length > max) return max - length - current // Move to fit within bounds
+  
   return move
 }
 
 function calculateSecondaryMovement(current: number, max: number) {
-  // 25% chance to move in opposite direction
-  if (Math.random() < 0.0) {
-    // Calculate new position. Either -1 or +1 since we already had 25% random movement
-    const move = Math.random() < 0.5 ? -1 : 1
+  // 30% chance for movement (balanced for more dynamic but controlled motion)
+  if (Math.random() < 0.3) {
+    // 85% chance for small move, 15% chance for larger jump  
+    const isLargeMove = Math.random() < 0.15
+    
+    let move
+    if (isLargeMove) {
+      // Larger secondary movement: -2 to +2
+      move = Math.floor(Math.random() * 5) - 2
+    } else {
+      // Small movement: -1 or +1
+      move = Math.random() < 0.5 ? -1 : 1
+    }
+    
     const newPos = current + move
 
-    // If new position is less than 0, return 0
-    if (newPos < 0) return 0
-
-    // If new position exceeds max, return 0
-    if (newPos >= max) return 0
+    // Check bounds
+    if (newPos < 0) return -current
+    if (newPos >= max) return max - 1 - current
 
     return move
   }
-  // no movement
+  // No movement
   return 0
 }
 
