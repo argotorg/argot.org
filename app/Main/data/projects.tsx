@@ -47,6 +47,7 @@ export const projects: Project[] = [
       </>
     ),
     url: 'https://github.com/ethereum/act',
+    logo: '/static/projects/act.svg',
   },
   {
     title: 'Ethdebug',
