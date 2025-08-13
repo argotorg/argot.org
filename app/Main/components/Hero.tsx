@@ -16,11 +16,11 @@ export default function Hero() {
       </div>
 
       {/* Main content */}
-      <div className="mb-6 mt-4 text-center">
+      <div className="mb-10 mt-10 text-center">
         <h1 className="text-3xl font-bold leading-tight tracking-tight sm:text-4xl md:text-5xl lg:text-6xl">
-          A credibly neutral home
+          Building the critical infrastructure
           <br />
-          for Ethereum infrastructure
+          Ethereum applications rely on.
         </h1>
       </div>
 

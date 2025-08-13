@@ -110,7 +110,7 @@ export default function AnimatedLines({
   // Initialize lines
   useEffect(() => {
     const initialLines: Line[] = []
-    const numLines = 8
+    const numLines = 5
     const usedRows = new Set<number>()
 
     for (let i = 0; i < numLines; i++) {
@@ -211,28 +211,28 @@ export default function AnimatedLines({
               newLength = line.length
             }
 
-            // If length is 1, randomly reassign orientation with 75% chance of being horizontal
-            newIsHorizontal = newLength === 1 ? Math.random() < 0.75 : line.isHorizontal
-
-            // Allow bidirectional growth/shrinking
-            // 50% chance to grow/shrink from the beginning vs the end
-            const growFromStart = Math.random() < 0.5
-
-            if (shouldChangeLength && newLength !== line.length) {
-              if (growFromStart && newLength < line.length) {
-                // Shrinking from start: move position forward
-                const shrinkAmount = line.length - newLength
-                newX = line.x + moveX + (line.isHorizontal ? shrinkAmount : 0)
-                newY = line.y + moveY + (!line.isHorizontal ? shrinkAmount : 0)
-              } else {
-                // Growing from start or shrinking/growing from end
-                newX = line.x + moveX
-                newY = line.y + moveY
-              }
+            // Only dots (length 1) can change orientation, others keep their orientation
+            if (newLength === 1) {
+              // Dots can have random orientation with 75% chance of being horizontal
+              newIsHorizontal = Math.random() < 0.75
             } else {
-              // Normal movement without length change
-              newX = line.x + moveX
-              newY = line.y + moveY
+              // Non-dots must keep their original orientation
+              newIsHorizontal = line.isHorizontal
+            }
+
+            // Apply movement with axis validation
+            newX = line.x + moveX
+            newY = line.y + moveY
+
+            // Validate position: non-dots should only move along their axis
+            if (newLength > 1) {
+              if (line.isHorizontal) {
+                // Horizontal lines should not change Y position (except for dots)
+                newY = line.y
+              } else {
+                // Vertical lines should not change X position (except for dots)
+                newX = line.x
+              }
             }
 
             // Ensure the new position and length don't exceed grid boundaries
@@ -264,8 +264,14 @@ export default function AnimatedLines({
             return line
           }
 
-          // Check if line becomes a square (1x1)
-          const isSquare = newLength === 1
+          // Validate the new length to prevent bugs
+          if (newLength < 1 || newLength > 5) {
+            // If length is invalid, keep the original length
+            newLength = line.length
+          }
+
+          // Check if line becomes a dot (1x1) - only dots should be amber
+          const isDot = newLength === 1
 
           return {
             ...line,
@@ -273,11 +279,11 @@ export default function AnimatedLines({
             y: newY,
             length: newLength,
             isHorizontal: newIsHorizontal,
-            color: isSquare ? 'amber' : lineColor,
+            color: isDot ? 'amber' : lineColor,
           }
         })
       )
-    }, 1250) // Move every 1.25 second
+    }, 1500) // Move every 1.25 second
 
     return () => clearInterval(interval)
   }, [columnCount, rowCount, lineColor])
