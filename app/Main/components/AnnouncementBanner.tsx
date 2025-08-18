@@ -1,5 +1,7 @@
 import Image from 'next/image'
 import Link from '@/components/Link'
+import { allBlogs } from 'contentlayer/generated'
+import { sortPosts } from 'pliny/utils/contentlayer'
 
 function LineRow({ direction = 'right', index }: { direction: 'left' | 'right'; index: number }) {
   // Generate random lines
@@ -30,6 +32,20 @@ function LineRow({ direction = 'right', index }: { direction: 'left' | 'right'; 
 }
 
 export default function AnnouncementBanner() {
+  const sortedPosts = sortPosts(allBlogs)
+  const latestPost = sortedPosts[0]
+    ? {
+        title: sortedPosts[0].title,
+        summary: sortedPosts[0].summary,
+        slug: sortedPosts[0].slug,
+        href: `/blog/${sortedPosts[0].slug}`,
+      }
+    : null
+
+  if (!latestPost) {
+    return null
+  }
+
   return (
     <div className="grid grid-cols-1 rounded-lg bg-amber-500 md:grid-cols-2">
       {/* Logo Side */}
@@ -66,12 +82,9 @@ export default function AnnouncementBanner() {
       {/* Content Side */}
       <div className="mb-6 mt-4 flex flex-col items-center justify-center px-6 text-center md:h-[300px] md:items-start md:px-12 md:text-left">
         <h2 className="mb-4 text-3xl font-bold text-anthracite">Read our latest blog post</h2>
-        <p className="mb-4 text-xl text-anthracite md:mb-8">
-          Marking Argot's Next Milestone: Securing Foundational Funding from the Ethereum
-          Foundation.
-        </p>
+        <p className="mb-4 text-xl text-anthracite md:mb-8">{latestPost.title}</p>
         <Link
-          href="/blog/hello-world"
+          href={latestPost.href}
           className="inline-flex w-fit items-center rounded-lg bg-anthracite px-6 py-2 font-bold text-ecru transition-colors hover:bg-anthracite/90"
         >
           Read
