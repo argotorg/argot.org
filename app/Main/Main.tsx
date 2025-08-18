@@ -9,34 +9,29 @@ export default function Main() {
     <>
       <Hero />
 
-      <section className="mx-auto space-y-4 py-12 text-base md:text-2xl">
-        <div className="rounded-lg  md:p-8">
-          <p className="">
-            Argot Collective is a non-profit, independent research and development group sustaining
-            Ethereum's core programming languages and tooling, most notably Solidity. We provide a
-            stable, long-term home for these projects.
-            <br />
-            <br />
-            By uniting expertise in compilers, formal verification, and language design under one
-            roof, we make smart contract and Ethereum application development simpler, safer, and
-            more resilient.
-          </p>
-
-          <div className="mt-6">
-            <p className="mt-6">
-              To learn more about our governance and values, please read our{' '}
-              <Link
-                href="/blog/hello-world"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-amber-600 underline dark:text-amber-400"
-              >
-                manifesto
-              </Link>
-              .
-            </p>
-          </div>
-        </div>
+      <section className="mx-auto space-y-4 py-12 text-center text-lg md:text-left md:text-xl">
+        <p className="">
+          Argot Collective is a non-profit, independent research and development group sustaining
+          Ethereum's core programming languages and tooling, most notably Solidity. We provide a
+          stable, long-term home for these projects.
+          <br />
+          <br />
+          By uniting expertise in compilers, formal verification, and language design under one
+          roof, we make smart contract and Ethereum application development simpler, safer, and more
+          resilient.
+          <br />
+          <br />
+          To learn more about our governance and values, please read our{' '}
+          <Link
+            href="/blog/hello-world"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-amber-600 underline dark:text-amber-400"
+          >
+            manifesto
+          </Link>
+          .
+        </p>
       </section>
 
       <section className="space-y-4 pb-12">
