@@ -67,7 +67,7 @@ export default function AnnouncementBanner() {
       <div className="mb-6 mt-4 flex flex-col items-center justify-center px-6 text-center md:h-[300px] md:items-start md:px-12 md:text-left">
         <h2 className="mb-4 text-3xl font-bold text-anthracite">We are live!</h2>
         <p className="mb-4 text-xl text-anthracite md:mb-8">
-          Argot Collective just launched! Read our manifesto to learn more.
+          Argot Collective kickstarted with an initial grant from the Ethereum Foundation.
         </p>
         <Link
           href="/blog/hello-world"
