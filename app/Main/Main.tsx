@@ -3,6 +3,7 @@ import { projects } from './data/projects'
 import AnnouncementBanner from './components/AnnouncementBanner'
 import Hero from './components/Hero'
 import About from './components/About'
+import Donations from './components/Donations'
 
 export default function Main() {
   return (
@@ -40,6 +41,8 @@ export default function Main() {
       <section>
         <AnnouncementBanner />
       </section>
+
+      <Donations />
     </>
   )
 }
