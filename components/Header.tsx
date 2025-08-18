@@ -14,7 +14,7 @@ const Header = () => {
 
   return (
     <header className={headerClass}>
-      <Link href="/" aria-label={siteMetadata.headerTitle}>
+      <Link href="/" aria-label={siteMetadata.headerTitle} className="link-underline pb-2">
         <Image
           src="/static/argot.png"
           alt="logo"
