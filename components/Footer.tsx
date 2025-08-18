@@ -29,6 +29,7 @@ const Footer = () => {
               <SocialIcon kind="github" href={siteMetadata.github} size={5} />
               <SocialIcon kind="farcaster" href={siteMetadata.farcaster} size={5} />
               <SocialIcon kind="x" href={siteMetadata.x} size={5} />
+              <SocialIcon kind="bluesky" href={siteMetadata.bluesky} size={5} />
             </div>
           </div>
         </div>

@@ -16,6 +16,7 @@ const siteMetadata = {
   github: 'https://github.com/argotorg',
   x: 'https://x.com/argotorg',
   farcaster: 'https://warpcast.com/argotorg',
+  bluesky: 'https://bsky.app/profile/argot.org',
   // twitter: 'https://twitter.com/Twitter',
   // facebook: 'https://facebook.com',
   // youtube: 'https://youtube.com',
