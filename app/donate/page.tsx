@@ -47,65 +47,6 @@ const funders: Funder[] = [
   },
 ]
 
-interface FundersProps {
-  title?: string
-  showTitle?: boolean
-  containerClassName?: string
-  logosContainerClassName?: string
-}
-
-function FundersSection({
-  title = 'Thanks to our supporters so far who have made strategic contributions to our work.',
-  showTitle = true,
-  containerClassName = 'mt-20 flex flex-col gap-8 rounded-lg bg-ecru-300 p-8 dark:bg-anthracite-600 md:flex-row md:items-center',
-  logosContainerClassName = 'flex flex-wrap items-center justify-center gap-8 rounded-lg py-8',
-}: FundersProps) {
-  return (
-    <div className={containerClassName}>
-      {showTitle && <p className="break-words text-base font-semibold md:text-xl">{title}</p>}
-      <div className={logosContainerClassName}>
-        {funders.map((funder) => (
-          <Link
-            key={funder.name}
-            href={funder.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="transition-opacity hover:opacity-75"
-            aria-label={`Visit ${funder.name}`}
-          >
-            {funder.logo.dark ? (
-              <>
-                <Image
-                  src={funder.logo.light}
-                  alt={funder.name}
-                  className={`${funder.className} dark:hidden`}
-                  width={400}
-                  height={100}
-                />
-                <Image
-                  src={funder.logo.dark}
-                  alt={funder.name}
-                  className={`${funder.className} hidden dark:block`}
-                  width={400}
-                  height={100}
-                />
-              </>
-            ) : (
-              <Image
-                src={funder.logo.light}
-                alt={funder.name}
-                className={funder.className}
-                width={400}
-                height={100}
-              />
-            )}
-          </Link>
-        ))}
-      </div>
-    </div>
-  )
-}
-
 export default function DonationsPage() {
   return (
     <div className="mx-auto">
@@ -155,7 +96,50 @@ export default function DonationsPage() {
             </a>
           </p>
         </div>
-        <FundersSection />
+        <div className="mt-20 flex flex-col space-y-4 rounded-lg bg-ecru-300 p-8 dark:bg-anthracite-600 md:flex-row md:items-center">
+          <p className="break-words text-center text-base font-semibold sm:text-left md:text-xl">
+            Thanks to our supporters so far who have made strategic contributions to our work.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-8 rounded-lg">
+            {funders.map((funder) => (
+              <Link
+                key={funder.name}
+                href={funder.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-opacity hover:opacity-75"
+                aria-label={`Visit ${funder.name}`}
+              >
+                {funder.logo.dark ? (
+                  <>
+                    <Image
+                      src={funder.logo.light}
+                      alt={funder.name}
+                      className={`${funder.className} dark:hidden`}
+                      width={400}
+                      height={100}
+                    />
+                    <Image
+                      src={funder.logo.dark}
+                      alt={funder.name}
+                      className={`${funder.className} hidden dark:block`}
+                      width={400}
+                      height={100}
+                    />
+                  </>
+                ) : (
+                  <Image
+                    src={funder.logo.light}
+                    alt={funder.name}
+                    className={funder.className}
+                    width={400}
+                    height={100}
+                  />
+                )}
+              </Link>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   )
