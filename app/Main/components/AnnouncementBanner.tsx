@@ -65,15 +65,16 @@ export default function AnnouncementBanner() {
 
       {/* Content Side */}
       <div className="mb-6 mt-4 flex flex-col items-center justify-center px-6 text-center md:h-[300px] md:items-start md:px-12 md:text-left">
-        <h2 className="mb-4 text-3xl font-bold text-anthracite">We are live!</h2>
+        <h2 className="mb-4 text-3xl font-bold text-anthracite">Read our latest blog post</h2>
         <p className="mb-4 text-xl text-anthracite md:mb-8">
-          Argot Collective kickstarted with an initial grant from the Ethereum Foundation.
+          Marking Argot's Next Milestone: Securing Foundational Funding from the Ethereum
+          Foundation.
         </p>
         <Link
           href="/blog/hello-world"
           className="inline-flex w-fit items-center rounded-lg bg-anthracite px-6 py-2 font-bold text-ecru transition-colors hover:bg-anthracite/90"
         >
-          Read the announcement
+          Read
         </Link>
       </div>
     </div>

@@ -9,11 +9,8 @@ const Footer = () => {
         <div className="flex flex-col items-center space-y-4 py-4 dark:border-gray-700 md:flex-row md:items-center md:justify-between md:space-y-0">
           <div className="flex flex-col items-center space-y-2 text-xl font-medium text-anthracite-700 dark:text-ecru-300 md:flex-row md:space-x-4 md:space-y-0">
             <span className="font-bold md:mr-8">ARGOT © {new Date().getFullYear()}</span>
-            <Link className="link-underline" href="/terms">
-              Terms of use
-            </Link>
             <Link className="link-underline" href="/imprint">
-              Imprint
+              Privacy policy
             </Link>
             <Link className="link-underline" href="/brand">
               Brand assets
