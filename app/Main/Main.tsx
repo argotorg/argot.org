@@ -10,9 +10,9 @@ export default function Main() {
     <>
       <Hero />
 
-      <section className="mx-auto max-w-3xl space-y-4 py-12 text-sm md:text-xl">
-        <div className="rounded-lg bg-ecru-300 p-8 dark:bg-anthracite-700">
-          <p className="mx-auto max-w-prose text-justify">
+      <section className="mx-auto max-w-3xl space-y-4 py-12 text-base md:text-xl">
+        <div className="rounded-lg bg-ecru-300 p-4 dark:bg-anthracite-700 md:p-8">
+          <p className="mx-auto max-w-prose text-center md:text-justify">
             Argot Collective is a non-profit, independent research and development group sustaining
             Ethereum's core programming languages and tooling, most notably Solidity.
             <br />
