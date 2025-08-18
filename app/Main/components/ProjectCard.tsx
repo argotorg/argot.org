@@ -42,7 +42,7 @@ export default function ProjectCard({ title, description, longDescription, url, 
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex w-screen items-center justify-center">
+        <div className="fixed inset-0 z-50 flex w-screen items-center justify-center overflow-y-auto p-4">
           {/* Backdrop */}
           <button
             onClick={() => setIsModalOpen(false)}
@@ -55,7 +55,7 @@ export default function ProjectCard({ title, description, longDescription, url, 
             role="dialog"
             aria-modal="true"
             aria-labelledby="modal-title"
-            className="relative z-50 mx-4 max-w-2xl translate-y-full rounded-lg bg-ecru p-6 opacity-0 transition-all duration-300 ease-out dark:bg-anthracite-600 md:p-8"
+            className="relative z-50 w-full max-w-lg max-h-full translate-y-full rounded-lg bg-ecru p-6 opacity-0 transition-all duration-300 ease-out dark:bg-anthracite-600 md:max-w-2xl md:p-8 overflow-y-auto"
             style={{
               animation: 'modalIn 0.3s ease-out forwards',
             }}
@@ -73,13 +73,6 @@ export default function ProjectCard({ title, description, longDescription, url, 
               }
             `}</style>
 
-            <button
-              onClick={() => setIsModalOpen(false)}
-              className="absolute right-4 top-4 p-1 text-anthracite-400 transition-colors hover:text-anthracite dark:text-ecru-400 dark:hover:text-ecru"
-              aria-label="Close modal"
-            >
-              <BiX className="h-8 w-8" />
-            </button>
 
             <div className="mb-6 flex items-center gap-4">
               {logo && (
@@ -107,14 +100,22 @@ export default function ProjectCard({ title, description, longDescription, url, 
               {longDescription}
             </p>
 
-            <div>
+            <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
               <Link
                 href={url}
-                className="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2 text-anthracite transition-colors hover:bg-amber-600"
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-amber-500 px-4 py-2 text-anthracite transition-colors hover:bg-amber-600"
               >
                 <BiLinkExternal className="h-5 w-5" />
                 <span className="font-bold">Website</span>
               </Link>
+              
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="inline-flex items-center justify-center gap-2 rounded-lg border-2 border-anthracite px-4 py-2 text-anthracite transition-colors hover:bg-anthracite hover:text-ecru dark:border-ecru dark:text-ecru dark:hover:bg-ecru dark:hover:text-anthracite"
+              >
+                <BiX className="h-5 w-5" />
+                <span className="font-bold">Close</span>
+              </button>
             </div>
           </div>
         </div>
