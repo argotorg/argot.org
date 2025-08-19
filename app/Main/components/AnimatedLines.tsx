@@ -225,15 +225,17 @@ export default function AnimatedLines({
             newY = line.y + moveY
 
             // Validate position: non-dots should only move along their axis
-            if (newLength > 1) {
-              if (line.isHorizontal) {
-                // Horizontal lines should not change Y position (except for dots)
-                newY = line.y
-              } else {
-                // Vertical lines should not change X position (except for dots)
-                newX = line.x
-              }
-            }
+            // EDIT: We remove this validation to let lines moves cross-axis if this is needed to find a non-colliding position.
+            // This will happen infrequently and won't look too weird
+            // if (newLength > 1) {
+            //   if (line.isHorizontal) {
+            //     // Horizontal lines should not change Y position (except for dots)
+            //     newY = line.y
+            //   } else {
+            //     // Vertical lines should not change X position (except for dots)
+            //     newX = line.x
+            //   }
+            // }
 
             // Ensure the new position and length don't exceed grid boundaries
             if (newIsHorizontal) {
