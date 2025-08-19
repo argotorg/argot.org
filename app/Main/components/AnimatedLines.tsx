@@ -178,8 +178,10 @@ export default function AnimatedLines({
   // Move lines randomly
   useEffect(() => {
     const interval = setInterval(() => {
-      setLines((currentLines) =>
-        currentLines.map((line) => {
+      setLines((currentLines) => {
+        const newCurrentLines: Line[] = []
+
+        currentLines.forEach((line) => {
           // Try to find a valid new position
           let newX, newY, newLength, newIsHorizontal
           let attempts = 0
@@ -254,7 +256,7 @@ export default function AnimatedLines({
           } while (
             wouldOverlap(
               { ...line, x: newX, y: newY, length: newLength, isHorizontal: newIsHorizontal },
-              currentLines,
+              newCurrentLines,
               columnCount,
               rowCount
             ) &&
@@ -263,7 +265,8 @@ export default function AnimatedLines({
 
           // If we couldn't find a valid position, keep the current position
           if (attempts >= maxAttempts) {
-            return line
+            newCurrentLines.push(line)
+            return
           }
 
           // Validate the new length to prevent bugs
@@ -275,16 +278,18 @@ export default function AnimatedLines({
           // Check if line becomes a dot (1x1) - only dots should be amber
           const isDot = newLength === 1
 
-          return {
+          newCurrentLines.push({
             ...line,
             x: newX,
             y: newY,
             length: newLength,
             isHorizontal: newIsHorizontal,
             color: isDot ? 'amber' : lineColor,
-          }
+          })
+          return
         })
-      )
+        return newCurrentLines
+      })
     }, 1500) // Move every 1.25 second
 
     return () => clearInterval(interval)
