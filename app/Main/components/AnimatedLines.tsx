@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useTheme } from 'next-themes'
 
 type AnimatedLinesProps = {
@@ -107,13 +107,14 @@ export default function AnimatedLines({
     return () => window.removeEventListener('resize', calculateSquareSize)
   }, [columnCount])
 
-  // Initialize lines
-  useEffect(() => {
-    const initialLines: Line[] = []
-    const numLines = 5
-    const usedRows = new Set<number>()
+  const createNewLine = useCallback(
+    (initialLines, id) => {
+      const usedRows = new Set<number>()
+      initialLines.forEach((line) => {
+        usedRows.add(line.y)
+      })
 
-    for (let i = 0; i < numLines; i++) {
+      console.log('usedRows', usedRows)
       // 75% chance of being horizontal
       const isHorizontal = Math.random() < 0.75
       const length = 1 + Math.floor(Math.random() * 5) // length between 1-5 units
@@ -132,7 +133,6 @@ export default function AnimatedLines({
           for (let row = 0; row < rowCount; row++) {
             if (!usedRows.has(row)) {
               y = row
-              usedRows.add(row)
               break
             }
           }
@@ -145,7 +145,7 @@ export default function AnimatedLines({
       } while (
         wouldOverlap(
           {
-            id: `line-${i}`,
+            id: `line-${id}`,
             x,
             y,
             isHorizontal,
@@ -159,21 +159,41 @@ export default function AnimatedLines({
         attempts < maxAttempts
       )
 
-      // If we couldn't find a valid position, skip this line
-      if (attempts >= maxAttempts) continue
+      // If we couldn't find a valid position, return false
+      if (attempts >= maxAttempts) return false
 
-      initialLines.push({
-        id: `line-${i}`,
+      return {
+        id: `line-${id}`,
         x,
         y,
         isHorizontal,
         length,
         color: lineColor,
-      })
+      }
+    },
+    [columnCount, lineColor, rowCount]
+  )
+
+  // Initialize lines
+  useEffect(() => {
+    const initialLines: Line[] = []
+    const numLines = 5
+
+    for (let i = 0; i < numLines; i++) {
+      const newLine = createNewLine(initialLines, i)
+
+      console.log('Newline', newLine)
+      if (newLine) {
+        initialLines.push(newLine)
+      } else {
+        console.log('NO NEW LINE')
+        // skip and don't add this line, very unlikely
+      }
     }
 
+    console.log('Setting initiallines', initialLines)
     setLines(initialLines)
-  }, [columnCount, rowCount, lineColor])
+  }, [createNewLine])
 
   // Move lines randomly
   useEffect(() => {
