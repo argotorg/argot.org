@@ -48,9 +48,12 @@ const wouldOverlap = (newLine: Line, lines: Line[], columnCount: number, rowCoun
     const checkX = isHorizontal ? x + i : x
     const checkY = isHorizontal ? y : y + i
 
-    // Check the position and its neighbors
+    // Check the position and its direct neighbors (no diagonals)
     for (let dx = -1; dx <= 1; dx++) {
       for (let dy = -1; dy <= 1; dy++) {
+        // Skip diagonal neighbors, only check direct neighbors and the position itself
+        if (Math.abs(dx) + Math.abs(dy) > 1) continue
+
         const neighborX = checkX + dx
         const neighborY = checkY + dy
 
@@ -108,19 +111,19 @@ export default function AnimatedLines({
   }, [columnCount])
 
   const createNewLine = useCallback(
-    (initialLines, id) => {
+    (initialLines: Line[], id: number, newLength?: number) => {
       const usedRows = new Set<number>()
-      initialLines.forEach((line) => {
+      initialLines.forEach((line: Line) => {
         usedRows.add(line.y)
       })
 
-      console.log('usedRows', usedRows)
       // 75% chance of being horizontal
       const isHorizontal = Math.random() < 0.75
-      const length = 1 + Math.floor(Math.random() * 5) // length between 1-5 units
+      const length = newLength ? newLength : 1 + Math.floor(Math.random() * 5) // length between 1-5 units
 
       // Try to find a valid position
-      let x, y
+      let x: number,
+        y: number = 0
       let attempts = 0
       const maxAttempts = 50
 
@@ -182,16 +185,13 @@ export default function AnimatedLines({
     for (let i = 0; i < numLines; i++) {
       const newLine = createNewLine(initialLines, i)
 
-      console.log('Newline', newLine)
       if (newLine) {
         initialLines.push(newLine)
       } else {
-        console.log('NO NEW LINE')
         // skip and don't add this line, very unlikely
       }
     }
 
-    console.log('Setting initiallines', initialLines)
     setLines(initialLines)
   }, [createNewLine])
 
@@ -199,11 +199,11 @@ export default function AnimatedLines({
   useEffect(() => {
     const interval = setInterval(() => {
       setLines((currentLines) => {
-        const newCurrentLines: Line[] = []
+        const workingLines = [...currentLines]
 
-        currentLines.forEach((line) => {
+        workingLines.forEach((line, index) => {
           // Try to find a valid new position
-          let newX, newY, newLength, newIsHorizontal
+          let newX: number, newY: number, newLength: number, newIsHorizontal: boolean
           let attempts = 0
           const maxAttempts = 20 // Increased from 10 to handle larger movement ranges
 
@@ -276,16 +276,48 @@ export default function AnimatedLines({
           } while (
             wouldOverlap(
               { ...line, x: newX, y: newY, length: newLength, isHorizontal: newIsHorizontal },
-              newCurrentLines,
+              workingLines,
               columnCount,
               rowCount
             ) &&
             attempts < maxAttempts
           )
-
-          // If we couldn't find a valid position, keep the current position
+          // If we couldn't find a valid position, collapse into a dot
           if (attempts >= maxAttempts) {
-            newCurrentLines.push(line)
+            // Randomly collapse to the end or the beginning
+            // const collapseToEnd = Math.random() > 0.5
+            const collapedToDotLine = {
+              ...line,
+              length: 1,
+              color: 'amber' as const,
+            }
+
+            // if it doesn't overlap assign
+            if (!wouldOverlap(collapedToDotLine, workingLines, columnCount, rowCount)) {
+              workingLines[index] = collapedToDotLine
+            } else {
+              // collapse the line to the end, not to beginning as above
+              const collapsedToEndDotLine = {
+                ...line,
+                length: 1,
+                x: line.isHorizontal ? line.x + line.length - 1 : line.x,
+                y: line.isHorizontal ? line.y : line.y + line.length - 1,
+                color: 'amber' as const,
+              }
+              // push if it doesn't overlap
+              if (!wouldOverlap(collapsedToEndDotLine, workingLines, columnCount, rowCount)) {
+                workingLines[index] = collapsedToEndDotLine
+              } else {
+                // if it still and still overlaps, new random dot
+                // const newRandomDot = createNewLine(workingLines, line.id, 1)
+                // if (newRandomDot) {
+                // workingLines[index] = newRandomDot
+                // } else {
+                // if even that is not possible? Keep the line
+                workingLines[index] = line
+                // }
+              }
+            }
             return
           }
 
@@ -298,19 +330,18 @@ export default function AnimatedLines({
           // Check if line becomes a dot (1x1) - only dots should be amber
           const isDot = newLength === 1
 
-          newCurrentLines.push({
+          workingLines[index] = {
             ...line,
             x: newX,
             y: newY,
             length: newLength,
             isHorizontal: newIsHorizontal,
             color: isDot ? 'amber' : lineColor,
-          })
-          return
+          }
         })
-        return newCurrentLines
+        return workingLines
       })
-    }, 1500) // Move every 1.25 second
+    }, 1500) // Move every 1.5 second
 
     return () => clearInterval(interval)
   }, [columnCount, rowCount, lineColor])
@@ -350,7 +381,7 @@ function calculatePrimaryMovement(current: number, length: number, max: number) 
   // 75% chance for small movement (-1, 0, 1), 25% chance for larger jump (-2 to 2)
   const isLargeMove = Math.random() < 0.25
 
-  let move
+  let move: number
   if (isLargeMove) {
     // Larger movement range: -2 to +2 (reduced for better collision avoidance)
     move = Math.floor(Math.random() * 5) - 2
@@ -374,7 +405,7 @@ function calculateSecondaryMovement(current: number, max: number) {
     // 85% chance for small move, 15% chance for larger jump
     const isLargeMove = Math.random() < 0.15
 
-    let move
+    let move: number
     if (isLargeMove) {
       // Larger secondary movement: -2 to +2
       move = Math.floor(Math.random() * 5) - 2
@@ -396,7 +427,7 @@ function calculateSecondaryMovement(current: number, max: number) {
 }
 
 function randomLength() {
-  let newLength
+  let newLength: number
   // Random length between 1 and 5 with weighted probabilities
   const random = Math.random()
   if (random < 0.05) {
