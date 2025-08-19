@@ -55,7 +55,7 @@ export default function ProjectCard({ title, description, longDescription, url, 
             role="dialog"
             aria-modal="true"
             aria-labelledby="modal-title"
-            className="relative z-50 w-full max-w-lg max-h-full translate-y-full rounded-lg bg-ecru p-6 opacity-0 transition-all duration-300 ease-out dark:bg-anthracite-600 md:max-w-2xl md:p-8 overflow-y-auto"
+            className="relative z-50 max-h-full w-full max-w-lg translate-y-full overflow-y-auto rounded-lg bg-ecru p-6 opacity-0 transition-all duration-300 ease-out dark:bg-anthracite-600 md:max-w-2xl md:p-8"
             style={{
               animation: 'modalIn 0.3s ease-out forwards',
             }}
@@ -72,7 +72,6 @@ export default function ProjectCard({ title, description, longDescription, url, 
                 }
               }
             `}</style>
-
 
             <div className="mb-6 flex items-center gap-4">
               {logo && (
@@ -108,7 +107,7 @@ export default function ProjectCard({ title, description, longDescription, url, 
                 <BiLinkExternal className="h-5 w-5" />
                 <span className="font-bold">Website</span>
               </Link>
-              
+
               <button
                 onClick={() => setIsModalOpen(false)}
                 className="inline-flex items-center justify-center gap-2 rounded-lg border-2 border-anthracite px-4 py-2 text-anthracite transition-colors hover:bg-anthracite hover:text-ecru dark:border-ecru dark:text-ecru dark:hover:bg-ecru dark:hover:text-anthracite"
