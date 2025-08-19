@@ -41,7 +41,8 @@ const funders: Funder[] = [
     name: 'Optimism',
     url: 'https://optimism.io/',
     logo: {
-      light: '/static/funders/optimism.svg',
+      light: '/static/funders/op-black.png',
+      dark: '/static/funders/op-white.png',
     },
     className: 'h-10 w-auto p-2',
   },

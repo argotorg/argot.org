@@ -97,6 +97,7 @@ export const projects: Project[] = [
       </>
     ),
     url: 'https://hevm.dev',
+    logo: '/static/projects/hevm.png',
   },
   {
     title: 'Sourcify',
