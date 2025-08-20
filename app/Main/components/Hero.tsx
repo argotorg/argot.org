@@ -20,7 +20,7 @@ export default function Hero() {
         <h1 className="text-3xl font-bold leading-tight tracking-tight sm:text-4xl md:text-5xl lg:text-6xl">
           Building the critical infrastructure
           <br />
-          Ethereum applications rely on.
+          Ethereum applications rely&nbsp;on.
         </h1>
       </div>
 
