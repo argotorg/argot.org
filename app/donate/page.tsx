@@ -3,9 +3,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: "Support Argot's Work - Donations",
+  title: 'Argot Collective - Donations',
   description:
-    "Support the development and maintenance of Ethereum's core infrastructure tools. Fund the longevity and security of Ethereum applications.",
+    'Support the development and maintenance of Ethereum’s core infrastructure tools. Fund the longevity and security of Ethereum applications.',
 }
 
 interface Funder {
@@ -97,9 +97,9 @@ export default function DonationsPage() {
             </a>
           </p>
         </div>
-        <div className="mt-20 flex flex-col space-y-4 rounded-lg bg-ecru-300 p-8 dark:bg-anthracite-600 md:flex-row md:items-center">
+        <div className="mt-20 flex flex-col space-y-4 rounded-lg bg-ecru-300 p-8 dark:bg-anthracite-600 md:flex-row md:items-center md:justify-evenly md:space-y-0">
           <p className="break-words text-center text-base font-semibold sm:text-left md:text-xl">
-            Thanks to our supporters so far who have made strategic contributions to our work.
+            Thanks to our supporters so far:
           </p>
           <div className="flex flex-wrap items-center justify-center gap-8 rounded-lg">
             {funders.map((funder) => (
