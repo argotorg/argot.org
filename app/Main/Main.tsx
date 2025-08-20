@@ -9,7 +9,7 @@ export default function Main() {
     <>
       <Hero />
 
-      <section className="mx-auto space-y-4 py-12 text-center text-lg md:text-left md:text-xl">
+      <section className="mx-auto max-w-prose space-y-4 py-12 text-center text-sm md:text-xl">
         <p className="">
           Argot Collective is a non-profit, independent research and development group sustaining
           Ethereum's core programming languages and tooling, most notably Solidity. We provide a
