@@ -10,6 +10,7 @@ import siteMetadata from '@/data/siteMetadata'
 import { ThemeProviders } from './theme-providers'
 import { Metadata } from 'next'
 import ConsoleLogger from '@/components/ConsoleLogger'
+import Script from 'next/script'
 
 const defaultMono = Inconsolata({
   subsets: ['latin'],
@@ -90,9 +91,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000" />
       <link rel="alternate" type="application/rss+xml" href={`${basePath}/feed.xml`} />
       <body className="mx-auto flex min-h-screen max-w-screen-xl flex-col justify-center bg-ecru px-4 text-anthracite antialiased transition-colors duration-300 dark:bg-anthracite dark:text-ecru md:px-8">
+        <Script
+          defer
+          src="https://cloud.umami.is/script.js"
+          data-website-id="d1035b7a-5037-4c03-8335-057ee0e1da7f"
+        />
         <ConsoleLogger />
         <ThemeProviders>
-          {/* <Analytics analyticsConfig={siteMetadata.analytics as AnalyticsConfig} /> */}
           <SearchProvider searchConfig={siteMetadata.search as SearchConfig}>
             <Header />
             <main className="mb-auto">{children}</main>
