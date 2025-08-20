@@ -13,7 +13,7 @@ let hasLogged = false
 // Console log function to display the ASCII art
 export const logArgotAscii = () => {
   if (!hasLogged) {
-    console.log(argotAscii)
+    console.log('%c' + argotAscii, 'font-family: monospace; font-size: 12px; line-height: 1;')
     hasLogged = true
   }
 }
