@@ -12,9 +12,9 @@ const Footer = () => {
           </div>
           <div className="flex flex-col items-center gap-4 md:flex-row">
             <div className="flex space-x-4 text-lg font-medium ">
-              <Link className="link-underline" href="/privacy-policy">
+              {/* <Link className="link-underline" href="/privacy-policy">
                 Privacy Policy
-              </Link>
+              </Link> */}
               <Link
                 className="link-underline"
                 href="https://github.com/argotorg/assets"
