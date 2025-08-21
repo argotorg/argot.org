@@ -8,8 +8,8 @@ const siteMetadata = {
   theme: 'light', // system, dark or light
   siteUrl: 'https://argot.org',
   siteRepo: 'https://github.com/argotorg/argot.org',
-  siteLogo: `${process.env.BASE_PATH || ''}/static/images/logo-circle.png`,
-  socialBanner: `${process.env.BASE_PATH || ''}/static/images/argot-og-image?cache-break-2.png`,
+  siteLogo: `${process.env.BASE_PATH || ''}/static/logo-circle.png`,
+  socialBanner: `${process.env.BASE_PATH || ''}/static/argot-og-image.png?cache-break-3`,
   // mastodon: 'https://mastodon.social/@mastodonuser',
   email: 'hello@argot.org',
   github: 'https://github.com/argotorg',
