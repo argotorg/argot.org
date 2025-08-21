@@ -14,6 +14,10 @@ module.exports = {
   ],
   darkMode: 'class',
   theme: {
+    fontFamily: {
+      sans: ['var(--font-karla)', ...fontFamily.sans],
+      mono: ['var(--font-inconsolata)', ...fontFamily.mono],
+    },
     extend: {
       lineHeight: {
         11: '2.75rem',
@@ -21,12 +25,39 @@ module.exports = {
         13: '3.25rem',
         14: '3.5rem',
       },
-      fontFamily: {
-        sans: ['var(--font-default-mono)', ...fontFamily.sans],
-      },
       colors: {
-        primary: colors.gray,
-        gray: colors.gray,
+        primary: {
+          DEFAULT: '#2D2725',
+          300: '#5B4D49',
+          400: '#423835',
+          500: '#2D2725',
+          600: '#24201E',
+          700: '#1A1717',
+        },
+        anthracite: {
+          DEFAULT: '#2D2725',
+          300: '#5B4D49',
+          400: '#423835',
+          500: '#2D2725',
+          600: '#24201E',
+          700: '#1A1717',
+        },
+        amber: {
+          DEFAULT: '#D49B3F',
+          300: '#F3CC88',
+          400: '#E7B865',
+          500: '#D49B3F',
+          600: '#BA7F19',
+          700: '#966316',
+        },
+        ecru: {
+          DEFAULT: '#EADBCA', // Different color from below
+          300: '#F6EADD',
+          400: '#E9DED2',
+          500: '#DBCCBB',
+          600: '#BEAC97',
+          700: '#A1907C',
+        },
       },
       zIndex: {
         60: '60',
@@ -36,38 +67,58 @@ module.exports = {
       typography: ({ theme }) => ({
         DEFAULT: {
           css: {
+            color: theme('colors.anthracite.700'),
             a: {
-              color: theme('colors.primary.500'),
+              color: theme('colors.amber.600'),
               '&:hover': {
-                color: `${theme('colors.primary.600')}`,
+                color: `${theme('colors.amber.700')}`,
               },
-              code: { color: theme('colors.primary.400') },
+              code: { color: theme('colors.anthracite.400') },
             },
             'h1,h2': {
               fontWeight: '700',
               letterSpacing: theme('letterSpacing.tight'),
               marginBottom: '0.5rem',
+              color: theme('colors.anthracite.DEFAULT'),
             },
-            h3: {
+            'h3,h4,h5,h6': {
               fontWeight: '600',
               marginBottom: '0.5rem',
+              color: theme('colors.anthracite.DEFAULT'),
             },
             code: {
               color: theme('colors.indigo.500'),
+            },
+            'ul > li': {
+              '&::marker': {
+                color: theme('colors.anthracite.500'),
+              },
+            },
+            hr: {
+              borderColor: theme('colors.anthracite.300'),
             },
           },
         },
         invert: {
           css: {
+            color: theme('colors.ecru.300'),
             a: {
-              color: theme('colors.primary.500'),
+              color: theme('colors.amber.500'),
               '&:hover': {
-                color: `${theme('colors.primary.400')}`,
+                color: `${theme('colors.amber.600')}`,
               },
-              code: { color: theme('colors.primary.400') },
+              code: { color: theme('colors.anthracite.400') },
+            },
+            'ul > li': {
+              '&::marker': {
+                color: theme('colors.ecru.500'),
+              },
             },
             'h1,h2,h3,h4,h5,h6': {
-              color: theme('colors.gray.100'),
+              color: theme('colors.ecru.300'),
+            },
+            hr: {
+              borderColor: theme('colors.ecru.300'),
             },
           },
         },
@@ -75,4 +126,10 @@ module.exports = {
     },
   },
   plugins: [require('@tailwindcss/forms'), require('@tailwindcss/typography')],
+  safelist: [
+    'divide-anthracite-300',
+    'dark:divide-ecru-300',
+    'border-anthracite-300',
+    'dark:border-ecru-300',
+  ],
 }
