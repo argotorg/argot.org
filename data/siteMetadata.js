@@ -3,8 +3,7 @@ const siteMetadata = {
   title: 'Argot Collective',
   author: 'Argot Collective',
   headerTitle: 'Argot Collective',
-  description:
-    "The Argot Collective is a new non-profit organization maintaining Ethereum's core infrastructure formed by 25 former Ethereum Foundation employees. Operating democratically and transparently, we aim to provide stable, long-term support for crucial projects, free from commercial pressures.",
+  description: 'Building the critical infrastructure for Ethereum applications.',
   language: 'en-us',
   theme: 'light', // system, dark or light
   siteUrl: 'https://argot.org',
