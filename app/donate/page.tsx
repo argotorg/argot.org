@@ -30,7 +30,7 @@ const funders: Funder[] = [
   },
   {
     name: 'Octant',
-    url: 'https://octant.app/',
+    url: 'https://octant.build/',
     logo: {
       light: '/static/funders/octant-horizontal-black.svg',
       dark: '/static/funders/octant-horizontal-white.svg',
