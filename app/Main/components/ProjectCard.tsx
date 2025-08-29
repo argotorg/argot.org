@@ -3,10 +3,18 @@
 import { useState } from 'react'
 import Link from '@/components/Link'
 import { BiX, BiLinkExternal } from 'react-icons/bi'
+import { FaGithub } from 'react-icons/fa'
 import Image from 'next/image'
 import { Project } from '../data/projects'
 
-export default function ProjectCard({ title, description, longDescription, url, logo }: Project) {
+export default function ProjectCard({
+  title,
+  description,
+  longDescription,
+  url,
+  logo,
+  github,
+}: Project) {
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   return (
@@ -100,13 +108,25 @@ export default function ProjectCard({ title, description, longDescription, url, 
             </p>
 
             <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
-              <Link
-                href={url}
-                className="inline-flex items-center justify-center gap-2 rounded-lg bg-amber-500 px-4 py-2 text-anthracite transition-colors hover:bg-amber-600"
-              >
-                <BiLinkExternal className="h-5 w-5" />
-                <span className="font-bold">Website</span>
-              </Link>
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <Link
+                  href={url}
+                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-amber-500 px-4 py-2 text-anthracite transition-colors hover:bg-amber-600"
+                >
+                  <BiLinkExternal className="h-5 w-5" />
+                  <span className="font-bold">Website</span>
+                </Link>
+
+                {github && (
+                  <Link
+                    href={github}
+                    className="inline-flex items-center justify-center gap-2 rounded-lg bg-anthracite px-4 py-2 text-ecru transition-colors hover:bg-anthracite-600 dark:bg-ecru dark:text-anthracite dark:hover:bg-ecru-600"
+                  >
+                    <FaGithub className="h-5 w-5" />
+                    <span className="font-bold">GitHub</span>
+                  </Link>
+                )}
+              </div>
 
               <button
                 onClick={() => setIsModalOpen(false)}

@@ -6,6 +6,7 @@ export interface Project {
   longDescription: ReactNode
   url: string
   logo?: string
+  github?: string
 }
 
 export const projects: Project[] = [
@@ -30,6 +31,7 @@ export const projects: Project[] = [
     ),
     url: 'https://soliditylang.org/',
     logo: '/static/projects/solidity.svg',
+    github: 'https://github.com/argotorg/solidity',
   },
   {
     title: 'Act',
@@ -48,6 +50,7 @@ export const projects: Project[] = [
     ),
     url: 'https://github.com/ethereum/act',
     logo: '/static/projects/act.svg',
+    github: 'https://github.com/argotorg/act',
   },
   {
     title: 'Ethdebug',
@@ -71,6 +74,7 @@ export const projects: Project[] = [
     ),
     url: 'https://ethdebug.github.io/format/index.html',
     logo: '/static/projects/ethdebug.svg',
+    github: 'https://github.com/ethdebug/format',
   },
   {
     title: 'Fe',
@@ -84,6 +88,7 @@ export const projects: Project[] = [
     ),
     url: 'https://fe-lang.org/',
     logo: '/static/projects/fe.svg',
+    github: 'https://github.com/argotorg/fe',
   },
   {
     title: 'Hevm',
@@ -98,6 +103,7 @@ export const projects: Project[] = [
     ),
     url: 'https://hevm.dev',
     logo: '/static/projects/hevm.svg',
+    github: 'https://github.com/argotorg/hevm',
   },
   {
     title: 'Sourcify',
@@ -123,5 +129,6 @@ export const projects: Project[] = [
     ),
     url: 'https://sourcify.dev/',
     logo: '/static/projects/sourcify.png',
+    github: 'https://github.com/argotorg/sourcify',
   },
 ]
