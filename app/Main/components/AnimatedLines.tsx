@@ -358,7 +358,7 @@ export default function AnimatedLines({
       {lines.map((line) => (
         <motion.div
           key={line.id}
-          className="absolute rounded"
+          className="absolute rounded-[1px] md:rounded-sm"
           animate={{
             x: line.x * squareSize,
             y: line.y * squareSize,
