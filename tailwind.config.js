@@ -75,15 +75,23 @@ module.exports = {
               },
               code: { color: theme('colors.anthracite.400') },
             },
+            h1: {
+              marginTop: '2rem',
+              marginBottom: '0.75rem',
+            },
+            h2: {
+              marginTop: '1rem',
+              marginBottom: '0.5rem',
+            },
             'h1,h2': {
               fontWeight: '700',
               letterSpacing: theme('letterSpacing.tight'),
-              marginBottom: '0.5rem',
               color: theme('colors.anthracite.DEFAULT'),
             },
             'h3,h4,h5,h6': {
               fontWeight: '600',
               marginBottom: '0.5rem',
+              marginTop: '0.5rem',
               color: theme('colors.anthracite.DEFAULT'),
             },
             code: {
