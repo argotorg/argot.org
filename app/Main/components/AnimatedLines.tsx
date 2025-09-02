@@ -235,8 +235,8 @@ export default function AnimatedLines({
 
             // Only dots (length 1) can change orientation, others keep their orientation
             if (newLength === 1) {
-              // Dots can have random orientation with 75% chance of being horizontal
-              newIsHorizontal = Math.random() < 0.75
+              // Dots can have random orientation with 50% chance of being horizontal
+              newIsHorizontal = Math.random() < 0.5
             } else {
               // Non-dots must keep their original orientation
               newIsHorizontal = line.isHorizontal
@@ -266,10 +266,19 @@ export default function AnimatedLines({
               }
               if (newX < 0) newX = 0
             } else {
-              if (newY + newLength > rowCount) {
-                newY = Math.max(0, rowCount - newLength)
+              // If vertical line is currently at max height, shrink it to size 1
+              if (
+                line.length >= rowCount ||
+                (line.y + line.length >= rowCount && line.length > 1)
+              ) {
+                newLength = 1
+                newY = Math.floor(Math.random() * rowCount)
+              } else {
+                if (newY + newLength > rowCount) {
+                  newY = Math.max(0, rowCount - newLength)
+                }
+                if (newY < 0) newY = 0
               }
-              if (newY < 0) newY = 0
             }
 
             attempts++
