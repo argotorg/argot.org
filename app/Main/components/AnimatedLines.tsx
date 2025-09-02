@@ -235,8 +235,8 @@ export default function AnimatedLines({
 
             // Only dots (length 1) can change orientation, others keep their orientation
             if (newLength === 1) {
-              // Dots can have random orientation with 75% chance of being horizontal
-              newIsHorizontal = Math.random() < 0.75
+              // Dots can have random orientation with 50% chance of being horizontal
+              newIsHorizontal = Math.random() < 0.5
             } else {
               // Non-dots must keep their original orientation
               newIsHorizontal = line.isHorizontal
