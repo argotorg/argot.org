@@ -143,9 +143,32 @@ export const Authors = defineDocumentType(() => ({
   computedFields,
 }))
 
+export const Other = defineDocumentType(() => ({
+  name: 'Other',
+  filePathPattern: '*.mdx',
+  contentType: 'mdx',
+  fields: {
+    title: { type: 'string', required: true },
+    layout: { type: 'string' },
+    canonicalUrl: { type: 'string' },
+  },
+  computedFields: {
+    ...computedFields,
+    structuredData: {
+      type: 'json',
+      resolve: (doc) => ({
+        '@context': 'https://schema.org',
+        '@type': 'WebPage',
+        headline: doc.title,
+        url: `${siteMetadata.siteUrl}/${doc._raw.flattenedPath}`,
+      }),
+    },
+  },
+}))
+
 export default makeSource({
   contentDirPath: 'data',
-  documentTypes: [Blog, Authors],
+  documentTypes: [Blog, Authors, Other],
   mdx: {
     cwd: process.cwd(),
     remarkPlugins: [
