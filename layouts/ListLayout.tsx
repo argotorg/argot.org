@@ -8,6 +8,7 @@ import type { Blog } from 'contentlayer/generated'
 import Link from '@/components/Link'
 import Tag from '@/components/Tag'
 import siteMetadata from '@/data/siteMetadata'
+import { HiExternalLink } from 'react-icons/hi'
 
 interface PaginationProps {
   totalPages: number
@@ -113,7 +114,7 @@ export default function ListLayout({
         <ul>
           {!filteredBlogPosts.length && 'No posts found.'}
           {displayPosts.map((post) => {
-            const { path, date, title, summary, tags } = post
+            const { path, date, title, summary, tags, externalUrl } = post
             return (
               <li key={path} className="py-4">
                 <article className="space-y-2 xl:grid xl:grid-cols-4 xl:items-baseline xl:space-y-0">
@@ -126,7 +127,8 @@ export default function ListLayout({
                   <div className="space-y-3 xl:col-span-3">
                     <div>
                       <h3 className="text-2xl font-bold leading-8 tracking-tight">
-                        <Link href={`/${path}`} className="">
+                        <Link href={externalUrl || `/${path}`} className="flex items-center gap-2">
+                          {externalUrl && <HiExternalLink className="h-5 w-5" />}
                           {title}
                         </Link>
                       </h3>

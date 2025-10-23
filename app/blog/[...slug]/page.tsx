@@ -13,6 +13,7 @@ import PostBanner from '@/layouts/PostBanner'
 import { Metadata } from 'next'
 import siteMetadata from '@/data/siteMetadata'
 import { notFound } from 'next/navigation'
+import ExternalPost from '../../external-post'
 
 const defaultLayout = 'PostLayout'
 const layouts = {
@@ -80,8 +81,24 @@ export const generateStaticParams = async () => {
 
 export default async function Page({ params }: { params: { slug: string[] } }) {
   const slug = decodeURI(params.slug.join('/'))
-  // Filter out drafts in production
-  const sortedCoreContents = allCoreContent(sortPosts(allBlogs))
+  const post = allBlogs.find((p) => p.slug === slug)
+
+  if (!post) {
+    return notFound()
+  }
+
+  // If post has externalUrl, show external post page with 404 status
+  if (post.externalUrl) {
+    return (
+      <>
+        <meta name="robots" content="noindex, nofollow" />
+        <ExternalPost post={post} />
+      </>
+    )
+  }
+
+  // Filter out drafts in production and external posts
+  const sortedCoreContents = allCoreContent(sortPosts(allBlogs.filter((p) => !p.externalUrl)))
   const postIndex = sortedCoreContents.findIndex((p) => p.slug === slug)
   if (postIndex === -1) {
     return notFound()
@@ -89,7 +106,6 @@ export default async function Page({ params }: { params: { slug: string[] } }) {
 
   const prev = sortedCoreContents[postIndex + 1]
   const next = sortedCoreContents[postIndex - 1]
-  const post = allBlogs.find((p) => p.slug === slug) as Blog
   const authorList = post?.authors || ['default']
   const authorDetails = authorList.map((author) => {
     const authorResults = allAuthors.find((p) => p.slug === author)
