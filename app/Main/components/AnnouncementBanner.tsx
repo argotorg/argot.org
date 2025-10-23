@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from '@/components/Link'
 import { allBlogs } from 'contentlayer/generated'
 import { sortPosts } from 'pliny/utils/contentlayer'
+import { HiExternalLink } from 'react-icons/hi'
 
 function LineRow({ direction = 'right', index }: { direction: 'left' | 'right'; index: number }) {
   // Generate random lines
@@ -38,7 +39,8 @@ export default function AnnouncementBanner() {
         title: sortedPosts[0].title,
         summary: sortedPosts[0].summary,
         slug: sortedPosts[0].slug,
-        href: `/blog/${sortedPosts[0].slug}`,
+        href: sortedPosts[0].externalUrl || `/blog/${sortedPosts[0].slug}`,
+        isExternal: !!sortedPosts[0].externalUrl,
       }
     : null
 
@@ -85,9 +87,10 @@ export default function AnnouncementBanner() {
         <p className="mb-4 text-xl text-anthracite md:mb-8">{latestPost.title}</p>
         <Link
           href={latestPost.href}
-          className="inline-flex w-fit items-center rounded-lg bg-anthracite px-6 py-2 font-bold text-ecru transition-colors hover:bg-anthracite/90"
+          className="inline-flex w-fit items-center gap-2 rounded-lg bg-anthracite px-6 py-2 font-bold text-ecru transition-colors hover:bg-anthracite/90"
         >
           Read
+          {latestPost.isExternal && <HiExternalLink className="h-4 w-4" />}
         </Link>
       </div>
     </div>
