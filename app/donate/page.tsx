@@ -46,6 +46,15 @@ const funders: Funder[] = [
     },
     className: 'h-10 w-auto p-2',
   },
+  {
+    name: 'ENS DAO',
+    url: 'https://ensdao.org/',
+    logo: {
+      light: '/static/funders/ensdao.svg',
+      dark: '/static/funders/ensdao.svg',
+    },
+    className: 'h-10 w-auto',
+  },
 ]
 
 export default function DonationsPage() {
@@ -98,10 +107,10 @@ export default function DonationsPage() {
           </p>
         </div>
         <div className="mt-20 flex flex-col space-y-4 rounded-lg bg-ecru-300 p-8 dark:bg-anthracite-600 md:flex-row md:items-center md:justify-evenly md:space-y-0">
-          <p className="break-words text-center text-base font-semibold sm:text-left md:text-xl">
+          <p className="break-words text-center text-base font-semibold sm:text-left md:text-2xl">
             Thanks to our supporters so far:
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-8 rounded-lg">
+          <div className="flex flex-wrap items-center justify-center gap-8 rounded-lg px-2">
             {funders.map((funder) => (
               <Link
                 key={funder.name}
