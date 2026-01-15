@@ -5,8 +5,8 @@ draft: false
 summary: 'This blog post recaps the Argot Collective’s work from the second half of 2025 and provides a detailed outline of priorities and upcoming milestones for the first half of 2026.'
 layout: PostBanner
 tags: ['argot']
-
 ---
+
 This post is our bi-annual roadmap update and forward-looking outlook.
 
 Argot is an independent non-profit organization and the largest spin-out of the Ethereum Foundation. We independently advance Ethereum’s core programming languages and developer tooling, with a mandate centered on long-term stewardship and sustainability.
@@ -22,11 +22,13 @@ This roadmap update covers Argot’s six core projects across programming langua
 # Programming Languages:
 
 ## Solidity
+
 [Github](https://github.com/argotorg/solidity) | [Socials](https://x.com/solidity_lang) | [Website](https://www.soliditylang.org/)
 
 Over the past months, the Solidity team has focused on articulating its current priorities and the long-term direction of the language in greater detail [^road-to-core][^core-deep-dive]. With this direction now clearly defined, the next six months are focused on executing at full speed against the outlined plan.
 
 [^road-to-core]: [The Road to Core Solidity](https://www.soliditylang.org/blog/2025/10/21/the-road-to-core-solidity/)
+
 [^core-deep-dive]: [Core Solidity Deep Dive](https://www.soliditylang.org/blog/2025/11/14/core-solidity-deep-dive/)
 
 Near-term work is centered on backend modernization. In the second quarter, we expect to deliver a functional but still experimental SSA-CFG pipeline, alongside initial improvements addressing long-standing issues such as stack-too-deep errors and compiler performance bottlenecks. Stabilization and production hardening will begin in Q2 and continue beyond, as the new pipeline matures.
@@ -34,64 +36,78 @@ Near-term work is centered on backend modernization. In the second quarter, we e
 In parallel, Core Solidity continues to take shape as the language’s future foundation, enabling faster language development, stronger correctness guarantees, and more accessible formal verification over a longer time horizon.
 
 ### Q3/Q4 2025 review
+
 **Milestones completed**
-* Core Solidity prototype supporting ERC20 functionality.
-* Compiler readiness for the Fusaka network upgrade.
-* Official Linux binaries for ARM architecture.
-* Differential fuzzing of the SSA CFG backend with hevm.
-* [Solidity Summit](https://www.soliditylang.org/blog/2025/12/04/solidity-summit-2025-recap/) at Devconnect
+
+- Core Solidity prototype supporting ERC20 functionality.
+- Compiler readiness for the Fusaka network upgrade.
+- Official Linux binaries for ARM architecture.
+- Differential fuzzing of the SSA CFG backend with hevm.
+- [Solidity Summit](https://www.soliditylang.org/blog/2025/12/04/solidity-summit-2025-recap/) at Devconnect
 
 **In progress / nearing completion**
-* Numerical AST node IDs in Yul.
-* Expanded storage layout specifiers.
-* Foundational work on the experimental version of SSA-CFG-based Yul backend.
-* Feature deprecations ahead of Solidity 0.9.0.
+
+- Numerical AST node IDs in Yul.
+- Expanded storage layout specifiers.
+- Foundational work on the experimental version of SSA-CFG-based Yul backend.
+- Feature deprecations ahead of Solidity 0.9.0.
 
 ### Q1 2026
+
 **SSA-CFG**
-* Initial compiler integration without memory spilling
-* Benchmarking setup
+
+- Initial compiler integration without memory spilling
+- Benchmarking setup
 
 **ethdebug**
-* Feature parity with source maps
-* Debug information propagation through optimizer passes
+
+- Feature parity with source maps
+- Debug information propagation through optimizer passes
 
 **Core Solidity**
-* Documentation: minimal compiler reference and overview
-* Community: further stakeholder feedback and outreach
-* Language: 
-    * syntax refinement
-    * comptime design
-* Prototype maintainability and UX (CLI, testing, benchmarking, stdlib refinement and modularization, typechecker refactoring)
-   
+
+- Documentation: minimal compiler reference and overview
+- Community: further stakeholder feedback and outreach
+- Language:
+  - syntax refinement
+  - comptime design
+- Prototype maintainability and UX (CLI, testing, benchmarking, stdlib refinement and modularization, typechecker refactoring)
+
 **Maintenance**
-* Feature deprecations ahead of the 0.9.0 breaking release
-* Initial work toward releasing Solidity 0.9.0
+
+- Feature deprecations ahead of the 0.9.0 breaking release
+- Initial work toward releasing Solidity 0.9.0
 
 ### Q2 2026
+
 **SSA-CFG**
-* Memory spilling (resolves StackTooDeep)
-* Initial work on optimizer passes and stabilization (addresses IR performance)
+
+- Memory spilling (resolves StackTooDeep)
+- Initial work on optimizer passes and stabilization (addresses IR performance)
 
 **ethdebug**
-* Continued work on propagation of debug information through optimizer passes
+
+- Continued work on propagation of debug information through optimizer passes
 
 **Core Solidity**
-* Documentation: minimal user-facing language reference
-* Community: define stdlib process
-* Language: 
-    * comptime implementation
-    * module system design and implementation
-    * Design and implementation of a flexible high-level contract composition and reusability mechanism
+
+- Documentation: minimal user-facing language reference
+- Community: define stdlib process
+- Language:
+  - comptime implementation
+  - module system design and implementation
+  - Design and implementation of a flexible high-level contract composition and reusability mechanism
 
 **Maintenance**
-* Glamsterdam EVM readiness
-* Continued work toward releasing Solidity 0.9.0
+
+- Glamsterdam EVM readiness
+- Continued work toward releasing Solidity 0.9.0
 
 The Solidity team will publish more details soon. You will be able to read more [here](https://www.soliditylang.org/blog/).
 
 ## Fe
-[Github](https://github.com/argotorg/fe) | [Socials](https://x.com/official_fe) |  [Website](https://fe-lang.org)
+
+[Github](https://github.com/argotorg/fe) | [Socials](https://x.com/official_fe) | [Website](https://fe-lang.org)
 
 We believe that language diversity and language research are essential to building safer systems. Fe is our exploration of that belief: a statically typed EVM language designed to make side effects explicit, prevent bugs before they happen, and pair a modern developer experience with a strict safety model.
 
@@ -100,232 +116,267 @@ Fe offers a batteries-included toolchain and a Rust-inspired syntax tailored for
 After a deliberately quiet period, Fe is now entering its next phase. The past year was spent rebuilding the language from the ground up to overcome architectural limitations and support its long-term vision. The team has laid the foundations for this work, which will materialize as Fe v2 in the first quarter of 2026.
 
 ### Q3/Q4 2025 review
+
 **Milestones completed**
-* New message-passing contract syntax and effects system
-* In-progress MIR and codegen capable of compiling basic ERC20 contracts to bytecode
-* Public HIR API refactor enabling static analysis, improved codegen, IDE support, and documentation tooling
-* Relaunched website and documentation
-* Language server with full navigation and refactoring support (find-all, go-to, hover, comprehensive renames), code completion (imports, modules, functions, methods, signature help), inlay hints, document and workspace symbols, outline and navigation, rudimentary code actions, and semantic tokens
-* Code formatter available via `fe fmt` and the language server
-* Support for external libraries (“ingots”) loaded from local paths or Git URLs
+
+- New message-passing contract syntax and effects system
+- In-progress MIR and codegen capable of compiling basic ERC20 contracts to bytecode
+- Public HIR API refactor enabling static analysis, improved codegen, IDE support, and documentation tooling
+- Relaunched website and documentation
+- Language server with full navigation and refactoring support (find-all, go-to, hover, comprehensive renames), code completion (imports, modules, functions, methods, signature help), inlay hints, document and workspace symbols, outline and navigation, rudimentary code actions, and semantic tokens
+- Code formatter available via `fe fmt` and the language server
+- Support for external libraries (“ingots”) loaded from local paths or Git URLs
 
 **In progress / nearing completion**
-* std lib content
+
+- std lib content
 
 ### Q1 2026
-* Complete code generation support (arrays, tuples, event logging, JSON ABI generation)
-* Define EVM capability and effect traits (Call, Log, Ctx)
-* Complete the contract ABI abstraction
-* Finalize and implement mutability and reference semantics
-* Design and implement a trait-based iterator experience
-* Build a comprehensive core and standard library
-* Develop a Solidity compatibility library
-* Implement encoding and decoding for dynamically sized types
-* Prepare the release pipeline (CI, bundling, installation)
-* Deliver the first release following the relaunch
-* Finalize the website and documentation ahead of release
-* Implement ingot workspaces
+
+- Complete code generation support (arrays, tuples, event logging, JSON ABI generation)
+- Define EVM capability and effect traits (Call, Log, Ctx)
+- Complete the contract ABI abstraction
+- Finalize and implement mutability and reference semantics
+- Design and implement a trait-based iterator experience
+- Build a comprehensive core and standard library
+- Develop a Solidity compatibility library
+- Implement encoding and decoding for dynamically sized types
+- Prepare the release pipeline (CI, bundling, installation)
+- Deliver the first release following the relaunch
+- Finalize the website and documentation ahead of release
+- Implement ingot workspaces
 
 ### Q2 2026
-* Drive growth and community engagement through partnerships, a relaunch blog post, and coordinated marketing efforts
-* Deploy non-trivial Fe contracts in production-like settings
-* Migrate to the SSA-CFG backend
-* Address multi-contract development patterns and composability (e.g., diamond pattern)
-* Polish developer tooling (`fe test`, `fe build`, `fe doc`, `fe fmt`, language server)
-* Develop non-trivial libraries (e.g., zk verifiers, Merkle trees)
 
-### *Note on Sonatina:*
+- Drive growth and community engagement through partnerships, a relaunch blog post, and coordinated marketing efforts
+- Deploy non-trivial Fe contracts in production-like settings
+- Migrate to the SSA-CFG backend
+- Address multi-contract development patterns and composability (e.g., diamond pattern)
+- Polish developer tooling (`fe test`, `fe build`, `fe doc`, `fe fmt`, language server)
+- Develop non-trivial libraries (e.g., zk verifiers, Merkle trees)
+
+### _Note on Sonatina:_
+
 Fe v2 will continue to target Yul as its production-grade backend for the time being. As Sonatina and the Yul SSA-CFG backends mature, we plan to implement support for those as well. Some limited development on the Sonatina EVM backend will continue in the short term, and the more ambitious research (e.g. VSDG representation) will resume in the future. For now, the primary contributor to Sonatina will be focusing on the Core Solidity compiler.
 
 **Sonatina milestones completed**
-* Implement Algebraic Simplifications with egglog
-* PoC work: GVN with egglog
-* Memory state tracking with egglog
-* Alias Analysis with egglog
-* PoC work: dead-store elimination with egglog
-* Multi-Block Support for egglog Optimization.
-* Solidify the VSDG concept and start implementing the translation from v1 IR into VSDG based IR.
+
+- Implement Algebraic Simplifications with egglog
+- PoC work: GVN with egglog
+- Memory state tracking with egglog
+- Alias Analysis with egglog
+- PoC work: dead-store elimination with egglog
+- Multi-Block Support for egglog Optimization.
+- Solidify the VSDG concept and start implementing the translation from v1 IR into VSDG based IR.
 
 **Not achieved**
-* Merge v1 into the Fe compiler behind `--backend` Sonatina flag, publish release-candidate builds, and gather feedback from early adopters.
-* Complete v1 code-generation phase with full CI coverage.
+
+- Merge v1 into the Fe compiler behind `--backend` Sonatina flag, publish release-candidate builds, and gather feedback from early adopters.
+- Complete v1 code-generation phase with full CI coverage.
 
 # Developer Tooling
 
-## Sourcify 
-[Github](https://github.com/argotorg/sourcify) | [Socials](https://x.com/sourcifyeth) |  [Website](https://sourcify.dev/) 
+## Sourcify
 
-Sourcify ensures verified EVM smart contract data remains open and accessible, and is powered by open-source tools. 
+[Github](https://github.com/argotorg/sourcify) | [Socials](https://x.com/sourcifyeth) | [Website](https://sourcify.dev/)
+
+Sourcify ensures verified EVM smart contract data remains open and accessible, and is powered by open-source tools.
 
 The team has been heads down building the technical foundations of a reliable and scalable verification service. As the technical aspects mature, the team is shifting its focus to outreach, community initiatives such as [Verifier Alliance](https://verifieralliance.org/), and other areas within the Ethereum ecosystem where Sourcify has high leverage.
 
 For further detail see [mid-2025 roadmap](https://docs.sourcify.dev/blog/roadmap-2025/) and the recent [2025 recap](https://docs.sourcify.dev/blog/recap-2025/) blog posts.
 
 ### Q3/Q4 2025 review
-**Milestones completed**
-* **4byte service and database:** Took over openchain.xyz's 4byte signature service. Built the largest Ethereum signature database (7.5 million signatures) by consolidating the openchain, 4byte.directory, [etherface](https://github.com/volsa/etherface/) data, and streaming Sourcify verified contract signatures. The service serves 7 million requests per day. 
-* **Public Queriable DB Instance**: Now mirroring the Sourcify database in BigQuery (listed in [Google web3 datasets](https://cloud.google.com/application/web3/discover)). Can be plugged into Colab Python notebooks, or queried through GCP services. Also shipped an [AI Playground](https://sourcify.dev/#/dataset-playground) to ask LLMs questions about the dataset.
-* **Contract Coverage**: The number of verified contracts reached 11 million, across 188 chains.
-* **Bytecode Similarity Search**: Shipped the endpoint `/v2/verify/similarity` that finds matches for unverified contracts by looking at the previously verified contracts.
-* **Verify Everywhere**
-    * **Hardhat Support**: Added a PR to Hardhat for Sourcify support and parallel verification on all verifiers.
-    * **Sourcify backend**: Whenever we receive a verification we submit it to all verifiers.
-* **Notable talks**: 
-  - [Why Contract Verification Needs to Open Up](https://www.youtube.com/watch?v=S8QarbmvpcA) 
-  - [The State of Source Code Verification: Closed, Painful, and Ready for Change](https://www.youtube.com/watch?v=4DLWcGtzh8A) 
 
-### Q1 & Q2 2026: 
-*Note: All workstreams will run in parallel across Q1 and Q2; accordingly, milestones are grouped under a combined Q1–Q2 timeline rather than listed on a per-quarter basis.*
+**Milestones completed**
+
+- **4byte service and database:** Took over [openchain.xyz](https://openchain.xyz)'s 4byte signature service. Built the largest Ethereum signature database (7.5 million signatures) by consolidating the openchain, [4byte.directory](https://4byte.directory), [etherface](https://github.com/volsa/etherface/) data, and streaming Sourcify verified contract signatures. The service serves 7 million requests per day.
+- **Public Queriable DB Instance**: Now mirroring the Sourcify database in BigQuery (listed in [Google web3 datasets](https://cloud.google.com/application/web3/discover)). Can be plugged into Colab Python notebooks, or queried through GCP services. Also shipped an [AI Playground](https://sourcify.dev/#/dataset-playground) to ask LLMs questions about the dataset.
+- **Contract Coverage**: The number of verified contracts reached 11 million, across 188 chains.
+- **Bytecode Similarity Search**: Shipped the endpoint `/v2/verify/similarity` that finds matches for unverified contracts by looking at the previously verified contracts.
+- **Verify Everywhere**
+  - **Hardhat Support**: Added a PR to Hardhat for Sourcify support and parallel verification on all verifiers.
+  - **Sourcify backend**: Whenever we receive a verification we submit it to all verifiers.
+- **Notable talks**:
+  - [Why Contract Verification Needs to Open Up](https://www.youtube.com/watch?v=S8QarbmvpcA)
+  - [The State of Source Code Verification: Closed, Painful, and Ready for Change](https://www.youtube.com/watch?v=4DLWcGtzh8A)
+
+### Q1 & Q2 2026:
+
+_Note: All workstreams will run in parallel across Q1 and Q2; accordingly, milestones are grouped under a combined Q1–Q2 timeline rather than listed on a per-quarter basis._
 
 **Sourcify**
-  - Implement brownouts for legacy API endpoints to make everyone switch to APIv2
-  - Codebase documentation for Agents (`AGENTS.md`)
-  - Verify on every Verifier
-    - Foundry: Push for adding parallel verification support
-    - Hardhat: Auto-verify on hardhat-ignition
+
+- Implement brownouts for legacy API endpoints to make everyone switch to APIv2
+- Codebase documentation for Agents (`AGENTS.md`)
+- Verify on every Verifier
+  - Foundry: Push for adding parallel verification support
+  - Hardhat: Auto-verify on hardhat-ignition
 - Verify All Contracts
-    - Execute runs on all chains to complete similarity verification on existing contracts.
-    - Support old Solidity versions
+  - Execute runs on all chains to complete similarity verification on existing contracts.
+  - Support old Solidity versions
 
 **Verifier Alliance**
-  - Parquet: Support incremental exports and v2 format
-  - Parquet: Separate self-contained export, i.e. each chain + address contains all sources and info, without deduplication.
-  - Data sanitization: Double check if the data is correct. Clean the known inconsistencies.
+
+- Parquet: Support incremental exports and v2 format
+- Parquet: Separate self-contained export, i.e. each chain + address contains all sources and info, without deduplication.
+- Data sanitization: Double check if the data is correct. Clean the known inconsistencies.
 
 **Ethereum ecosystem**
+
 - Clear Signing Initiatives
-    * Contribute development capacity across the SDK, website, and UI tooling for generating specification files
-    * Support specification development and, subsequently, help streamline the review process
+  - Contribute development capacity across the SDK, website, and UI tooling for generating specification files
+  - Support specification development and, subsequently, help streamline the review process
 - ethereum-lists/chains
-    - Support maintenance of adding chains with manpower and automations
+  - Support maintenance of adding chains with manpower and automations
 
 **Solidity**
+
 - Optimize Solidity's CI processes, and hosting of binaries.
 - Support Solidity’s benchmarking efforts by providing relevant datasets and analytical capacity
 
 ## ethdebug
-[Github](https://github.com/ethdebug/format) | [Website](https://ethdebug.github.io/format/) | [Socials](https://x.com/ethdebug) | 
 
-The ethdebug format is a debugging data format standard for smart contracts that enables compilers to provide rich debugging information to development tools. 
+[Github](https://github.com/ethdebug/format) | [Website](https://ethdebug.github.io/format/) | [Socials](https://x.com/ethdebug) |
+
+The ethdebug format is a debugging data format standard for smart contracts that enables compilers to provide rich debugging information to development tools.
 
 The past months focused on transitioning the format from specification design toward implementation. While compiler integration was delayed by the Argot spin-out's administrative demands on the Solidity team, early adopter interest, most notably from Walnut, has validated the format's direction and begun generating real-world feedback. With those constraints now easing, the coming months will focus on completing the v1 specification and deepening compiler support.
 
 ### Q3/Q4 2025 review
+
 Progress on compiler integration was slower than planned, as Solidity team capacity was partially constrained during Argot’s organizational establishment. While the team has since resumed full execution, available bandwidth was still insufficient to advance all initiatives in parallel, including ethdebug. As administrative demands continue to wind down and the team is gradually reinforced through additional hires, engineering capacity is returning to implementation efforts.
 **Milestones completed**
-* New debugger [Walnut](https://walnut.dev/) has begun to support ethdebug in material ways (debugger support, framework to evaluate ethdebug output from a given compiler, initial attempt to produce ethdebug data for old solc versions)
-* Reference toy compiler that produces initial ethdebug output, toy compiler ("`bugc`") playground
-* Notable talk: [ethdebug format overview (2025)](https://www.youtube.com/watch?v=KKvkXFv-GXM)
+
+- New debugger [Walnut](https://walnut.dev/) has begun to support ethdebug in material ways (debugger support, framework to evaluate ethdebug output from a given compiler, initial attempt to produce ethdebug data for old solc versions)
+- Reference toy compiler that produces initial ethdebug output, toy compiler ("`bugc`") playground
+- Notable talk: [ethdebug format overview (2025)](https://www.youtube.com/watch?v=KKvkXFv-GXM)
 
 **In progress / nearing completion**
-* Develop toy compiler implementation demonstrating full format
+
+- Develop toy compiler implementation demonstrating full format
 
 ### Q1 2026
-* **Schema specification**
-    * Define function call semantics in program schema (enabling compilers to mark instructions as relating to function call operations)
-    * Resolve pointer template variable renaming limitations
 
-* **Compiler integration**
-    * Drive Solidity integration toward feature parity with source maps
+- **Schema specification**
+  - Define function call semantics in program schema (enabling compilers to mark instructions as relating to function call operations)
+  - Resolve pointer template variable renaming limitations
 
-* **Debugger integration**
-    * Continue collaboration with Tenderly and Simbolik (RV) on their implementations
+- **Compiler integration**
+  - Drive Solidity integration toward feature parity with source maps
 
-* **Reference implementation**
-    * Bring toy compiler (`bugc`) into compliance with current format specification (reference implementation serves to validate spec as it develops)
+- **Debugger integration**
+  - Continue collaboration with Tenderly and Simbolik (RV) on their implementations
 
+- **Reference implementation**
+  - Bring toy compiler (`bugc`) into compliance with current format specification (reference implementation serves to validate spec as it develops)
 
 ### Q2 2026
-* **Schema specification**
-    * Define "fancy [`pick`](https://ethdebug.github.io/format/spec/program/context/pick)" context combinator to reduce debugger disambiguation complexity
-    * Extend types schema to support generic type specifications
-    * Expand template system from pointer schema for use by other relevant schemas 
 
-* **Compiler integration**
-    * Continue Solidity integration (priorities to be informed by Q1 progress)
-    * Integrate Walnut's [ethdebug-stats](https://github.com/walnuthq/ethdebug-stats) to assess solc's ethdebug output
-    * Begin monitoring Fe and Vyper for ethdebug integration feasibility
+- **Schema specification**
+  - Define "fancy [`pick`](https://ethdebug.github.io/format/spec/program/context/pick)" context combinator to reduce debugger disambiguation complexity
+  - Extend types schema to support generic type specifications
+  - Expand template system from pointer schema for use by other relevant schemas
 
-* **Debugger integration**
-    * Continue collaboration with Tenderly and Simbolik (RV) on their implementations
-    * Document best practices and integration guides 
-    * Foster collaboration with Walnut debugger 
-    * Outreach to Remix 
+- **Compiler integration**
+  - Continue Solidity integration (priorities to be informed by Q1 progress)
+  - Integrate Walnut's [ethdebug-stats](https://github.com/walnuthq/ethdebug-stats) to assess solc's ethdebug output
+  - Begin monitoring Fe and Vyper for ethdebug integration feasibility
+
+- **Debugger integration**
+  - Continue collaboration with Tenderly and Simbolik (RV) on their implementations
+  - Document best practices and integration guides
+  - Foster collaboration with Walnut debugger
+  - Outreach to Remix
 
 # Formal Verification
+
 ## Act
-[Github](https://github.com/argotorg/act) |  [Documentation](https://argotorg.github.io/act/) 
+
+[Github](https://github.com/argotorg/act) | [Documentation](https://argotorg.github.io/act/)
 
 Act is a formal specification language and verification framework for Ethereum smart contracts and a core research effort aimed at improving smart contract safety. It bridges human-readable specifications and EVM bytecode by proving their equivalence using the hevm tool, enabling high-assurance contracts across multiple smart contract languages.
 
 Recent work has focused on formalizing Act itself, including the development of formal semantics and proofs of type safety and soundness. With these foundations in place, the team is now preparing the first official Act v0.1.0 release, planned for early 2026.
 
 ### Q3/Q4 2025 Review
+
 **Milestones completed**
-* Formalize Act’s mathematical foundations with precise semantic definitions.
-* Real-world case studies: Verification of ERC20 and AMM (uniswap v2 core)
-* Publish foundational research paper to lower adoption barriers: submitted, awaits reviews.
-* Comprehensive documentation suite from basic usage to advanced extensions: planned for the release, underway.
-* End-to-end working tool to verify smart contracts from bytecode to the Rocq proof assistant
-* Vyper frontend: Act specifications can now be checked for equivalence against smart contracts written in Vyper in addition to Solidity
+
+- Formalize Act’s mathematical foundations with precise semantic definitions.
+- Real-world case studies: Verification of ERC20 and AMM (uniswap v2 core)
+- Publish foundational research paper to lower adoption barriers: submitted, awaits reviews.
+- Comprehensive documentation suite from basic usage to advanced extensions: planned for the release, underway.
+- End-to-end working tool to verify smart contracts from bytecode to the Rocq proof assistant
+- Vyper frontend: Act specifications can now be checked for equivalence against smart contracts written in Vyper in addition to Solidity
 
 **In progress / nearing completion**
-* Enhanced scalability and expressiveness with support for additional data types: structs, unknown code reasoning
-* Official v0.1.0 release
+
+- Enhanced scalability and expressiveness with support for additional data types: structs, unknown code reasoning
+- Official v0.1.0 release
 
 ### Q1 2026
-* Official v0.1.0 release (Jan 2026)
-* Complete & publish documentation (Jan 2026)
-* Grow adoption through marketing, educational tutorials, and conferences attendance
-* CheckMate ready for integration (extending with conditional actions)
-* Language extensions (structs, array)
-* Open source technical report with formal definitions and proofs
+
+- Official v0.1.0 release (Jan 2026)
+- Complete & publish documentation (Jan 2026)
+- Grow adoption through marketing, educational tutorials, and conferences attendance
+- CheckMate ready for integration (extending with conditional actions)
+- Language extensions (structs, array)
+- Open source technical report with formal definitions and proofs
 
 ### Q2 2026
-* Introduce game-theoretic reasoning with CheckMate tool integration for verification backend.
-* Add Fe support
-* Continue growth & adoption related activities
+
+- Introduce game-theoretic reasoning with CheckMate tool integration for verification backend.
+- Add Fe support
+- Continue growth & adoption related activities
 
 In parallel to the milestones listed above, the team will begin exploratory work to verify smart contracts written in Core Solidity.
 
 ## hevm
-[Github](https://github.com/ethereum/hevm) I [Website](https://hevm.dev/) 
 
-Hevm is a specialized symbolic execution engine and testing framework for Ethereum smart contracts. It enables developers to perform detailed analysis of contract behavior, find edge cases, and verify properties of their code through symbolic manipulation. This powerful tool helps ensure contract correctness and security. 
+[Github](https://github.com/ethereum/hevm) I [Website](https://hevm.dev/)
 
-Over the past months, the focus has been on shipping and hardening the tool, with two maintenance-focused releases delivering significant under-the-hood improvements to performance, reliability, and usability, alongside better analysis insights and user control. 
+Hevm is a specialized symbolic execution engine and testing framework for Ethereum smart contracts. It enables developers to perform detailed analysis of contract behavior, find edge cases, and verify properties of their code through symbolic manipulation. This powerful tool helps ensure contract correctness and security.
+
+Over the past months, the focus has been on shipping and hardening the tool, with two maintenance-focused releases delivering significant under-the-hood improvements to performance, reliability, and usability, alongside better analysis insights and user control.
 
 Looking ahead, the focus will increasingly shift toward positioning hevm as a foundational execution engine on which other tools can be built. Echidna demonstrates the power of this model in practice, and future work will continue to strengthen hevm as a dependable core for the broader verification and testing ecosystem.
 
 ### Q3/Q4 2025 Review
-**Milestones completed**
-* Shipped [0.55.1](https://github.com/argotorg/hevm/releases/tag/release%2F0.55.1), [0.56.0](https://github.com/argotorg/hevm/releases/tag/release/0.56.0), and [0.57.00](https://github.com/argotorg/hevm/releases/tag/release%2F0.57.0)
-* Large performance improvement of symbolic execution
-    * More controlled parallelism (fewer OOMs)
-    * Enhanced infeasible path pruning
-* UX improvements
-    * Counterexample validation
-    * Warnings mapped back to Solidity source lines
-    * Better and more robust calldata decoding
-    * More control over the analysis for the users (`--only-deployed`)
-* RPC framework with improved performance and robustness
-* Tighter integration with Echidna
-    * Echidna's symbolic worker based on hevm's symbolic execution
-    * Unified RPC handling
 
-**In progress / nearing completion** 
-* A browser-based version of hevm with a reduced initial feature set to increase accessibility
+**Milestones completed**
+
+- Shipped [0.55.1](https://github.com/argotorg/hevm/releases/tag/release%2F0.55.1), [0.56.0](https://github.com/argotorg/hevm/releases/tag/release/0.56.0), and [0.57.00](https://github.com/argotorg/hevm/releases/tag/release%2F0.57.0)
+- Large performance improvement of symbolic execution
+  - More controlled parallelism (fewer OOMs)
+  - Enhanced infeasible path pruning
+- UX improvements
+  - Counterexample validation
+  - Warnings mapped back to Solidity source lines
+  - Better and more robust calldata decoding
+  - More control over the analysis for the users (`--only-deployed`)
+- RPC framework with improved performance and robustness
+- Tighter integration with Echidna
+  - Echidna's symbolic worker based on hevm's symbolic execution
+  - Unified RPC handling
+
+**In progress / nearing completion**
+
+- A browser-based version of hevm with a reduced initial feature set to increase accessibility
 
 ### Q1 2026
-* Osaka support: update Ethereum testing infrastructure
-* Ship browser-based version of hevm
-* Stateful invariant testing
-* General maintenance (update dependencies)
-* Continued UX improvements: additional information about explored state 
+
+- Osaka support: update Ethereum testing infrastructure
+- Ship browser-based version of hevm
+- Stateful invariant testing
+- General maintenance (update dependencies)
+- Continued UX improvements: additional information about explored state
 
 ### Q2 2026
-* Separation of concrete and symbolic execution in the code for better performance and easier maintenance
+
+- Separation of concrete and symbolic execution in the code for better performance and easier maintenance
 
 In addition to the above listed milestones, hevm is supporting projects across the collective:
-* `solc` to differentially fuzz new codegen pipelines in development (SSA-CFG pipeline)
-* `act` as a backend to prove equivalence between Act specification and implementation (in e.g. Solidity & Vyper).
+
+- `solc` to differentially fuzz new codegen pipelines in development (SSA-CFG pipeline)
+- `act` as a backend to prove equivalence between Act specification and implementation (in e.g. Solidity & Vyper).
