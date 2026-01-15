@@ -18,6 +18,11 @@
   @apply no-underline;
 }
 
+/* Add spacing between consecutive footnote reference links */
+a[data-footnote-ref] {
+  @apply mr-1;
+}
+
 .csl-entry {
   @apply my-5;
 }

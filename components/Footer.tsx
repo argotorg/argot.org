@@ -30,6 +30,7 @@ const Footer = () => {
               <SocialIcon kind="farcaster" href={siteMetadata.farcaster} size={5} />
               <SocialIcon kind="x" href={siteMetadata.x} size={5} />
               <SocialIcon kind="bluesky" href={siteMetadata.bluesky} size={5} />
+              <SocialIcon kind="rss" href="/feed.xml" size={5} />
             </div>
           </div>
         </div>
