@@ -22,7 +22,7 @@ export default function ReportLayout({ title, date, children, className }: Repor
     <>
       <ScrollTopAndComment />
       <article className={className}>
-        <div className="">
+        <div className="mx-auto max-w-screen-lg">
           <header className="pt-6">
             <div className="space-y-4">
               <div>
@@ -42,16 +42,12 @@ export default function ReportLayout({ title, date, children, className }: Repor
               </dl>
             </div>
           </header>
-          <div className="divide-y pb-8">
-            <div className="divide-y">
-              <div className="prose max-w-none pb-8 pt-10 dark:prose-invert">{children}</div>
-            </div>
-            <footer>
-              <div className="pt-4 xl:pt-8">
-                <Link href="/reports" aria-label="Back to reports">
-                  &larr; Back to reports
-                </Link>
-              </div>
+          <div className="pb-8">
+            <div className="prose max-w-none pb-8 pt-10 dark:prose-invert">{children}</div>
+            <footer className="border-t border-anthracite-300 pt-4 dark:border-ecru-300 xl:pt-8">
+              <Link href="/reports" aria-label="Back to reports">
+                &larr; Back to reports
+              </Link>
             </footer>
           </div>
         </div>
