@@ -3,8 +3,10 @@ import { genPageMetadata } from 'app/seo'
 import reportData from '@/data/reports/2025/transparency-report.json'
 import financialData from '@/data/reports/2025/financial-data.json'
 import fundingData from '@/data/reports/2025/funding-data.json'
+import hiresData from '@/data/reports/2025/hires-data.json'
 import BudgetSection from './BudgetSection'
 import DonorCard from './DonorCard'
+import HireCard from './HireCard'
 
 export const metadata = genPageMetadata({
   title: reportData.title,
@@ -81,23 +83,14 @@ export default function TransparencyReport2025() {
               </p>
             </div>
 
-            <div>
-              <h3 className="mb-3 text-xl font-semibold">New hires</h3>
-              <ul className="list-inside list-disc space-y-2">
-                <li>
-                  <strong>Operations (part-time):</strong> Supporting back-office operations and
-                  payroll administration.
-                </li>
-                <li>
-                  <strong>Fundraising & Ecosystem (full-time):</strong> Supporting donor relations,
-                  grant coordination, and long-term funding strategy.
-                </li>
-                <li>
-                  <strong>Solidity Engineer (full-time):</strong> Strengthening the C++
-                  implementation of the Solidity compiler through backend and optimizer features
-                  contributions, including SSA-CFG and ethdebug.
-                </li>
-              </ul>
+            <div className="mt-8 grid gap-6 md:grid-cols-[300px_1fr]">
+              <h3 className="text-3xl font-extrabold">New Hires</h3>
+
+              <div className="space-y-4">
+                {hiresData.hires.map((hire) => (
+                  <HireCard key={hire.role} hire={hire} />
+                ))}
+              </div>
             </div>
           </div>
         </section>
