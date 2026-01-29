@@ -5,9 +5,9 @@ export const metadata = genPageMetadata({ title: 'Reports' })
 
 const reports = [
   {
-    slug: 'transparency-report-2024',
-    title: 'Transparency Report 2024',
-    date: '2024-12-31',
+    slug: 'transparency-report-2025',
+    title: 'Transparency Report 2025',
+    date: '2026-02-01',
     summary:
       'Annual transparency report showcasing our financial operations and organizational updates.',
   },
