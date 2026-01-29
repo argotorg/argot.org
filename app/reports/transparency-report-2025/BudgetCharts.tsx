@@ -8,8 +8,7 @@ interface BudgetItem {
 }
 
 interface BudgetChartsProps {
-  budgetExpenses: BudgetItem[]
-  salaryByProject: BudgetItem[]
+  items: BudgetItem[]
 }
 
 // Amber color palette from tailwind config
@@ -32,9 +31,9 @@ const addColorsToData = (data: BudgetItem[]) =>
     fill: COLORS[index % COLORS.length],
   }))
 
-export default function BudgetCharts({ budgetExpenses, salaryByProject }: BudgetChartsProps) {
-  const dataWithColors = addColorsToData(budgetExpenses)
-  const total = budgetExpenses.reduce((sum, item) => sum + item.amount, 0)
+export default function BudgetCharts({ items }: BudgetChartsProps) {
+  const dataWithColors = addColorsToData(items)
+  const total = items.reduce((sum, item) => sum + item.amount, 0)
 
   return (
     <div className="flex flex-col gap-8 md:flex-row md:items-start">
@@ -50,6 +49,10 @@ export default function BudgetCharts({ budgetExpenses, salaryByProject }: Budget
               outerRadius="100%"
               innerRadius="40%"
               stroke="none"
+              isAnimationActive={true}
+              animationBegin={0}
+              animationDuration={500}
+              animationEasing="ease-out"
             />
             <Tooltip
               formatter={(value: number, name: string) => [formatCurrency(value), name]}
@@ -79,7 +82,7 @@ export default function BudgetCharts({ budgetExpenses, salaryByProject }: Budget
         </div>
       </div>
       <div className="w-full space-y-2 md:w-1/2">
-        {budgetExpenses.map((item, index) => (
+        {items.map((item, index) => (
           <div key={item.name} className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div
@@ -93,7 +96,7 @@ export default function BudgetCharts({ budgetExpenses, salaryByProject }: Budget
         ))}
         <div className="flex items-center justify-between border-t border-anthracite-300 pt-2 font-bold dark:border-ecru-300">
           <span>Total</span>
-          <span>{formatCurrency(budgetExpenses.reduce((sum, item) => sum + item.amount, 0))}</span>
+          <span>{formatCurrency(total)}</span>
         </div>
       </div>
     </div>

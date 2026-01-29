@@ -2,7 +2,7 @@ import ReportLayout from '@/layouts/ReportLayout'
 import { genPageMetadata } from 'app/seo'
 import reportData from '@/data/reports/2025/transparency-report.json'
 import financialData from '@/data/reports/2025/financial-data.json'
-import BudgetCharts from './BudgetCharts'
+import BudgetSection from './BudgetSection'
 
 export const metadata = genPageMetadata({
   title: reportData.title,
@@ -106,15 +106,10 @@ export default function TransparencyReport2025() {
             From July 1, 2025 through December 31, 2025 our total expenditures amounted to $
             {financialData.totalSpent.toLocaleString()}
           </p>
-          <BudgetCharts
+          <BudgetSection
             budgetExpenses={financialData.budgetExpenses}
             salaryByProject={financialData.salaryByProject}
           />
-          <p className="mt-6 text-sm italic">
-            *Professional Services includes the domicile in Switzerland, design, accounting and
-            banking fees.
-          </p>
-          <p className="mt-2 text-sm italic">**Org includes Admin, Ops, and Fundraising</p>
         </section>
       </div>
     </ReportLayout>
