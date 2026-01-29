@@ -1,0 +1,29 @@
+{
+  "intro": "Argot is grateful to its early contributors, whose support has been essential to our formation and momentum. Every contribution truly makes a difference. Upon incorporation, we secured a three-year operational funding arrangement with the Ethereum Foundation, with a potential two-year extension pending the progress and ecosystem contribution the collective makes. While we value EF's foundational role and continued collaboration, Argot's transition into an independent organization makes diversification of funding sources critical to guaranteeing long-term sustainability and resilience.",
+  "donors": [
+    {
+      "name": "Ethereum Foundation",
+      "amount": "7250 ETH",
+      "date": "July 4th",
+      "description": "This inaugural grant provides the Argot Collective with its initial operational runway and supports core infrastructure development, contributor coordination, and the long-term maintenance of critical protocol tooling."
+    },
+    {
+      "name": "Octant",
+      "amount": "49.8 ETH",
+      "date": "August 6th",
+      "description": "Four Argot Collective projects were selected to participate in Octant's Epoch 8, collectively raising 49.8 ETH, with funding allocated as follows: Solidity received 22.4 ETH, Fe 9.8 ETH, Act 8.9 ETH, and hevm 8.8 ETH. Octant is playing an important role in advancing sustainable public goods funding within the Ethereum ecosystem, and we greatly value its continued contribution to this effort."
+    },
+    {
+      "name": "ENS",
+      "amount": "75,000 USDC",
+      "date": "September 25th",
+      "description": "This grant was awarded by the ENS DAO Public Goods Working Group in support of Argot's work. We are deeply grateful for this early recognition and the confidence placed in our mission."
+    },
+    {
+      "name": "OP Retro Funding",
+      "amount": "605,259 OP",
+      "date": "Feb 4th - Dec 31st",
+      "description": "Five of Argot's six projects received funding through the OP Retro Funding initiative. OP has been one of the strongest stewards of public goods funding, and we are sincerely grateful for this continued support. The recurring nature of this funding enabled Argot to cover all operational expenses from the moment of incorporation until we received funds from the EF grant, providing a critical buffer and operational agency at a pivotal moment. The funds break-down across projects is as follows: Solidity received 559,000 OP, Act 259 OP, Sourcify 18,000 OP, Fe 21,000 OP, and hevm 7,000 OP."
+    }
+  ]
+}

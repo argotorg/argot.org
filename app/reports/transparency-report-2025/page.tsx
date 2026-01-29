@@ -2,7 +2,9 @@ import ReportLayout from '@/layouts/ReportLayout'
 import { genPageMetadata } from 'app/seo'
 import reportData from '@/data/reports/2025/transparency-report.json'
 import financialData from '@/data/reports/2025/financial-data.json'
+import fundingData from '@/data/reports/2025/funding-data.json'
 import BudgetSection from './BudgetSection'
+import DonorCard from './DonorCard'
 
 export const metadata = genPageMetadata({
   title: reportData.title,
@@ -110,6 +112,35 @@ export default function TransparencyReport2025() {
             budgetExpenses={financialData.budgetExpenses}
             salaryByProject={financialData.salaryByProject}
           />
+        </section>
+
+        <section>
+          <h2 className="mb-6 text-4xl font-extrabold tracking-tight">Grants</h2>
+          <div className="space-y-4">
+            <p>
+              This grant funds the work of one engineer to continue maintaining evmone. The project
+              was previously supported by the Ethereum Foundation and is now maintained
+              independently following the conclusion of that engagement, and it remains a critical
+              dependency for the compiler's test framework.
+            </p>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="mb-6 text-4xl font-extrabold tracking-tight">Funding</h2>
+          <div className="space-y-4">
+            <p>{fundingData.intro}</p>
+          </div>
+
+          <div className="mt-8 grid gap-6 md:grid-cols-[300px_1fr]">
+            <h3 className="text-3xl font-extrabold">Donors</h3>
+
+            <div className="space-y-4">
+              {fundingData.donors.map((donor) => (
+                <DonorCard key={donor.name} donor={donor} />
+              ))}
+            </div>
+          </div>
         </section>
       </div>
     </ReportLayout>

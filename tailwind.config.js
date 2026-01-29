@@ -36,6 +36,8 @@ module.exports = {
         },
         anthracite: {
           DEFAULT: '#2D2725',
+          100: '#D5CFCD',
+          200: '#A8A09D',
           300: '#5B4D49',
           400: '#423835',
           500: '#2D2725',
@@ -51,7 +53,9 @@ module.exports = {
           700: '#966316',
         },
         ecru: {
-          DEFAULT: '#EADBCA', // Different color from below
+          DEFAULT: '#EADBCA',
+          100: '#FAF6F1',
+          200: '#F5EDE4',
           300: '#F6EADD',
           400: '#E9DED2',
           500: '#DBCCBB',
