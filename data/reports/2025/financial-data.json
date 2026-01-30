@@ -1,20 +1,19 @@
 {
-  "totalSpent": 2782856,
+  "totalSpent": 2443067,
   "budgetExpenses": [
-    { "name": "Salaries", "amount": 2491568 },
-    { "name": "Infra", "amount": 114384 },
-    { "name": "Legal", "amount": 56455 },
+    { "name": "Salaries", "amount": 2159955 },
+    { "name": "Infra", "amount": 107218 },
+    { "name": "Legal", "amount": 56454 },
     { "name": "Travel", "amount": 61955 },
-    { "name": "Professional Services*", "amount": 39080 },
-    { "name": "Grants", "amount": 15597 },
-    { "name": "Marketing", "amount": 3817 }
+    { "name": "Professional Services*", "amount": 42897 },
+    { "name": "Grants", "amount": 14588 }
   ],
   "salaryByProject": [
-    { "name": "Solidity", "amount": 995610 },
-    { "name": "Sourcify", "amount": 415125 },
+    { "name": "Solidity", "amount": 876538 },
+    { "name": "Sourcify", "amount": 301692 },
     { "name": "Act", "amount": 310923 },
-    { "name": "Org**", "amount": 240256 },
-    { "name": "Hevm", "amount": 204056 },
+    { "name": "Org**", "amount": 199967 },
+    { "name": "Hevm", "amount": 145238 },
     { "name": "Fe", "amount": 219283 },
     { "name": "ethdebug", "amount": 106314 }
   ]
