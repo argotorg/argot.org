@@ -2,9 +2,9 @@
   "grantees": [
     {
       "name": "evmone",
-      "amount": "10 ETH",
-      "date": "July 4th",
-      "description": "Grant for evmone TBD"
+      "amount": "$14,588",
+      "date": " ",
+      "description": " This grant funds the work of one engineer to continue maintaining evmone. The project was previously supported by the Ethereum Foundation and is now maintained independently following the conclusion of that engagement, and it remains a critical dependency for the compiler’s test framework."
     }
   ]
 }
