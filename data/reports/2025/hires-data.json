@@ -1,0 +1,16 @@
+{
+  "hires": [
+    {
+      "role": "Ops (Part-Time)",
+      "description": "Supporting back office operations, payroll."
+    },
+    {
+      "role": "Fundraising",
+      "description": "Supporting donor relations, grant coordination, and long-term funding strategy."
+    },
+    {
+      "role": "Solidity",
+      "description": "Strengthening the C++ implementation of the Solidity compiler through backend and optimizer features contributions, including SSA-CFG and ethdebug."
+    }
+  ]
+}
