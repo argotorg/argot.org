@@ -20,6 +20,12 @@
       "description": "This grant was awarded by the ENS DAO Public Goods Working Group in support of Argot's work. We are deeply grateful for this early recognition and the confidence placed in our mission."
     },
     {
+      "name": "Gitcoin",
+      "amount": "$2,913.92",
+      "date": "October 2025",
+      "description": "Argot participated in the Gitcoin GG24 Developer Tooling & Infrastructure Quadratic Funding round on Giveth, supporting community-backed funding for open-source Ethereum tooling."
+    },
+    {
       "name": "OP Retro Funding",
       "amount": "605,259 OP",
       "date": "Feb 4th - Dec 31st",
