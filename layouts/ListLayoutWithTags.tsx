@@ -10,15 +10,16 @@ import Link from '@/components/Link'
 import Tag from '@/components/Tag'
 import siteMetadata from '@/data/siteMetadata'
 import tagData from 'app/tag-data.json'
+import type { ListPost } from './ListLayout'
 
 interface PaginationProps {
   totalPages: number
   currentPage: number
 }
 interface ListLayoutProps {
-  posts: CoreContent<Blog>[]
+  posts: ListPost[]
   title: string
-  initialDisplayPosts?: CoreContent<Blog>[]
+  initialDisplayPosts?: ListPost[]
   pagination?: PaginationProps
 }
 
@@ -122,7 +123,7 @@ export default function ListLayoutWithTags({
           <div>
             <ul>
               {displayPosts.map((post) => {
-                const { path, date, title, summary, tags } = post
+                const { path, date, title, summary, tags, isReport } = post
                 return (
                   <li key={path} className="py-5">
                     <article className="flex flex-col space-y-2 xl:space-y-0">
@@ -137,7 +138,15 @@ export default function ListLayoutWithTags({
                       <div className="space-y-3">
                         <div>
                           <h2 className="text-2xl font-bold leading-8 tracking-tight">
-                            <Link href={`/${path}`} className="text-gray-900 dark:text-gray-100">
+                            <Link
+                              href={`/${path}`}
+                              className="flex items-center gap-2 text-gray-900 dark:text-gray-100"
+                            >
+                              {isReport && (
+                                <span className="dark:bg-ecru-900 inline-flex items-center rounded-md bg-anthracite-100 px-2 py-0.5 text-xs font-medium text-anthracite-700 ring-1 ring-inset ring-anthracite-300 dark:text-ecru-300 dark:ring-ecru-700">
+                                  Report
+                                </span>
+                              )}
                               {title}
                             </Link>
                           </h2>

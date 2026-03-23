@@ -14,10 +14,14 @@ interface PaginationProps {
   totalPages: number
   currentPage: number
 }
+export interface ListPost extends CoreContent<Blog> {
+  isReport?: boolean
+}
+
 interface ListLayoutProps {
-  posts: CoreContent<Blog>[]
+  posts: ListPost[]
   title: string
-  initialDisplayPosts?: CoreContent<Blog>[]
+  initialDisplayPosts?: ListPost[]
   pagination?: PaginationProps
 }
 
@@ -114,7 +118,7 @@ export default function ListLayout({
         <ul>
           {!filteredBlogPosts.length && 'No posts found.'}
           {displayPosts.map((post) => {
-            const { path, date, title, summary, tags, externalUrl } = post
+            const { path, date, title, summary, tags, externalUrl, isReport } = post
             return (
               <li key={path} className="py-4">
                 <article className="space-y-2 xl:grid xl:grid-cols-4 xl:items-baseline xl:space-y-0">
@@ -129,6 +133,11 @@ export default function ListLayout({
                       <h3 className="text-2xl font-bold leading-8 tracking-tight">
                         <Link href={externalUrl || `/${path}`} className="flex items-center gap-2">
                           {externalUrl && <HiExternalLink className="h-5 w-5" />}
+                          {isReport && (
+                            <span className="dark:bg-ecru-900 inline-flex items-center rounded-md bg-anthracite-100 px-2 py-0.5 text-xs font-medium text-anthracite-700 ring-1 ring-inset ring-anthracite-300 dark:text-ecru-300 dark:ring-ecru-700">
+                              Report
+                            </span>
+                          )}
                           {title}
                         </Link>
                       </h3>
