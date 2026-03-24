@@ -1,17 +1,8 @@
 import { genPageMetadata } from 'app/seo'
 import Link from '@/components/Link'
+import reports from '@/data/reports'
 
 export const metadata = genPageMetadata({ title: 'Reports' })
-
-const reports = [
-  {
-    slug: 'transparency-report-2025',
-    title: 'Transparency Report 2025',
-    date: '2026-02-01',
-    summary:
-      'Annual transparency report showcasing our financial operations and organizational updates.',
-  },
-]
 
 export default function ReportsPage() {
   return (

@@ -9,15 +9,20 @@ import Link from '@/components/Link'
 import Tag from '@/components/Tag'
 import siteMetadata from '@/data/siteMetadata'
 import { HiExternalLink } from 'react-icons/hi'
+import ReportBadge from '@/components/ReportBadge'
 
 interface PaginationProps {
   totalPages: number
   currentPage: number
 }
+export interface ListPost extends CoreContent<Blog> {
+  isReport?: boolean
+}
+
 interface ListLayoutProps {
-  posts: CoreContent<Blog>[]
+  posts: ListPost[]
   title: string
-  initialDisplayPosts?: CoreContent<Blog>[]
+  initialDisplayPosts?: ListPost[]
   pagination?: PaginationProps
 }
 
@@ -114,7 +119,7 @@ export default function ListLayout({
         <ul>
           {!filteredBlogPosts.length && 'No posts found.'}
           {displayPosts.map((post) => {
-            const { path, date, title, summary, tags, externalUrl } = post
+            const { path, date, title, summary, tags, externalUrl, isReport } = post
             return (
               <li key={path} className="py-4">
                 <article className="space-y-2 xl:grid xl:grid-cols-4 xl:items-baseline xl:space-y-0">
@@ -129,6 +134,7 @@ export default function ListLayout({
                       <h3 className="text-2xl font-bold leading-8 tracking-tight">
                         <Link href={externalUrl || `/${path}`} className="flex items-center gap-2">
                           {externalUrl && <HiExternalLink className="h-5 w-5" />}
+                          {isReport && <ReportBadge />}
                           {title}
                         </Link>
                       </h3>
