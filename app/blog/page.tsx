@@ -1,18 +1,13 @@
-import ListLayout, { ListPost } from '@/layouts/ListLayout'
-import { allCoreContent, sortPosts } from 'pliny/utils/contentlayer'
-import { allBlogs } from 'contentlayer/generated'
+import ListLayout from '@/layouts/ListLayout'
 import { genPageMetadata } from 'app/seo'
-import { reportsAsListPosts } from '@/data/reports'
+import { getAllPosts } from '@/data/reports'
 
 const POSTS_PER_PAGE = 5
 
 export const metadata = genPageMetadata({ title: 'Blog' })
 
 export default function BlogPage() {
-  const blogPosts: ListPost[] = allCoreContent(sortPosts(allBlogs))
-  const allPosts = [...blogPosts, ...reportsAsListPosts()].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  )
+  const allPosts = getAllPosts()
   const pageNumber = 1
   const initialDisplayPosts = allPosts.slice(
     POSTS_PER_PAGE * (pageNumber - 1),

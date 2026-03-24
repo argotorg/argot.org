@@ -11,6 +11,7 @@ import Tag from '@/components/Tag'
 import siteMetadata from '@/data/siteMetadata'
 import tagData from 'app/tag-data.json'
 import type { ListPost } from './ListLayout'
+import ReportBadge from '@/components/ReportBadge'
 
 interface PaginationProps {
   totalPages: number
@@ -142,11 +143,7 @@ export default function ListLayoutWithTags({
                               href={`/${path}`}
                               className="flex items-center gap-2 text-gray-900 dark:text-gray-100"
                             >
-                              {isReport && (
-                                <span className="dark:bg-ecru-900 inline-flex items-center rounded-md bg-anthracite-100 px-2 py-0.5 text-xs font-medium text-anthracite-700 ring-1 ring-inset ring-anthracite-300 dark:text-ecru-300 dark:ring-ecru-700">
-                                  Report
-                                </span>
-                              )}
+                              {isReport && <ReportBadge />}
                               {title}
                             </Link>
                           </h2>

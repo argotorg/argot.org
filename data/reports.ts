@@ -1,4 +1,6 @@
 import transparencyReport2025 from './reports/2025/transparency-report.json'
+import { allCoreContent, sortPosts } from 'pliny/utils/contentlayer'
+import { allBlogs } from 'contentlayer/generated'
 import type { ListPost } from '@/layouts/ListLayout'
 
 export interface Report {
@@ -14,6 +16,13 @@ const reports: Report[] = [
     ...transparencyReport2025,
   },
 ]
+
+export function getAllPosts(): ListPost[] {
+  const blogPosts: ListPost[] = allCoreContent(sortPosts(allBlogs))
+  return [...blogPosts, ...reportsAsListPosts()].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  )
+}
 
 export function reportsAsListPosts(): ListPost[] {
   return reports.map((report) => ({
