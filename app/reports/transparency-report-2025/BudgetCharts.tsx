@@ -55,7 +55,15 @@ export default function BudgetCharts({ items }: BudgetChartsProps) {
               animationEasing="ease-out"
             />
             <Tooltip
-              formatter={(value: number, name: string) => [formatCurrency(value), name]}
+              formatter={(value: number, name: string) => [
+                <span key="value">
+                  {formatCurrency(value)}
+                  <span style={{ fontWeight: 400, opacity: 0.6, marginLeft: 4 }}>
+                    ({((value / total) * 100).toFixed(1)}%)
+                  </span>
+                </span>,
+                name,
+              ]}
               contentStyle={{
                 backgroundColor: '#1a1a1a',
                 border: 'none',
@@ -91,7 +99,12 @@ export default function BudgetCharts({ items }: BudgetChartsProps) {
               />
               <span>{item.name}</span>
             </div>
-            <span className="font-semibold">{formatCurrency(item.amount)}</span>
+            <span className="font-semibold">
+              <span className="mr-1.5 text-xs font-normal text-anthracite-500/60 dark:text-ecru-500/60">
+                {((item.amount / total) * 100).toFixed(1)}%
+              </span>
+              {formatCurrency(item.amount)}
+            </span>
           </div>
         ))}
         <div className="flex items-center justify-between border-t border-anthracite-300 pt-2 font-bold dark:border-ecru-300">
