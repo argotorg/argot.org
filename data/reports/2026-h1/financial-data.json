@@ -1,0 +1,19 @@
+{
+  "totalSpent": 2570361,
+  "budgetExpenses": [
+    { "name": "Salaries", "amount": 2251118 },
+    { "name": "Travel & Events", "amount": 147746 },
+    { "name": "Professional Services*", "amount": 76362 },
+    { "name": "Infrastructure", "amount": 44951 },
+    { "name": "Legal", "amount": 35329 },
+    { "name": "Grants", "amount": 14855 }
+  ],
+  "salaryByProject": [
+    { "name": "Solidity", "amount": 1135873 },
+    { "name": "Sourcify", "amount": 294439 },
+    { "name": "Fe", "amount": 288156 },
+    { "name": "Act", "amount": 279062 },
+    { "name": "Org**", "amount": 201051 },
+    { "name": "Hevm", "amount": 52537 }
+  ]
+}

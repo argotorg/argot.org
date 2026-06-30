@@ -1,0 +1,35 @@
+{
+  "intro": "We are grateful to all public-goods stewards and donors who contributed to Argot this year. Your support allows us to maintain critical open-source infrastructure independently and under a neutral umbrella. We are also pleased to share that we have finalized the terms and governance of the original five-year funding commitment with the Ethereum Foundation. Details are outlined below.",
+  "donors": [
+    {
+      "name": "Octant",
+      "amount": "46.3 ETH",
+      "date": "29.01.2026",
+      "description": "Solidity was selected to participate in Octant epoch 10, raising 46.3 ETH in total. Octant continues to be a driving force in public goods funding innovation within the Ethereum ecosystem, and Argot is grateful for its continued support."
+    },
+    {
+      "name": "Octant",
+      "amount": "2.4 ETH",
+      "date": "20.05.2026",
+      "description": "Octant piloted StreamVote. Instead of distributing funds at the end of a fixed voting period, the round used Superfluid money streams to continuously distribute funding proportional to the voters' quadratic voting distribution. Solidity was included in the inaugural list of projects available to fund and was able to raise a total of 2.4 ETH."
+    },
+    {
+      "name": "theDAO Fund x Giveth",
+      "amount": "20.15 ETH, 2,972 USDC",
+      "date": "26.06.2026",
+      "description": "Three Argot projects were selected for the inaugural theDAO Fund Ethereum Security QF Round on Giveth: Sourcify, act, and hevm, collectively raising 20.15 ETH and 2,972 USDC. Funding was allocated as follows: Sourcify received 11.91 ETH & 1,067 USDC, act 1.24 ETH & 324 USDC, and hevm 7 ETH & 1,581 USDC. The theDAO Security Fund is a newly formed initiative to fulfill that original intention of TheDAO: put long-idle resources to work in service of Ethereum's security. Argot is honored to have been part of its first round."
+    },
+    {
+      "name": "Octant",
+      "amount": "TBD",
+      "date": "30.06.2026",
+      "description": "Solidity was selected to participate in Octant's inaugural v2 round: epoch 12. This round introduced ProperQF and allowed ETH contributions for the first time. This new mechanism allowed Solidity to raise [TBD] ETH in total."
+    },
+    {
+      "name": "Ethereum Foundation",
+      "amount": "2,469 stETH",
+      "date": "01.07.2026",
+      "description": "When Argot was formed, the Ethereum Foundation committed to five years of operational runway, with the first three years paid out in full last year. The terms and governance of the remaining two years have now been finalized, with the first unlock taking place on July 1, 2026. This continued support provides the collective with the stability to maintain and develop core programming languages and tooling for Ethereum over the long term. Full details about the set-up can be found in our funding announcement [insert funding announcement link]."
+    }
+  ]
+}
