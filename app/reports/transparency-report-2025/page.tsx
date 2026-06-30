@@ -5,9 +5,9 @@ import financialData from '@/data/reports/2025/financial-data.json'
 import fundingData from '@/data/reports/2025/funding-data.json'
 import grantData from '@/data/reports/2025/grant-data.json'
 import hiresData from '@/data/reports/2025/hires-data.json'
-import BudgetSection from './BudgetSection'
-import DonorCard from './DonorCard'
-import HireCard from './HireCard'
+import BudgetSection from '../_components/BudgetSection'
+import DonorCard from '../_components/DonorCard'
+import HireCard from '../_components/HireCard'
 
 export const metadata = genPageMetadata({
   title: reportData.title,
