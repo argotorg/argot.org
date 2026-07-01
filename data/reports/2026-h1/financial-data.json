@@ -1,19 +1,21 @@
 {
-  "totalSpent": 2570361,
+  "totalSpent": 2666561,
   "budgetExpenses": [
-    { "name": "Salaries", "amount": 2251118 },
-    { "name": "Travel & Events", "amount": 147746 },
-    { "name": "Professional Services*", "amount": 76362 },
-    { "name": "Infrastructure", "amount": 44951 },
+    { "name": "Salaries", "amount": 2340492 },
+    { "name": "Travel & Events", "amount": 154310 },
+    { "name": "Professional Services*", "amount": 76372 },
+    { "name": "Infrastructure", "amount": 45203 },
     { "name": "Legal", "amount": 35329 },
     { "name": "Grants", "amount": 14855 }
   ],
   "salaryByProject": [
-    { "name": "Solidity", "amount": 1135873 },
-    { "name": "Sourcify", "amount": 294439 },
-    { "name": "Fe", "amount": 288156 },
+    { "name": "Solidity", "amount": 1096968 },
+    { "name": "Sourcify", "amount": 312299 },
     { "name": "act", "amount": 279062 },
-    { "name": "Org**", "amount": 201051 },
-    { "name": "hevm", "amount": 52537 }
+    { "name": "Fe", "amount": 243678 },
+    { "name": "Org**", "amount": 218929 },
+    { "name": "ethdebug","amount": 88958 },
+    { "name": "hevm", "amount": 56120 },
+    { "name": "Sonatina", "amount": 44478 }
   ]
 }
