@@ -1,0 +1,250 @@
+---
+title: Argot Roadmap Update 2026 (2/2)
+date: '2026-07-01'
+draft: false
+summary: 'This blog post recaps the Argot Collective’s work from the first half of 2026 and provides a detailed outline of priorities and upcoming milestones for the second half of 2026.'
+layout: PostBanner
+tags: ['argot']
+---
+
+This post is our bi-annual roadmap update, recapping the first half of the year and outlining our focus for the months ahead.
+
+Argot is a self-governed collective of engineers and researchers that maintains Solidity and the open-source compiler tooling the Ethereum ecosystem depends on. Alongside that core maintenance work, it's a research home for more experimental work on programming languages and developer tools.
+
+The first half of 2026 saw the Solidity team focus on fixing stack-too-deep errors in the compiler. The SSA-CFG pipeline under the `--experimental` flag fixes this. Efforts to standardize debugging with ethdebug have also been increased significantly. act and Fe each delivered their first releases following extensive rewrites, marking important milestones for both projects. Sourcify has continued its commitment to ecosystem-wide initiatives such as the Clear Signing working group, contributing to broader efforts to improve transaction safety and UX on Ethereum.
+
+In the sections that follow, we recap the work delivered across the collective and provide an outlook for the remainder of 2026.
+
+## Solidity
+
+Github [solc](https://github.com/argotorg/solidity) & [solcore](https://github.com/argotorg/solcore) | [Socials](https://x.com/solidity_lang) | [Website](https://www.soliditylang.org/)
+
+In the first half of 2026, the Solidity team's main priority was to address stack-too-deep errors in the compiler. The SSA-CFG pipeline under the `--experimental` flag resolves this and is foundational work for significantly faster compile times and an overall better developer experience. This work not only benefits Classic Solidity, but will also directly carry over to Core Solidity as it will use the same backend.
+
+The focus for the remainder of the year is on stabilizing the SSA-CFG pipeline and moving it out of `--experimental`. Efforts to improve debugging infrastructure have also increased substantially and will continue to do so, with further details covered in the ethdebug section below.
+
+Core Solidity has reached the point where smart contracts can be written and compiled end-to-end. Significant progress has been made on the standard library and on foundational language design decisions. This ensures that it will be as easy as possible for existing developers to migrate to Core Solidity. A number of essential contracts have been successfully ported (e.g., the beacon chain deposit contract, wETH, a multisig, a Uniswap v2 vault, etc.). With these foundations in place, the focus for the second half of the year is preparing and starting the production implementation of the language.
+
+### Classic Solidity Q1/Q2 review
+
+- **New SSA-CFG code generation backend**: a from-scratch single static assignment (SSA) based Yul codegen path (Yul to SSA control-flow graph (CFG) transform utilizing the phi/upsilon form, underpinned by a uniform instruction store and code transform to EVM assembly), wired into the CLI and Standard JSON as `--via-ssa-cfg` / `settings.viaSSACFG`, shipped as an experimental opt-in in 0.8.35, and now run by default across the semantic-test suite next to the evmasm and viaIR pipelines. [#16498](https://github.com/argotorg/solidity/pull/16498), [#16501](https://github.com/argotorg/solidity/pull/16501), [#16503](https://github.com/argotorg/solidity/pull/16503), [#16542](https://github.com/argotorg/solidity/pull/16542), [#16544](https://github.com/argotorg/solidity/pull/16544), [#16550](https://github.com/argotorg/solidity/pull/16550), [#16566](https://github.com/argotorg/solidity/pull/16566), [#16641](https://github.com/argotorg/solidity/pull/16641), [#16643](https://github.com/argotorg/solidity/pull/16643), [#16646](https://github.com/argotorg/solidity/pull/16646), [#16668](https://github.com/argotorg/solidity/pull/16668), [#16686](https://github.com/argotorg/solidity/pull/16686), [#16707](https://github.com/argotorg/solidity/pull/16707), [#16709](https://github.com/argotorg/solidity/pull/16709), [#16714](https://github.com/argotorg/solidity/pull/16714), [#16765](https://github.com/argotorg/solidity/pull/16765), [#16786](https://github.com/argotorg/solidity/pull/16786)
+- **Stack layout generation and stack shuffler**: the algorithmic heart of the new backend, including stack-layout generation, a stack shuffler, jump unification, and a long stream of correctness fixes and performance improvements. [#16464](https://github.com/argotorg/solidity/pull/16464), [#16512](https://github.com/argotorg/solidity/pull/16512), [#16515](https://github.com/argotorg/solidity/pull/16515), [#16559](https://github.com/argotorg/solidity/pull/16559), [#16567](https://github.com/argotorg/solidity/pull/16567), [#16568](https://github.com/argotorg/solidity/pull/16568), [#16571](https://github.com/argotorg/solidity/pull/16571), [#16591](https://github.com/argotorg/solidity/pull/16591), [#16595](https://github.com/argotorg/solidity/pull/16595), [#16607](https://github.com/argotorg/solidity/pull/16607), [#16608](https://github.com/argotorg/solidity/pull/16608), [#16623](https://github.com/argotorg/solidity/pull/16623), [#16676](https://github.com/argotorg/solidity/pull/16676), [#16688](https://github.com/argotorg/solidity/pull/16688), [#16703](https://github.com/argotorg/solidity/pull/16703), [#16817](https://github.com/argotorg/solidity/pull/16817), [#16827](https://github.com/argotorg/solidity/pull/16827)
+- **Stack-to-memory spilling**: the spill machinery (spill set, memory addressing, spill emitter) that lets the new backend resolve stack-too-deep by spilling values to memory on demand in the stack scheduling phase opposed to viaIRs memory spilling in the optimizer phase. [#16599](https://github.com/argotorg/solidity/pull/16599), [#16744](https://github.com/argotorg/solidity/pull/16744), [#16750](https://github.com/argotorg/solidity/pull/16750), [#16767](https://github.com/argotorg/solidity/pull/16767), [#16789](https://github.com/argotorg/solidity/pull/16789), [#16829](https://github.com/argotorg/solidity/pull/16829), [#16830](https://github.com/argotorg/solidity/pull/16830)
+- **SSA-CFG optimizer pass pipeline**: efforts towards implementing a full optimization pipeline for the new backend (separated build and optimize phases, trivial-phi and unreachable-block cleanup, identity removal, literal deduplication, a block outliner) that aims to fix viaIRs long compile times. [#16486](https://github.com/argotorg/solidity/pull/16486), [#16544](https://github.com/argotorg/solidity/pull/16544), [#16550](https://github.com/argotorg/solidity/pull/16550), [#16674](https://github.com/argotorg/solidity/pull/16674), [#16689](https://github.com/argotorg/solidity/pull/16689), [#16733](https://github.com/argotorg/solidity/pull/16733), [#16795](https://github.com/argotorg/solidity/pull/16795)
+- **Benchmarking infrastructure (solc-bench)**: a statistical benchmarking harness, Welch t-test significance gating, and an expanded suite tracking instructions, cycles, CPU/wall time, peak memory, bytecode size, and gas, used for regression gating. [solc-bench #9](https://github.com/argotorg/solc-bench/pull/9)
+- **Experimental mode gating framework ([docs](https://docs.soliditylang.org/en/v0.8.35/using-the-compiler.html#experimental-mode))**: the `--experimental` flag that gates all experimental features (`generic-solidity`, `lsp`, `ethdebug`, `eof`, `evm`, `ast-import`, `evmasm-import`, `ir-ast`, `ssa-cfg`), recorded in JSON and CBOR metadata, plus an experimental `@future` EVM version. [#16229](https://github.com/argotorg/solidity/pull/16229), [#16505](https://github.com/argotorg/solidity/pull/16505)
+- **Around 30 security reports analyzed**: LLMs getting better resulted in an order of magnitude increase in the amount of vulnerability reports that the team had to investigate and react to. Triggered a general overhaul of the internal security procedures to deal with the increased load
+- **Emergency 0.8.34 security release**: a fix for a high-severity bug in the IR codegen ([Transient Storage Clearing Helper Collision Bug](https://www.soliditylang.org/blog/2026/02/18/transient-storage-clearing-helper-collision-bug/), where a storage variable sharing a layout slot with a transient variable could be cleared), shipped end-to-end within a week and tagged 2026-02-18. [#16477](https://github.com/argotorg/solidity/pull/16477), [#16478](https://github.com/argotorg/solidity/pull/16478)
+- **0.8.35 and 0.8.36 releases**: version 0.8.35 tagged 2026-04-29 (SSA-CFG codegen, experimental mode, granular ethdebug outputs, `erc7201` builtin), and the 0.8.36 line in preparation. [#16479](https://github.com/argotorg/solidity/pull/16479), [#16645](https://github.com/argotorg/solidity/pull/16645), [#16651](https://github.com/argotorg/solidity/pull/16651)
+- **`erc7201` storage-namespace builtin**: a builtin computing the ERC-7201 storage-namespace base slot, shipped in 0.8.35. [#15968](https://github.com/argotorg/solidity/pull/15968), [#16649](https://github.com/argotorg/solidity/pull/16649)
+- **Deletion of the experimental EOF backend**: a strategic removal of the experimental EVM Object Format support across the entire codebase (compiler interface, libsolidity, libyul, libevmasm, and test infrastructure). [#16760](https://github.com/argotorg/solidity/pull/16760), [#16769](https://github.com/argotorg/solidity/pull/16769), [#16770](https://github.com/argotorg/solidity/pull/16770), [#16772](https://github.com/argotorg/solidity/pull/16772), [#16757](https://github.com/argotorg/solidity/pull/16757), [#16758](https://github.com/argotorg/solidity/pull/16758), [#16773](https://github.com/argotorg/solidity/pull/16773)
+- **ethdebug foundation**: dedicated testing tools in the isoltest framework, alignment of compiler outputs with ethdebug spec (`--ethdebug-resources`, `--ethdebug-compilation`, `--ethdebug-program`), decoupling from bytecode generation, revamp of debug info storage in SSA CFG. [#16533](https://github.com/argotorg/solidity/pull/16533), [#16565](https://github.com/argotorg/solidity/pull/16565), [#16675](https://github.com/argotorg/solidity/pull/16675), [#16727](https://github.com/argotorg/solidity/pull/16727)
+- **Deprecation warnings ahead of 0.9.0**: non-breaking warnings for identifiers reserved for future promotion to Solidity and Yul keywords (`at`, `error`, `layout`, `transient`, `this`, and a Yul reserved-identifier set), plus deactivating the deprecated `--assemble` input mode. [#16206](https://github.com/argotorg/solidity/pull/16206), [#16521](https://github.com/argotorg/solidity/pull/16521)
+- **Streamlining of CI and build infrastructure**: a ccache rollout giving roughly 8x to 18x faster CI builds, migration of certain jobs to from CircleCI to GitHub Actions, ANTLR-check batching, test-matrix trimming and reliability fixes. [#16384](https://github.com/argotorg/solidity/pull/16384), [#16385](https://github.com/argotorg/solidity/pull/16385), [#16434](https://github.com/argotorg/solidity/pull/16434), [#16475](https://github.com/argotorg/solidity/pull/16475), [#16266](https://github.com/argotorg/solidity/pull/16266), [#16389](https://github.com/argotorg/solidity/pull/16389), [#16353](https://github.com/argotorg/solidity/pull/16353), [#16435](https://github.com/argotorg/solidity/pull/16435), [#16473](https://github.com/argotorg/solidity/pull/16473), [#16687](https://github.com/argotorg/solidity/pull/16687), [#16564](https://github.com/argotorg/solidity/pull/16564)
+- **Performance and correctness fixes**: ongoing work towards making the language concepts of constant/comptime/pure internally consistent, custom-error preservation under `--revert-strings strip`, an SMTChecker constant-operand fix, eliminated corner cases in Yul object name escaping, eliminated O(n^2) blowup in variable renaming, faster SHA-256 hashing, Whiskers regex speedups, and YulString storage performance tweaks. [#16422](https://github.com/argotorg/solidity/issues/16422), [#16563](https://github.com/argotorg/solidity/pull/16563), [#16654](https://github.com/argotorg/solidity/pull/16654), [#16669](https://github.com/argotorg/solidity/pull/16669), [#16736](https://github.com/argotorg/solidity/pull/16736), [#16466](https://github.com/argotorg/solidity/pull/16466), [#16517](https://github.com/argotorg/solidity/pull/16517), [#16763](https://github.com/argotorg/solidity/pull/16763)
+- **Developer Survey 2025**: [results and report published](https://www.soliditylang.org/blog/2026/04/15/solidity-developer-survey-2025-results/)
+- **Media**: general intro [ECH podcast](https://www.youtube.com/watch?v=qEdUoZxrLwU), status overview at [EthPrague](https://www.youtube.com/watch?v=Z89lljEBZOE&list=PLkCRcxMT8qhYK3Lk_VCNnFkO-GJGxDkRJ&index=122) & [DappCon](https://www.youtube.com/watch?v=BzOtVmlKIPY&feature=youtu.be), [SSA-CFG demo](https://www.youtube.com/watch?v=KMyQjAPLlM0) and some some not yet released presentations from Berlin Blockchain Week
+- **Further work landing now** (in progress): continued spilling and shuffler hardening including an outliner equivalence fix [#16768](https://github.com/argotorg/solidity/pull/16768) and stack-limit handling [#16832](https://github.com/argotorg/solidity/pull/16832), carrying ethdebug debug-info through Yul [#16780](https://github.com/argotorg/solidity/pull/16780), SWAPN/DUPN support for Glamsterdam [#16424](https://github.com/argotorg/solidity/pull/16424), ConstantOptimizer rewrite [#16788](https://github.com/argotorg/solidity/pull/16788), evmasm BlockDeduplicator performance improvements [#16684](https://github.com/argotorg/solidity/pull/16684), comptime type conversions and `keccak256` for use in storage layouts [#16742](https://github.com/argotorg/solidity/pull/16742)
+
+### Classic Solidity Q3/Q4 focus
+
+- Stabilizing SSA-CFG to move out of `--experimental` is the main focus of the team for the next 6 months
+- Develop phase 1 and 2 of ethdebug, where phase 1 is the internal debug data spec and phase 2 is yul serialization/deserialization
+- Glamsterdam support
+- Finalization of work on numerical AST IDs in Yul to improve performance and eliminate the main source of non-determinism bugs affecting source verification [#15969](https://github.com/argotorg/solidity/pull/15969)
+- Devcon presence through talks and workshops and increasing general community outreach
+
+### Core Solidity Q1/Q2 review
+
+- **ERC20 and WETH9 contracts compile and run end-to-end on the EVM**: they go through the full pipeline (source -> Hull IR -> Yul -> bytecode) and execute on evmone via a testrunner that asserts return data and revert status. The clearest proof the approach works. [#314](https://github.com/argotorg/solcore/pull/314), [#323](https://github.com/argotorg/solcore/pull/323), [#356](https://github.com/argotorg/solcore/pull/356), [#483](https://github.com/argotorg/solcore/pull/483), [#437](https://github.com/argotorg/solcore/pull/437), [#473](https://github.com/argotorg/solcore/pull/473), [#306](https://github.com/argotorg/solcore/pull/306), [#325](https://github.com/argotorg/solcore/pull/325), [#362](https://github.com/argotorg/solcore/pull/362), [#445](https://github.com/argotorg/solcore/pull/445)
+- **New pattern-matching compiler**: Maranget decision trees with exhaustiveness (error) and redundancy (warning) checking, plus a 25-case test suite. [#322](https://github.com/argotorg/solcore/pull/322), [#342](https://github.com/argotorg/solcore/pull/342), [#347](https://github.com/argotorg/solcore/pull/347), [#349](https://github.com/argotorg/solcore/pull/349), [#396](https://github.com/argotorg/solcore/pull/396), [#326](https://github.com/argotorg/solcore/pull/326), [#456](https://github.com/argotorg/solcore/pull/456)
+- **Typeclass-based numeric and arithmetic type tower**: `uint256`, `bytes32`, full arithmetic, modular arithmetic, bounds, and bitwise ops delivered as user-level typeclass instances rather than compiler built-ins. [#370](https://github.com/argotorg/solcore/pull/370), [#377](https://github.com/argotorg/solcore/pull/377), [#376](https://github.com/argotorg/solcore/pull/376), [#403](https://github.com/argotorg/solcore/pull/403), [#404](https://github.com/argotorg/solcore/pull/404), [#468](https://github.com/argotorg/solcore/pull/468), [#481](https://github.com/argotorg/solcore/pull/481), [#485](https://github.com/argotorg/solcore/pull/485)
+- **Error handling built as a library, not a built-in**: `Error` is an ADT, and `require`/`assert` and custom-error reverts are ordinary library code. [#378](https://github.com/argotorg/solcore/pull/378), [#389](https://github.com/argotorg/solcore/pull/389), [#418](https://github.com/argotorg/solcore/pull/418), [#446](https://github.com/argotorg/solcore/pull/446), [#417](https://github.com/argotorg/solcore/pull/417), [#495](https://github.com/argotorg/solcore/pull/495)
+- **Generic ABI encoding with automatic deriving**: ABI encoding generalized over algebraic data types, plus a compiler pass that auto-derives `Generic` instances so encoding works for new user types. [#465](https://github.com/argotorg/solcore/pull/465), [#466](https://github.com/argotorg/solcore/pull/466), [#464](https://github.com/argotorg/solcore/pull/464), [#410](https://github.com/argotorg/solcore/pull/410), [#367](https://github.com/argotorg/solcore/pull/367), [#253](https://github.com/argotorg/solcore/pull/253)
+- **Compile-time evaluation (comptime)**: a partial-evaluation engine, the `comptime` keyword, comptime integers (literals evaluated at compile time via overloaded `Int.fromInteger`), compile-time dispatch selectors, and comptime evaluation of selected assembly blocks. [#318](https://github.com/argotorg/solcore/pull/318), [#319](https://github.com/argotorg/solcore/pull/319), [#354](https://github.com/argotorg/solcore/pull/354), [#400](https://github.com/argotorg/solcore/pull/400), [#422](https://github.com/argotorg/solcore/pull/422)
+- **Module and namespace system**: real `import`, separate type/class/term namespaces, cycle detection, qualified constructors, and cached public interfaces, with docs and tests. [#321](https://github.com/argotorg/solcore/pull/321), [#360](https://github.com/argotorg/solcore/pull/360), [#397](https://github.com/argotorg/solcore/pull/397), [#415](https://github.com/argotorg/solcore/pull/415), [#421](https://github.com/argotorg/solcore/pull/421), [#423](https://github.com/argotorg/solcore/pull/423), [#429](https://github.com/argotorg/solcore/pull/429), [#433](https://github.com/argotorg/solcore/pull/433), [#467](https://github.com/argotorg/solcore/pull/467)
+- **Broad typechecker overhaul**: instance checking, typing and resolution, closures, phantom types, subsumption, type synonyms, skolemization, and specialization fixes. [#299](https://github.com/argotorg/solcore/pull/299), [#301](https://github.com/argotorg/solcore/pull/301), [#303](https://github.com/argotorg/solcore/pull/303), [#305](https://github.com/argotorg/solcore/pull/305), [#309](https://github.com/argotorg/solcore/pull/309), [#310](https://github.com/argotorg/solcore/pull/310), [#311](https://github.com/argotorg/solcore/pull/311), [#313](https://github.com/argotorg/solcore/pull/313), [#317](https://github.com/argotorg/solcore/pull/317), [#328](https://github.com/argotorg/solcore/pull/328), [#336](https://github.com/argotorg/solcore/pull/336), [#369](https://github.com/argotorg/solcore/pull/369), [#374](https://github.com/argotorg/solcore/pull/374), [#455](https://github.com/argotorg/solcore/pull/455), [#459](https://github.com/argotorg/solcore/pull/459), [#460](https://github.com/argotorg/solcore/pull/460), [#371](https://github.com/argotorg/solcore/pull/371), [#372](https://github.com/argotorg/solcore/pull/372)
+- **Mandatory type annotations** on top-level functions and class signatures, keeping type reconstruction predictable. [#379](https://github.com/argotorg/solcore/pull/379), [#393](https://github.com/argotorg/solcore/pull/393)
+- **Contract dispatch** (constructors, `payable`, `public` visibility, `fallback`): the layer that makes real contracts callable. [#244](https://github.com/argotorg/solcore/pull/244), [#275](https://github.com/argotorg/solcore/pull/275), [#350](https://github.com/argotorg/solcore/pull/350), [#414](https://github.com/argotorg/solcore/pull/414), [#458](https://github.com/argotorg/solcore/pull/458), [#461](https://github.com/argotorg/solcore/pull/461), [#434](https://github.com/argotorg/solcore/pull/434), [#419](https://github.com/argotorg/solcore/pull/419), [#413](https://github.com/argotorg/solcore/pull/413), [#478](https://github.com/argotorg/solcore/pull/478), [#441](https://github.com/argotorg/solcore/pull/441), [#494](https://github.com/argotorg/solcore/pull/494)
+- **Opcodes library and precompiles**: `std/opcodes` aligned to the Osaka opcode set, plus precompile wrappers (keccak256, sha256, ripemd160, ecrecover), later rewritten without inline assembly. [#405](https://github.com/argotorg/solcore/pull/405), [#407](https://github.com/argotorg/solcore/pull/407), [#463](https://github.com/argotorg/solcore/pull/463), [#476](https://github.com/argotorg/solcore/pull/476), [#449](https://github.com/argotorg/solcore/pull/449), [#427](https://github.com/argotorg/solcore/pull/427), [#431](https://github.com/argotorg/solcore/pull/431), [#452](https://github.com/argotorg/solcore/pull/452), [#470](https://github.com/argotorg/solcore/pull/470), [#496](https://github.com/argotorg/solcore/pull/496)
+- **Memory and storage**: string and bytes storage, the `erc7201` storage-layout standard, memory initialization, and reusable memory abstractions (zeroed allocation, cheap slices). [#260](https://github.com/argotorg/solcore/pull/260), [#501](https://github.com/argotorg/solcore/pull/501), [#482](https://github.com/argotorg/solcore/pull/482), [#443](https://github.com/argotorg/solcore/pull/443), [#444](https://github.com/argotorg/solcore/pull/444), [#453](https://github.com/argotorg/solcore/pull/453), [#387](https://github.com/argotorg/solcore/pull/387), [#471](https://github.com/argotorg/solcore/pull/471)
+- **Control flow and concatenation**: `for` loops and `break`, plus bytes/string concatenation in the standard library. [#366](https://github.com/argotorg/solcore/pull/366), [#488](https://github.com/argotorg/solcore/pull/488), [#424](https://github.com/argotorg/solcore/pull/424), [#391](https://github.com/argotorg/solcore/pull/391), [#450](https://github.com/argotorg/solcore/pull/450)
+- **Megaparsec parser rewrite**: the entire Alex/Happy lexer and grammar replaced with a modular megaparsec parser (~1,000 lines removed), adding C-style ternary and a cleaner foundation for syntax work, alongside short returns and a new proxy syntax. [#401](https://github.com/argotorg/solcore/pull/401), [#245](https://github.com/argotorg/solcore/pull/245), [#504](https://github.com/argotorg/solcore/pull/504), [#239](https://github.com/argotorg/solcore/pull/239), [#320](https://github.com/argotorg/solcore/pull/320)
+- **Hull mid-level IR became a typed IR**: renamed from Core to Hull, given its own typechecker, documented, and hardened for nested ADTs. [#277](https://github.com/argotorg/solcore/pull/277), [#368](https://github.com/argotorg/solcore/pull/368), [#357](https://github.com/argotorg/solcore/pull/357), [#363](https://github.com/argotorg/solcore/pull/363), [#499](https://github.com/argotorg/solcore/pull/499)
+- **Standard library refinement**: prefer operators and builtins over inline assembly, consolidate base types, retire legacy code. [#382](https://github.com/argotorg/solcore/pull/382), [#388](https://github.com/argotorg/solcore/pull/388), [#398](https://github.com/argotorg/solcore/pull/398), [#420](https://github.com/argotorg/solcore/pull/420), [#315](https://github.com/argotorg/solcore/pull/315)
+- **Engineering infrastructure**: ormolu formatter, a no-warnings CI gate, evmone integration, UTF-8 locale fix, Yul typechecking hardening, JSON ABI file emission, testrunner improvements, and `runsol.sh` options. [#285](https://github.com/argotorg/solcore/pull/285), [#324](https://github.com/argotorg/solcore/pull/324), [#402](https://github.com/argotorg/solcore/pull/402), [#428](https://github.com/argotorg/solcore/pull/428), [#425](https://github.com/argotorg/solcore/pull/425), [#487](https://github.com/argotorg/solcore/pull/487), [#493](https://github.com/argotorg/solcore/pull/493), [#475](https://github.com/argotorg/solcore/pull/475), [#457](https://github.com/argotorg/solcore/pull/457), [#353](https://github.com/argotorg/solcore/pull/353), [#373](https://github.com/argotorg/solcore/pull/373), [#335](https://github.com/argotorg/solcore/pull/335), [#384](https://github.com/argotorg/solcore/pull/384)
+- **Documentation**: a published mdBook compiler [reference](https://argotorg.github.io/solcore/), a Hull IR chapter, the SAIL language reference, comptime design notes, and updated setup instructions. [#327](https://github.com/argotorg/solcore/pull/327), [#346](https://github.com/argotorg/solcore/pull/346), [#357](https://github.com/argotorg/solcore/pull/357), [#386](https://github.com/argotorg/solcore/pull/386), [#355](https://github.com/argotorg/solcore/pull/355), [#358](https://github.com/argotorg/solcore/pull/358), [#361](https://github.com/argotorg/solcore/pull/361)
+- **Ethereum 2.0 deposit contract** (largely complete, being reviewed): one of the most productive forcing functions of the half. Porting this real, security-critical contract surfaced a long list of missing capabilities that were then implemented and merged: custom errors [#389](https://github.com/argotorg/solcore/pull/389), `payable` [#414](https://github.com/argotorg/solcore/pull/414), precompile hashing [#427](https://github.com/argotorg/solcore/pull/427), bitwise helpers [#404](https://github.com/argotorg/solcore/pull/404), `address` ABI encoding [#410](https://github.com/argotorg/solcore/pull/410), opcodes [#407](https://github.com/argotorg/solcore/pull/407), Yul arity checks [#425](https://github.com/argotorg/solcore/pull/425). [#399](https://github.com/argotorg/solcore/pull/399)
+- **Further work landing now** (in progress): a multisig contract [#480](https://github.com/argotorg/solcore/pull/480), storage for arrays [#469](https://github.com/argotorg/solcore/pull/469) and ADTs [#500](https://github.com/argotorg/solcore/pull/500), generic deriving [#505](https://github.com/argotorg/solcore/pull/505), string literals in memory [#294](https://github.com/argotorg/solcore/pull/294)/[#479](https://github.com/argotorg/solcore/pull/479), contract introspection via `type(C).publicMethods` [#462](https://github.com/argotorg/solcore/pull/462), `msg`/`block`/`tx` globals [#454](https://github.com/argotorg/solcore/pull/454), named instances [#337](https://github.com/argotorg/solcore/pull/337), a packed-records library [#359](https://github.com/argotorg/solcore/pull/359), better diagnostics [#416](https://github.com/argotorg/solcore/pull/416), a `csol` CLI [#352](https://github.com/argotorg/solcore/pull/352), and table-based typeclass resolution research [#392](https://github.com/argotorg/solcore/pull/392)
+- [Blog post](https://www.soliditylang.org/blog/2026/05/05/pattern-matching-in-core-solidity/) on pattern matching
+
+### Core Solidity Q3/Q4 focus
+
+- Rework syntax to ease transition from Classic
+- Documentation: improved user-facing language reference
+- flexible high-level contract composition and reusability mechanism
+- storage and memory arrays
+- support for logs / emit
+- `abi_encode`/`abi_decode` function usable within the language
+- string literals
+- User-defined operators
+- Formal specification of intermediate languages (Hull)
+- Plan and start production implementation of the compiler
+- Web playground
+
+## ethdebug
+
+[Github](https://github.com/ethdebug/format) | [Socials](https://x.com/ethdebug) | [Website](https://ethdebug.github.io/format/)
+
+ethdebug is a debugging data format standard for smart contracts that enables compilers to provide rich debugging information to development tools. Over the past six months, the project has transitioned from specification design toward implementation, supported by a formalized partnership with [Walnut](https://walnut.dev/) whose implementation work is driving real-world validation and informing format requirements. The focus ahead is on completing the v0.1.0 (first stable version) specification and deepening compiler support in solc.
+
+### ethdebug Q1/Q2 review
+
+- Define function call semantics in program schema: `invoke`/`return`/`revert` contexts, function identity, `type`/`specifier` ([#154](https://github.com/ethdebug/format/pull/154)); `return.data` made optional ([#211](https://github.com/ethdebug/format/pull/211))
+- Resolve pointer template variable renaming limitations: `yields` region-name remapping, inline template definitions, and `$concat` operator ([#156](https://github.com/ethdebug/format/pull/156), [#158](https://github.com/ethdebug/format/pull/158))
+- Bring toy compiler (`bugc`) into format specification compliance (90% completed): Emits `invoke`/`return` contexts, preserved through the optimizer ([#185](https://github.com/ethdebug/format/pull/185), [#210](https://github.com/ethdebug/format/pull/210)); reads `calldata`/`returndata`/`code`/`transient` storage ([#181](https://github.com/ethdebug/format/pull/181)); correct source IDs ([#177](https://github.com/ethdebug/format/pull/177)); end-to-end behavioral test harness ([#183](https://github.com/ethdebug/format/pull/183)); source-map call setup ([#188](https://github.com/ethdebug/format/pull/188)); 100% instruction-mapping coverage ([#190](https://github.com/ethdebug/format/pull/190), [#184](https://github.com/ethdebug/format/pull/184)). Remaining: `transform` context emission
+- Documentation site overhaul: New information architecture; getting-started, concepts, and deep-dive docs; interactive `bugc-react` widgets and trace drawer ([#168](https://github.com/ethdebug/format/pull/168), [#169](https://github.com/ethdebug/format/pull/169))
+- Schema and tooling polish: array `count` and descriptions ([#170](https://github.com/ethdebug/format/pull/170)); `materials/id` description ([#172](https://github.com/ethdebug/format/pull/172)); `context/name` schema integrated into program context ([#179](https://github.com/ethdebug/format/pull/179)); build/test modernization — ESLint 9 flat config, coverage reporting ([#174](https://github.com/ethdebug/format/pull/174)).
+- [Demonstration](https://ethdebug.github.io/format/docs/core-schemas/programs/tracing/#tracing-through-a-function-call) of end-to-end viability (from compiler through debugger)
+
+### ethdebug Q3/4 focus
+
+- **Cut and version the first release** — introduce schema versioning (versioned identifiers,
+  `ethdebug/format/0.1.0/…`) and tag the stabilized core (data, materials, types, pointers, and the program/function-call contexts), establishing a semver cutover after which additions are non-breaking.
+- **`transform` context:** land the schema and emit it from `bugc` (tail-call optimization first), giving debuggers compiler-pipeline provenance for optimized code, such as reconstructing virtual call frames; groundwork merged in [#213](https://github.com/ethdebug/format/pull/213), [#214](https://github.com/ethdebug/format/pull/214)
+- **Call/return correlation:** add an optional static call-edge label to `invoke`/`return`, letting debuggers reconstruct call stacks reliably across recursion and tail calls
+- **Deepen solc support:** continue the Walnut-led solc integration toward source-map feature parity, and integrate Walnut's [`ethdebug-stats`](https://github.com/walnuthq/ethdebug-stats) to assess solc's output
+- **Reference implementation:** bring `bugc` to full specification support (local-variable and frame emission) and extend the debugger-side reference beyond pointers to the full program schema
+- **Ecosystem:** formalize collaboration with the Walnut debugger, monitor Fe's debug-symbol emission prototype, and document integration best practices
+
+## Fe
+
+[Github](https://github.com/argotorg/fe) | [Socials](https://x.com/official_fe) | [Website](https://fe-lang.org/)
+
+Argot believes that language diversity and research are essential to building safer systems. Fe is a Rust-inspired EVM language designed to make side effects explicit and prevent bugs before they happen, built with a modern language design unburdened by technical debt. The team shipped Fe 26 in the first half of the year, a complete rewrite featuring a new SSA-based compilation pipeline, integrated toolchain, and Sourcify integration. Fe is now capable of implementing complex EVM contracts, with bytecode output that performs on par with, and in some cases outperforms, solc. The next phase focuses on production readiness, advanced language features, and comprehensive tooling, while evaluating how Fe can best serve the broader Ethereum ecosystem.
+
+### Fe Q1/Q2 review
+
+- Finalized and implemented all language semantics
+- Complete EVM code generation, via the Sonatina backend
+- Standard library with Solidity-compatible ABI encode/decode, EVM capability types, and more
+- Substantial improvements to dev tooling (`fe test`, `fe doc`, `fe fmt`, LSP language server)
+- Advanced compile-time code execution
+- Implemented non-trivial libraries and contracts (cryptographic libraries, beacon deposit contract, uniswap v3, and others)
+- Initial [26.0 release](https://github.com/argotorg/fe/releases/tag/v26.0.0), followed by [26.1](https://github.com/argotorg/fe/releases/tag/v26.1.0) and [26.2](https://github.com/argotorg/fe/releases/tag/v26.2.0) with major improvements
+- Deployed [Bountiful](https://bountiful.fe-lang.org/#src/registry::registry::BountyRegistry) bug-bounty contracts
+
+### Fe Q3/Q4 focus
+
+- ethdebug support, tracing and program introspection (in progress)
+- Metaprogramming and reflection (in progress)
+- Multi-backend support (EVM, RISC-V zkVM, Wasm, ARM/x86_64) (in progress)
+  - onchain (EVM) + offchain (ZK) application example
+- Hardening of effect/capability security guarantees
+- Support for custom ABIs
+- Expanded standard library
+- Parallel dependency downloads
+- Improve dev experience and tooling
+- Bug squashing: better fuzzing infrastructure, AI scans, port more Solidity contracts to ensure matching behavior, etc
+
+## _Notes on Sonatina_
+
+[Github](https://github.com/fe-lang/sonatina)
+
+_Since the previous roadmap update, Fe has moved from targeting Yul to using Sonatina as its backend. Sonatina is a better architectural fit for Fe's CFG-based mid-level representation and preserves rich type information, enabling optimizations that would otherwise need to live in Fe itself. Sonatina is designed to be a useful backend for other compiler projects and is currently available as an optional backend for Plank._
+
+### Sonatina Q1/Q2 review
+
+- Complete EVM backend, with stack spilling and advanced memory planning
+- New optimization passes: inliner, dead-function elimination, dead-argument elimination, ADCE, CFG cleanup, checked-arithmetic elimination, pure-instruction sinking, scalar canonicalization, loop strength reduction, known-bits analysis
+- Improvements to GVN and SCCP optimizations
+- Aggregate and enum IR support and optimizations
+
+### Sonatina Q3/Q4 focus
+
+- Add Solidity-compatible memory management mode
+- Further gas and bytecode optimizations
+- Correctness hardening: differential fuzzing of optimization passes and end-to-end EVM execution testing
+
+## Sourcify
+
+[Github](https://github.com/argotorg/sourcify) | [Socials](https://x.com/sourcifyeth) | [Website](https://sourcify.dev/)
+
+Sourcify ensures verified EVM smart contract data remains open and accessible, and is powered by open-source tools.
+
+Sourcify's biggest focus has been on the Clear Signing Working Group efforts, as this has the highest impact for the ecosystem. Additional focus has been on increasing the contract coverage and pushing parallel verification on frameworks for the future verification funnel. The team worked at 70% capacity, as one of the team members has been on parental leave.
+
+Current tasks and milestones can be followed on the [GitHub Project Board](https://github.com/orgs/argotorg/projects/33/views/1)
+
+### Sourcify Q1/Q2 review
+
+- Founding member of the Clear Signing working group: [Playground](https://clear-signing.sourcify.dev); wallet [SDK](https://github.com/sourcifyeth/clear-signing); website: [clearsigning.org](https://clearsigning.org)
+- [Support](https://github.com/argotorg/sourcify/pull/2652) for older Solidity contracts
+- Contract coverage: total 38.5M verified contracts from 11M last half year: [stats.sourcify.dev](https://stats.sourcify.dev)
+- Added [Fe](https://github.com/argotorg/sourcify/pull/2692) support
+- Improved dependency security, in response to the waves of AI related attacks
+- Chain support is [automated](https://github.com/sourcifyeth/sourcify-chains) to keep up to date with new and deprecated chains, and increase number of supported chains
+- Remove legacy APIv1 ([blog post](https://docs.sourcify.dev/blog/api-v1-brownouts/)) through brownouts [(PR)](https://github.com/argotorg/sourcify/pull/2744)
+- [Restructured](https://github.com/sourcifyeth/docs/pull/51) and [revamped](https://github.com/sourcifyeth/docs/pull/56) the docs to make the right information more easily findable
+- [Optimize Solidity's CI processes](https://github.com/argotorg/solidity/pull/16385), and hosting of binaries, resulting in $180k/year cost reduction
+- Shipped parallel verification in [Hardhat](https://github.com/NomicFoundation/hardhat/pull/7967) and Foundry PR [just merged](https://github.com/foundry-rs/foundry/pull/15124). By default, verifications go to Sourcify and Etherscan, not just Etherscan.
+- Media: [ECH podcast](https://www.youtube.com/watch?v=XZDInjWp0Fo), Clear Signing [EthCC panel](https://www.youtube.com/watch?v=rMq78W6667I), talks at [EthPrague](https://www.youtube.com/watch?v=OFlBA826YXQ&list=PLkCRcxMT8qhYK3Lk_VCNnFkO-GJGxDkRJ&index=97), [DappCon](https://www.youtube.com/watch?v=4DKnkMpJPmA&feature=youtu.be), Berlin Ethereum Day
+
+### Sourcify Q3/Q4 focus
+
+- Explore building tooling on top of Sourcify's open dataset of verified contracts of over 38.5 million contracts: general-purpose search, vulnerability, pattern detection
+- Clear Signing WG:
+  - Explore designing a Domain Specific Language [(example)](https://youtu.be/4DKnkMpJPmA?t=928), a language to directly declare the ERC7730 descriptors inside the contract itself
+  - Improve and maintain the [Typescript SDK](https://github.com/sourcifyeth/clear-signing), find more users and gather user feedback
+  - Maintain [the registry](https://github.com/ethereum/clear-signing-erc7730-registry) by designing processes for descriptor submission and tooling for it, setting up the reviewer (auditor) pipeline, and setting up the repo CI
+- Look into optimizing Sourcify's infrastructure architecture to reduce hosting costs, as the Google Cloud stipend is coming to an end
+- Set up better monitoring and alerting around Sourcify's infrastructure in order to ensure server uptime and scalability
+- Improve the design and UX of Sourcify's web presence to better reflect its expanded scope and surface richer contract information
+- Contribute to the maintenance of ethereum-lists/chains and do market research on the usage relative to other chain lists
+
+## act
+
+[Github](https://github.com/argotorg/act) | [Documentation](https://argotorg.github.io/act/)
+
+act is a formal specification language and verification framework for Ethereum smart contracts, bridging human-readable specifications and EVM bytecode by proving their equivalence using hevm. The team shipped the first official v0.2.0 release in the first half of the year, backed by formalized semantics and proofs of type safety.
+
+act sparked two other research directions, informed by stakeholder feedback, on which the focus ahead lies: EquiVM, expanding bytecode equivalence proofs by embedding EVM semantics directly into Lean, enabling developers to reason about contract behavior at a mathematical level within a proof assistant; and CheckMate, formally verifying economic incentives of smart contracts.
+
+### act Q1/Q2 review
+
+- official [v0.2.0 release](https://github.com/argotorg/act/releases/tag/v0.2.0) with major redesign: multi-contract support, Vyper support, new typechecker, verification backend redesign
+- Lean backend: Second extraction target alongside Rocq
+- Mechanized type safety proof (Rocq): Developed using LLMs from pen-and-paper proof. Manual audit in progress
+- CheckMate ready for integration: Extension for uncontrollable events (price changes, lotteries) needed. Theory/semantics misalignment discovered, fixing before integration. See [[1](https://github.com/apre-group/checkmate)] and [[2](https://github.com/sophierain/contract2game)]
+- Support for unknown code calls in progress: Critical for scalability and adoption (top community feedback item). Research question, designing new equivalence backend based on Lean theorem provers
+- Soundness proof in progress
+- Media: [Common Prefix podcast](https://www.youtube.com/watch?v=bnSVJTKdbdM), [workshop](https://www.youtube.com/watch?v=wB50e8Ui-UQ) at EthPrague, open-source technical [report](https://arxiv.org/abs/2604.02955) on arXiv
+
+### act Q3/Q4 focus
+
+- **EquiVM:** introduce a new framework for proving equivalence between bytecode and high-level specification languages defined in Lean. The semantics of the high-level spec are defined in Lean, in terms of low-level EVM state, with high-level/bytecode equivalence expressed as a Lean theorem. The team is currently experimenting with modular lemma libraries and proof scalability
+- **CheckMate integration:** Introduce game-theoretic reasoning to act by integrating CheckMate as a verification backend, building an automated pipeline from act specifications to game-theoretic models. This includes fixing a theory/implementation misalignment in the CheckMate framework identified in Q2
+- Outreach: Presentations at CICM and MPI-SP, with further outreach activities planned for Q4
+- Deepen act's integration across Argot projects, exploring synergies with other teams' work
+
+## hevm
+
+[Github](https://github.com/argotorg/hevm) | [Documentation](https://hevm.dev/)
+
+hevm is a symbolic execution engine and testing framework for Ethereum smart contracts. Over the past six months, the team continued to harden the tool through maintenance-focused releases, improving performance, reliability, and usability. hevm is increasingly positioned as a foundational execution engine on which other tools can be built, with Echidna demonstrating this model in practice. Part of the team's capacity has since moved to support Solidity, but hevm remains a dependable core for the broader verification and testing ecosystem.
+
+### hevm Q1/Q2 review
+
+- Performance improvements of symbolic execution including more controlled parallelism and enhanced infeasible path pruning
+- State merging to significantly improve symbolic exploration performance
+- UX improvements including counterexample validation, warnings mapped back to Solidity source lines, better and more robust calldata decoding, and more control over analysis for the users
+- RPC framework with improved performance robustness
+- Additional Forge cheatcodes such as `expectRevert`, the `assertApprox*` family, and `etch`
+- solc to differentially fuzz new codegen pipelines in development (SSA-CFG pipeline)
+- improved Osaka support: CLZ opcode implemented, and test suite pulls from ethereum/execution-spec-tests
+- latest release: [v0.58.0](https://github.com/argotorg/hevm/releases/tag/release%2F0.58.0)
+
+### hevm Q3/Q4 focus
+
+- Osaka support
+- General maintenance (update dependencies)
