@@ -22,15 +22,14 @@ export default function TransparencyReport2026H1() {
           <h2 className="mb-6 text-4xl font-extrabold tracking-tight">Introduction</h2>
           <div className="space-y-4 text-lg">
             <p>
-              This is Argot Collective's bi-annual transparency report, detailing all spending from
-              January 16 to July 1, 2026. Financial and organizational transparency is a core value
-              of the collective. We believe public-goods stewardship requires openness and
-              accountability.
+              This is Argot Collective's bi-annual transparency report, covering all spending from
+              January 16 to July 1, 2026. As a collective committed to public-goods stewardship, we
+              believe financial and organizational transparency is essential to accountability.
             </p>
             <p>
-              This is our second transparency report. Due to a slight delay in publishing the first
-              report, the period covered here is slightly shorter than six months. This is reflected
-              in the numbers.
+              This is our second transparency report. Due to a small delay in publishing the first
+              report, this period covers slightly less than six months, which is reflected in the
+              numbers.
             </p>
             <p>
               As with our previous report, the majority of expenses are contributor salaries

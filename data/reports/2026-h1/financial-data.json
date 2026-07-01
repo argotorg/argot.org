@@ -12,8 +12,8 @@
     { "name": "Solidity", "amount": 1135873 },
     { "name": "Sourcify", "amount": 294439 },
     { "name": "Fe", "amount": 288156 },
-    { "name": "Act", "amount": 279062 },
+    { "name": "act", "amount": 279062 },
     { "name": "Org**", "amount": 201051 },
-    { "name": "Hevm", "amount": 52537 }
+    { "name": "hevm", "amount": 52537 }
   ]
 }
