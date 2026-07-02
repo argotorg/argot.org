@@ -33,7 +33,7 @@ export default function TransparencyReport2026H1() {
             </p>
             <p>
               As with our previous report, the majority of expenses are contributor salaries
-              supporting the continued development of Solidity, ethdebug, Fe, Sourcify, hevm, and
+              supporting the continued development of Solidity, ethdebug, Fe (including Sonatina), Sourcify, hevm, and
               act.
             </p>
           </div>
