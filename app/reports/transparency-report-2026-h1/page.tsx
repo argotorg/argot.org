@@ -33,8 +33,8 @@ export default function TransparencyReport2026H1() {
             </p>
             <p>
               As with our previous report, the majority of expenses are contributor salaries
-              supporting the continued development of <a href="https://github.com/argotorg/solidity" target="_blank">Solidity</a>, <a href="https://github.com/ethdebug/format" target="_blank">ethdebug</a>, <a href="https://github.com/argotorg/fe" target="_blank"">Fe</a> (including <a href="https://github.com/fe-lang/sonatina" target="_blank">Sonatina</a>), <a href="https://github.com/argotorg/sourcify" target="_blank">Sourcify</a>, <a href="https://github.com/argotorg/hevm" target="_blank">hevm</a>, and
-              <a href="https://github.com/argotorg/act" target="_blank">act</a>.
+              supporting the continued development of <a href="https://github.com/argotorg/solidity" target="_blank" rel="noopener noreferrer">Solidity</a>, <a href="https://github.com/ethdebug/format" target="_blank" rel="noopener noreferrer">ethdebug</a>, <a href="https://github.com/argotorg/fe" target="_blank" rel="noopener noreferrer">Fe</a> (including <a href="https://github.com/fe-lang/sonatina" target="_blank" rel="noopener noreferrer">Sonatina</a>), <a href="https://github.com/argotorg/sourcify" target="_blank" rel="noopener noreferrer">Sourcify</a>, <a href="https://github.com/argotorg/hevm" target="_blank" rel="noopener noreferrer">hevm</a>, and{' '}
+              <a href="https://github.com/argotorg/act" target="_blank" rel="noopener noreferrer">act</a>.
             </p>
           </div>
         </section>
