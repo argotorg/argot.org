@@ -23,7 +23,7 @@ export default function TransparencyReport2026H1() {
           <div className="space-y-4 text-lg">
             <p>
               This is Argot Collective's bi-annual transparency report, covering all spending from
-              January 16 to July 1, 2026. As a collective committed to public-goods stewardship, we
+              January 16 to July 2, 2026. As a collective committed to public-goods stewardship, we
               believe financial and organizational transparency is essential to accountability.
             </p>
             <p>
@@ -97,7 +97,7 @@ export default function TransparencyReport2026H1() {
         <section>
           <h2 className="mb-6 text-4xl font-extrabold tracking-tight">Budget & Expenses</h2>
           <p className="mb-6">
-            From January 16, 2026 through July 1, 2026 our total expenditures amounted to $
+            From January 16, 2026 through July 2, 2026 our total expenditures amounted to $
             {financialData.totalSpent.toLocaleString()}
           </p>
           <BudgetSection
