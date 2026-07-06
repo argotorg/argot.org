@@ -27,11 +27,6 @@ export default function TransparencyReport2026H1() {
               believe financial and organizational transparency is essential to accountability.
             </p>
             <p>
-              This is our second transparency report. Due to a small delay in publishing the first
-              report, this period covers slightly less than six months, which is reflected in the
-              numbers.
-            </p>
-            <p>
               As with our previous report, the majority of expenses are contributor salaries
               supporting the continued development of{' '}
               <a
@@ -98,7 +93,9 @@ export default function TransparencyReport2026H1() {
           <h2 className="mb-6 text-4xl font-extrabold tracking-tight">Budget & Expenses</h2>
           <p className="mb-6">
             From January 16, 2026 through July 2, 2026 our total expenditures amounted to $
-            {financialData.totalSpent.toLocaleString()}
+            {financialData.totalSpent.toLocaleString()}. Due to a small delay in publishing the
+            first report, this period covers slightly less than six months, which is reflected in
+            the numbers.
           </p>
           <BudgetSection
             budgetExpenses={financialData.budgetExpenses}
