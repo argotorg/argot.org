@@ -94,13 +94,12 @@ export default function TransparencyReport2026H1() {
           <p className="mb-6">
             From January 16, 2026 through July 2, 2026 our total expenditures amounted to $
             {financialData.totalSpent.toLocaleString()}. Due to a small delay in publishing the
-            first report, this period covers slightly less than six months, which is reflected in
-            the numbers.
+            first report, this period covers slightly less than six months.
           </p>
           <BudgetSection
             budgetExpenses={financialData.budgetExpenses}
             salaryByProject={financialData.salaryByProject}
-            professionalServicesNote="*Professional Services includes, e.g., the domicile in Switzerland, accounting and banking fees."
+            professionalServicesNote="*e.g. Professional Services includes the domicile in Switzerland, accounting and banking fees."
           />
         </section>
 
