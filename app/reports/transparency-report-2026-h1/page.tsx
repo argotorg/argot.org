@@ -100,6 +100,7 @@ export default function TransparencyReport2026H1() {
           <BudgetSection
             budgetExpenses={financialData.budgetExpenses}
             salaryByProject={financialData.salaryByProject}
+            professionalServicesNote="*Professional Services includes, e.g., the domicile in Switzerland, accounting and banking fees."
           />
         </section>
 

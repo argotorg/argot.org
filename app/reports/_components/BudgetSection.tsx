@@ -11,11 +11,16 @@ interface BudgetItem {
 interface BudgetSectionProps {
   budgetExpenses: BudgetItem[]
   salaryByProject: BudgetItem[]
+  professionalServicesNote?: string
 }
 
 type Tab = 'total' | 'salaries'
 
-export default function BudgetSection({ budgetExpenses, salaryByProject }: BudgetSectionProps) {
+export default function BudgetSection({
+  budgetExpenses,
+  salaryByProject,
+  professionalServicesNote = '*Professional Services includes the domicile in Switzerland, design, accounting and banking fees.',
+}: BudgetSectionProps) {
   const [activeTab, setActiveTab] = useState<Tab>('total')
 
   const tabs: { id: Tab; label: string }[] = [
@@ -46,10 +51,7 @@ export default function BudgetSection({ budgetExpenses, salaryByProject }: Budge
       {activeTab === 'total' ? (
         <>
           <BudgetCharts items={budgetExpenses} />
-          <p className="mt-6 text-right text-sm italic">
-            *Professional Services includes the domicile in Switzerland, design, accounting and
-            banking fees.
-          </p>
+          <p className="mt-6 text-right text-sm italic">{professionalServicesNote}</p>
         </>
       ) : (
         <>
