@@ -23,7 +23,11 @@ export default function DonorCard({ donor }: DonorCardProps) {
         <div className="text-base">{donor.date}</div>
       </div>
       <h4 className="text-2xl font-extrabold">{donor.name}</h4>
-      <div className="mt-2 text-sm">{donor.description}</div>
+      <div className="mt-2 space-y-2 text-sm">
+        {donor.description.split('\n\n').map((paragraph, i) => (
+          <p key={i}>{paragraph}</p>
+        ))}
+      </div>
       {donor.link && (
         <Link
           href={donor.link.href}
