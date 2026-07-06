@@ -1,0 +1,136 @@
+import ReportLayout from '@/layouts/ReportLayout'
+import { genPageMetadata } from 'app/seo'
+import reportData from '@/data/reports/2026-h1/transparency-report.json'
+import financialData from '@/data/reports/2026-h1/financial-data.json'
+import fundingData from '@/data/reports/2026-h1/funding-data.json'
+import grantData from '@/data/reports/2026-h1/grant-data.json'
+import hiresData from '@/data/reports/2026-h1/hires-data.json'
+import BudgetSection from '../_components/BudgetSection'
+import DonorCard from '../_components/DonorCard'
+import HireCard from '../_components/HireCard'
+
+export const metadata = genPageMetadata({
+  title: reportData.title,
+  description: reportData.summary,
+})
+
+export default function TransparencyReport2026H1() {
+  return (
+    <ReportLayout title={reportData.title} date={reportData.date}>
+      <div className="space-y-12">
+        <section>
+          <h2 className="mb-6 text-4xl font-extrabold tracking-tight">Introduction</h2>
+          <div className="space-y-4 text-lg">
+            <p>
+              This is Argot Collective's bi-annual transparency report, covering all spending from
+              January 16 to July 2, 2026. As a collective committed to public-goods stewardship, we
+              believe financial and organizational transparency is essential to accountability.
+            </p>
+            <p>
+              As with our previous report, the majority of expenses are contributor salaries
+              supporting the continued development of{' '}
+              <a
+                href="https://github.com/argotorg/solidity"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Solidity
+              </a>
+              ,{' '}
+              <a
+                href="https://github.com/ethdebug/format"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                ethdebug
+              </a>
+              ,{' '}
+              <a href="https://github.com/argotorg/fe" target="_blank" rel="noopener noreferrer">
+                Fe
+              </a>{' '}
+              (including{' '}
+              <a
+                href="https://github.com/fe-lang/sonatina"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Sonatina
+              </a>
+              ),{' '}
+              <a
+                href="https://github.com/argotorg/sourcify"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Sourcify
+              </a>
+              ,{' '}
+              <a href="https://github.com/argotorg/hevm" target="_blank" rel="noopener noreferrer">
+                hevm
+              </a>
+              , and{' '}
+              <a href="https://github.com/argotorg/act" target="_blank" rel="noopener noreferrer">
+                act
+              </a>
+              .
+            </p>
+          </div>
+        </section>
+
+        <section>
+          <div className="mt-8 grid gap-6 md:grid-cols-[300px_1fr]">
+            <h3 className="text-3xl font-extrabold">New Hires</h3>
+
+            <div className="space-y-4">
+              {hiresData.hires.map((hire) => (
+                <HireCard key={hire.role} hire={hire} />
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="mb-6 text-4xl font-extrabold tracking-tight">Budget & Expenses</h2>
+          <p className="mb-6">
+            From January 16, 2026 through July 2, 2026 our total expenditures amounted to $
+            {financialData.totalSpent.toLocaleString()}. Due to a small delay in publishing the
+            first report, this period covers slightly less than six months.
+          </p>
+          <BudgetSection
+            budgetExpenses={financialData.budgetExpenses}
+            salaryByProject={financialData.salaryByProject}
+            professionalServicesNote="*e.g. Professional Services includes the domicile in Switzerland, accounting and banking fees."
+          />
+        </section>
+
+        <section>
+          <div className="mt-8 grid gap-6 md:grid-cols-[300px_1fr]">
+            <h3 className="text-3xl font-extrabold">Grants</h3>
+            <div className="space-y-4">
+              {grantData.grantees.map((grantee) => (
+                <DonorCard key={grantee.name} donor={grantee} />
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="mb-6 text-4xl font-extrabold tracking-tight">Funding</h2>
+          <div className="space-y-4">
+            <p>{fundingData.intro}</p>
+          </div>
+
+          <div className="mt-8 grid gap-6 md:grid-cols-[300px_1fr]">
+            <h3 className="text-3xl font-extrabold">Donors</h3>
+
+            <div className="space-y-4">
+              {fundingData.donors.map((donor) => (
+                <DonorCard key={`${donor.name}-${donor.date}`} donor={donor} />
+              ))}
+            </div>
+          </div>
+        </section>
+      </div>
+    </ReportLayout>
+  )
+}

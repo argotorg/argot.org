@@ -20,6 +20,7 @@ const COLORS = [
   '#E7B865', // amber-400
   '#EDBC76',
   '#F3CC88', // amber-300
+  '#F9DCA5', // amber-200
 ]
 
 const formatCurrency = (value: number) => `$${value.toLocaleString()}`
