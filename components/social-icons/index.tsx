@@ -11,6 +11,7 @@ import {
   Instagram,
   Farcaster,
   Bluesky,
+  Holders,
   Rss,
 } from './icons'
 
@@ -27,6 +28,7 @@ const components = {
   instagram: Instagram,
   farcaster: Farcaster,
   bluesky: Bluesky,
+  holders: Holders,
   rss: Rss,
 }
 

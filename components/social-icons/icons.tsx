@@ -111,6 +111,15 @@ export function Bluesky(svgProps: SVGProps<SVGSVGElement>) {
   )
 }
 
+export function Holders(svgProps: SVGProps<SVGSVGElement>) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...svgProps}>
+      <title>Holders</title>
+      <path d="M12 3 22 21 H2 Z" />
+    </svg>
+  )
+}
+
 export function Rss(svgProps: SVGProps<SVGSVGElement>) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...svgProps}>
