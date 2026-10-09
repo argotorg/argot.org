@@ -22,6 +22,9 @@ const REVEAL_TO = -0.8
 // runs to REVEAL_TO, then the second beat, and the figure's own note STILL
 // later)
 const STILL = 0.25
+// (and the band that holds a phone's beat bubbles mid-screen is this many
+// screens' heights of scrolling long)
+const READ = 2.3
 // an annotated figure that fits on the screen instead holds still in its
 // middle while the reader scrolls through its story, in parts measured in
 // screens' heights: LEAD, the raw bytes alone, for a look first; BEAT,
@@ -262,15 +265,6 @@ export default function EthdebugFigure({
   const [screen, setScreen] = useState<number>()
   // which beat shows (-1: none yet)
   const [beat, setBeat] = useState(-1)
-  // (the beat the phone's bubble says: it follows `beat` a moment late,
-  // once the last one has faded out)
-  const [told, setTold] = useState(-1)
-  useEffect(() => {
-    if (beat === told) return
-    if (beat < 0 || told < 0) return setTold(beat)
-    const t = setTimeout(() => setTold(beat), 160)
-    return () => clearTimeout(t)
-  }, [beat, told])
   useEffect(() => {
     const el = stage.current
     if (!reveals || !el) return
@@ -325,9 +319,7 @@ export default function EthdebugFigure({
         progress = (begin - top) / (begin - end)
         after = top < end - innerHeight * STILL ? 1 : 0
         const final = (beats?.length ?? 1) - 1
-        // (and the bubble goes before the figure's end reaches it)
-        const gone = el.getBoundingClientRect().bottom < innerHeight * 0.3
-        setBeat(top > start || gone ? -1 : progress < 1 ? 0 : final)
+        setBeat(top > start ? -1 : progress < 1 ? 0 : final)
       }
       progress = Math.min(1, Math.max(0, progress))
       if (progress + after === last) return
@@ -443,34 +435,42 @@ export default function EthdebugFigure({
             </div>
           </>
         )}
-        <div ref={stage} style={pinned ? { position: 'sticky', top: hold } : undefined}>
+        <div
+          ref={stage}
+          className="relative"
+          style={pinned ? { position: 'sticky', top: hold } : undefined}
+        >
           {story.length > 0 && !pinned && (
-            // (not pinned, as on a phone: one amber bubble over the top of
-            // the figure, where the reader is looking. It takes no room: it
-            // starts a little way into the figure, so the top of the dump
-            // shows above it, then sticks to the screen's top while the
-            // figure scrolls under it, and leaves with the figure's end. It
-            // shows the newest beat: the old one fades out before the new one
-            // fades in, so the two never show at once)
-            <div className="sticky top-3 z-10 -mb-11 mt-11 h-0">
-              <div
-                aria-hidden={beat < 0}
-                className="mx-auto max-w-[34rem] rounded-xl border-l-4 border-amber-500 bg-[#FBEFD9] px-4 py-2.5 shadow-lg transition-[opacity,transform] duration-300 dark:border-amber-400 dark:bg-[#3A2F22]"
-                style={{
-                  opacity: beat >= 0 ? 1 : 0,
-                  transform: beat >= 0 ? 'none' : 'translateY(-0.5rem)',
-                }}
-              >
-                <p
-                  className="my-0 text-center text-[15px] font-semibold leading-snug text-anthracite-700 transition-opacity duration-150 dark:text-ecru-100"
-                  style={{
-                    textWrap: 'balance',
-                    whiteSpace: 'pre-line',
-                    opacity: told === beat ? 1 : 0,
-                  }}
-                >
-                  {story[Math.max(0, told)]}
-                </p>
+            // (not pinned, as on a phone: the beats as amber bubbles in the
+            // middle of the screen, the newest under the ones before. They
+            // take no room: a band over the figure, from a little way into
+            // it, holds them in the middle of the screen for READ of
+            // scrolling, long enough to read them while the figure scrolls
+            // under them; then they scroll away with the page)
+            <div
+              className="pointer-events-none absolute inset-x-0 top-11 z-10"
+              style={{ height: `${READ * 100}svh` }}
+            >
+              <div className="sticky top-1/2 -translate-y-1/2 space-y-2">
+                {story.map((text, i) => (
+                  <p
+                    key={i}
+                    aria-hidden={beat < i}
+                    className={`mx-auto my-0 max-w-[34rem] rounded-xl px-4 py-3 text-center leading-snug shadow-lg transition-[opacity,transform] duration-300 ${
+                      i === story.length - 1 && i > 0
+                        ? 'border-2 border-amber-500 bg-amber-300 text-[17px] font-bold text-anthracite-700 dark:border-amber-400 dark:bg-amber-700 dark:text-ecru-100'
+                        : 'border-l-4 border-amber-500 bg-[#FBEFD9] text-[16px] font-semibold text-anthracite-700 dark:border-amber-400 dark:bg-[#3A2F22] dark:text-ecru-100'
+                    }`}
+                    style={{
+                      textWrap: 'balance',
+                      whiteSpace: 'pre-line',
+                      opacity: beat >= i ? 1 : 0,
+                      transform: beat >= i ? 'none' : 'translateY(0.5rem)',
+                    }}
+                  >
+                    {text}
+                  </p>
+                ))}
               </div>
             </div>
           )}
