@@ -76,25 +76,34 @@ hard.
 
 Even within one language, designing software to use clear abstractions means
 structuring data in nested containers. To find Alice's score in the game, a tool
-cryptographically hashes her address with the mapping's slot to find her record,
-then picks her score out of six small fields packed into that one slot. Her name
-sits in the next slot, but not as plain text: the characters start at one end,
-their length is tucked into the other, and the bytes between mean nothing. Each
-layer has its own rule, and a tool that gets any one of them wrong reads the
-wrong bytes.
+hashes her address with the mapping's slot (using keccak, Ethereum's standard
+hash function) to find her record, then picks her score out of six small fields
+packed into that one slot. Her name sits in the next slot, but not as plain
+text: the characters start at one end, their length is tucked into the other,
+and the bytes between mean nothing. Each layer has its own rule, and a tool that
+gets any one of them wrong reads the wrong bytes.
 
 <EthdebugFigure scene="pitfall-nesting" size="wide">
-  [Caption TODO] One player's record: a mapping entry whose fields share one
-  storage slot, and a name stored as a string.
+  Alice's record, as the compiler's data describes it: six fields packed into
+  one slot, then her name, with its characters at one end of the next slot
+  and its length at the other. The grey rows are the ones a tool reads on the
+  way to finding it.
 </EthdebugFigure>
 
 Then a tool has to do it all again for the next language. Sometimes the rules
-match up, and sometimes they are off in subtle ways. Here is the same game
-compiled with Vyper, read the way a Solidity tool would read it:
+match up, and sometimes they are off in subtle ways. Vyper also finds a
+mapping's entry by hashing the key together with the mapping's slot, but it
+hashes them in the other order: slot first, then key. Its slot numbers differ
+too, because Vyper reserves room for an array's or a string's full capacity, so
+the game's players mapping lands at slot 108 instead of slot 3. A tool that
+applies Solidity's rule to Vyper's storage computes a slot that looks just as
+valid, finds it empty, and reports that Alice's score is 0. Here is the same
+game compiled with Vyper, read the way a Solidity tool would read it:
 
 <EthdebugFigure scene="pitfall-compiler" size="wide">
-  [Caption TODO] One slot, two answers: Alice's score read with Solidity's
-  storage rule (0) and with Vyper's actual layout (30).
+  The same storage, read two ways. Solidity's rule hashes Alice's address
+  before the slot and lands on an empty slot, so her score reads 0. Vyper's
+  layout hashes the slot first and finds her real score: 30.
 </EthdebugFigure>
 
 _[Glue: first reveal, then the rest of §1: the guess was wrong and nothing warned you (say it plainly: 0, when it is 30). Then: every team built its own decoder; it breaks with every compiler and version; for an auditor, that's a wrong finding. End §1 with what ethdebug is, in one or two lines: the compiler writes down what its bytecode means.]_
