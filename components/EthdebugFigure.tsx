@@ -486,8 +486,8 @@ export default function EthdebugFigure({
           style={pinned ? { position: 'sticky', top: hold } : undefined}
         >
           {story.length > 0 && !pinned && (
-            // (not pinned, as on a phone: the beats as amber bubbles in the
-            // middle of the screen, the newest under the ones before. They
+            // (not pinned, as on a phone: the first beat as an amber bubble
+            // near the middle of the screen, the rest as its footnotes. They
             // take no room: a band over the figure, from a little way into
             // it to just before the end of its storage dump, holds them in
             // the middle of the screen while the figure scrolls under them;
@@ -496,26 +496,48 @@ export default function EthdebugFigure({
               className="pointer-events-none absolute inset-x-0 top-11 z-10"
               style={{ height: Math.max(0, (storageEnd ?? (frameTall ?? 0) * 0.65) - 44 - 16) }}
             >
-              <div className="sticky top-1/2 -translate-y-1/2 space-y-2">
-                {story.map((text, i) => (
+              <div className="sticky top-[30svh] mx-auto max-w-[34rem]">
+                {/* (the first beat is the bubble; the ones after it are its
+                    footnotes, a drawer that slides out from under it in the
+                    same colours, smaller: seen, but not the story) */}
+                <div
+                  aria-hidden={beat < 0}
+                  className="relative z-10 rounded-xl border-l-4 border-amber-500 bg-[#FBEFD9] px-4 py-3 shadow-lg transition-[opacity,transform,border-radius] duration-300 dark:border-amber-400 dark:bg-[#3A2F22]"
+                  style={{
+                    opacity: beat >= 0 ? 1 : 0,
+                    transform: beat >= 0 ? 'none' : 'translateY(0.5rem)',
+                    ...(beat >= 1 ? { borderBottomLeftRadius: 0, borderBottomRightRadius: 0 } : {}),
+                  }}
+                >
                   <p
-                    key={i}
-                    aria-hidden={beat < i}
-                    className={`mx-auto my-0 max-w-[34rem] rounded-xl px-4 py-3 text-center leading-snug shadow-lg transition-[opacity,transform] duration-300 ${
-                      i === story.length - 1 && i > 0
-                        ? 'border-2 border-amber-500 bg-amber-300 text-[17px] font-bold text-anthracite-700 dark:border-amber-400 dark:bg-amber-700 dark:text-ecru-100'
-                        : 'border-l-4 border-amber-500 bg-[#FBEFD9] text-[16px] font-semibold text-anthracite-700 dark:border-amber-400 dark:bg-[#3A2F22] dark:text-ecru-100'
-                    }`}
-                    style={{
-                      textWrap: 'balance',
-                      whiteSpace: 'pre-line',
-                      opacity: beat >= i ? 1 : 0,
-                      transform: beat >= i ? 'none' : 'translateY(0.5rem)',
-                    }}
+                    className="my-0 text-center text-[16px] font-semibold leading-snug text-anthracite-700 dark:text-ecru-100"
+                    style={{ textWrap: 'balance', whiteSpace: 'pre-line' }}
                   >
-                    {text}
+                    {story[0]}
                   </p>
-                ))}
+                </div>
+                {story.length > 1 && (
+                  <div className="overflow-hidden rounded-b-xl">
+                    <div
+                      aria-hidden={beat < 1}
+                      className="space-y-1 rounded-b-xl border-l-4 border-t border-amber-500 border-t-amber-500/30 bg-[#FBEFD9] px-4 pb-2.5 pt-2 shadow-lg transition-[opacity,transform] duration-300 dark:border-amber-400 dark:border-t-amber-400/30 dark:bg-[#3A2F22]"
+                      style={{
+                        opacity: beat >= 1 ? 1 : 0,
+                        transform: beat >= 1 ? 'none' : 'translateY(-100%)',
+                      }}
+                    >
+                      {story.slice(1).map((text, i) => (
+                        <p
+                          key={i}
+                          className="my-0 text-center text-[13px] font-medium leading-snug text-anthracite-400 dark:text-ecru-300"
+                          style={{ textWrap: 'balance', whiteSpace: 'pre-line' }}
+                        >
+                          {text}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -564,7 +586,13 @@ export default function EthdebugFigure({
               {story.map((text, i) => (
                 <p
                   key={i}
-                  className={`${CAPTION} my-0 transition-opacity duration-500`}
+                  // (the beats after the first are its footnotes: smaller,
+                  // quieter, right under it)
+                  className={
+                    i === 0
+                      ? `${CAPTION} my-0 transition-opacity duration-500`
+                      : 'mx-auto -mt-1 mb-0 max-w-[50rem] text-center text-sm leading-snug text-anthracite-300 transition-opacity duration-500 dark:text-ecru-400'
+                  }
                   style={{
                     textWrap: 'balance',
                     whiteSpace: 'pre-line',
