@@ -48,8 +48,10 @@ guesswork: rules learned by watching the compiler, and special cases for each
 version, because compiler internals change from release to release. Each new
 language, and each new compiler for a language, is a new challenge.
 
-This is what a development tool sees when it looks at the machine state in the
-middle of a transaction:
+Take a small example, which the rest of this post uses too: a multiplayer game
+where players join and make moves that may earn them points. This is what a
+development tool sees when it looks at the game's state in the middle of a
+transaction:
 
 <EthdebugFigure
   scene="reveal"
@@ -69,25 +71,29 @@ tools read the right bytes.
 
 The trouble starts when a rule doesn't fit. A tool can't tell when it has met a
 case its rules never covered. It applies the rule it knows, and the answer it
-gets looks just as plausible as a correct one. Two pitfalls stand out.
+gets looks just as plausible as a correct one. And getting every rule right is
+hard.
 
-The first is data that nests. To find alice's score, a tool hashes her address
-with the mapping's slot to find her record, then picks her score out of six
-small fields packed into that one slot. Her name sits in the next slot, but not
-as plain text: the characters start at one end, their length is tucked into the
-other, and the bytes between mean nothing. Each layer has its own rule, and a
-tool that gets any one of them wrong reads the wrong bytes.
+Even within one language, designing software to use clear abstractions means
+structuring data in nested containers. To find Alice's score in the game, a tool
+cryptographically hashes her address with the mapping's slot to find her record,
+then picks her score out of six small fields packed into that one slot. Her name
+sits in the next slot, but not as plain text: the characters start at one end,
+their length is tucked into the other, and the bytes between mean nothing. Each
+layer has its own rule, and a tool that gets any one of them wrong reads the
+wrong bytes.
 
 <EthdebugFigure scene="pitfall-nesting" size="wide">
   [Caption TODO] One player's record: a mapping entry whose fields share one
   storage slot, and a name stored as a string.
 </EthdebugFigure>
 
-The second is a different compiler. Here is the same game compiled with Vyper,
-read the way a Solidity tool would read it:
+Then a tool has to do it all again for the next language. Sometimes the rules
+match up, and sometimes they are off in subtle ways. Here is the same game
+compiled with Vyper, read the way a Solidity tool would read it:
 
 <EthdebugFigure scene="pitfall-compiler" size="wide">
-  [Caption TODO] One slot, two answers: alice's score read with Solidity's
+  [Caption TODO] One slot, two answers: Alice's score read with Solidity's
   storage rule (0) and with Vyper's actual layout (30).
 </EthdebugFigure>
 
