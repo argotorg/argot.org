@@ -16,15 +16,12 @@ const FALLBACK = '160px'
 // where an annotated figure's top is (as a fraction of the screen's
 // height from its top) when its reveal starts, and when it is complete
 const REVEAL_FROM = 0.25
-const REVEAL_TO = -0.8
+const REVEAL_TO = -0.45
 // (not pinned, the same story in screens' heights of scrolling: the first
 // beat shows at REVEAL_FROM, the bytes stay raw for STILL more, the reveal
 // runs to REVEAL_TO, then the second beat, and the figure's own note STILL
 // later)
 const STILL = 0.25
-// (and the band that holds a phone's beat bubbles mid-screen is this many
-// screens' heights of scrolling long)
-const READ = 2.3
 // an annotated figure that fits on the screen instead holds still in its
 // middle while the reader scrolls through its story, in parts measured in
 // screens' heights: LEAD, the raw bytes alone, for a look first; BEAT,
@@ -157,6 +154,7 @@ function Frame({
   reserve = DEFAULT_HEIGHT,
   onMessage,
   frameRef,
+  eager,
 }: {
   src: string
   title: string
@@ -164,6 +162,8 @@ function Frame({
   reserve?: number
   onMessage?: (data: Data, el: HTMLIFrameElement) => void
   frameRef?: React.MutableRefObject<HTMLIFrameElement | null>
+  // (load at once, not when it nears the screen)
+  eager?: boolean
 }) {
   const own = useRef<HTMLIFrameElement>(null)
   const frame = frameRef ?? own
@@ -203,7 +203,7 @@ function Frame({
         ref={frame}
         src={src}
         title={title}
-        loading="lazy"
+        loading={eager ? 'eager' : 'lazy'}
         scrolling="no"
         onLoad={onLoad}
         className="block h-full w-full border-0"
@@ -250,6 +250,10 @@ export default function EthdebugFigure({
 
   const [reported, setReported] = useState<Size>()
   const [row, setRow] = useState<number>()
+  // (where the figure's storage dump ends, in its frame, as it says: the
+  // phone's beat bubbles let go before it; until it says, a guess)
+  const [storageEnd, setStorageEnd] = useState<number>()
+  const [frameTall, setFrameTall] = useState<number>()
   const release = row ? `${RELEASE_ROWS * row}px` : FALLBACK
   const [reserve, setReserve] = useState<number>()
   const box = useRef<HTMLDivElement>(null)
@@ -372,6 +376,8 @@ export default function EthdebugFigure({
   const onFigure = useCallback((data: Data, el: HTMLIFrameElement) => {
     if (data.columns === 1 || data.columns === 2) setReported(data.columns === 2 ? 'wide' : 'text')
     if (typeof data.row === 'number' && data.row > 0) setRow(data.row)
+    if (typeof data.storageBottom === 'number') setStorageEnd(data.storageBottom)
+    if (typeof data.height === 'number' && data.height > 0) setFrameTall(data.height)
     if (data.reveal === true) setReveals(true)
     // the figure asks the page to bring a point of it into view, below
     // the sticky panel (it can't scroll itself: it is as tall as its content)
@@ -444,12 +450,12 @@ export default function EthdebugFigure({
             // (not pinned, as on a phone: the beats as amber bubbles in the
             // middle of the screen, the newest under the ones before. They
             // take no room: a band over the figure, from a little way into
-            // it, holds them in the middle of the screen for READ of
-            // scrolling, long enough to read them while the figure scrolls
-            // under them; then they scroll away with the page)
+            // it to just before the end of its storage dump, holds them in
+            // the middle of the screen while the figure scrolls under them;
+            // then they scroll away with the page)
             <div
               className="pointer-events-none absolute inset-x-0 top-11 z-10"
-              style={{ height: `${READ * 100}svh` }}
+              style={{ height: Math.max(0, (storageEnd ?? (frameTall ?? 0) * 0.65) - 44 - 16) }}
             >
               <div className="sticky top-1/2 -translate-y-1/2 space-y-2">
                 {story.map((text, i) => (
@@ -499,6 +505,9 @@ export default function EthdebugFigure({
                 reserve={reserve}
                 onMessage={onFigure}
                 frameRef={figure}
+                // (a figure with a story loads at once, so it is ready by
+                // the time the reader scrolls into it)
+                eager={story.length > 0}
               />
             )}
           </div>
