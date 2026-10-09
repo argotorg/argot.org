@@ -502,7 +502,7 @@ export default function EthdebugFigure({
                     same colours, smaller: seen, but not the story) */}
                 <div
                   aria-hidden={beat < 0}
-                  className="relative z-10 rounded-xl border-l-4 border-amber-500 bg-[#FBEFD9] px-4 py-3 shadow-lg transition-[opacity,transform,border-radius] duration-300 dark:border-amber-400 dark:bg-[#3A2F22]"
+                  className="relative z-10 rounded-xl border-l-4 border-amber-500 bg-[#FBEFD9] px-4 py-3 shadow-sm transition-[opacity,transform,border-radius] duration-300 dark:border-amber-400 dark:bg-[#3A2F22]"
                   style={{
                     opacity: beat >= 0 ? 1 : 0,
                     transform: beat >= 0 ? 'none' : 'translateY(0.5rem)',
@@ -520,7 +520,7 @@ export default function EthdebugFigure({
                   <div className="overflow-hidden rounded-b-xl">
                     <div
                       aria-hidden={beat < 1}
-                      className="space-y-1 rounded-b-xl border-l-4 border-t border-amber-500 border-t-amber-500/30 bg-[#FBEFD9] px-4 pb-2.5 pt-2 shadow-lg transition-[opacity,transform] duration-300 dark:border-amber-400 dark:border-t-amber-400/30 dark:bg-[#3A2F22]"
+                      className="space-y-1 rounded-b-xl border-l-4 border-t border-amber-500 border-t-amber-500/30 bg-[#FBEFD9] px-4 pb-2.5 pt-2 shadow-sm transition-[opacity,transform] duration-300 dark:border-amber-400 dark:border-t-amber-400/30 dark:bg-[#3A2F22]"
                       style={{
                         opacity: beat >= 1 ? 1 : 0,
                         transform: beat >= 1 ? 'none' : 'translateY(-100%)',
