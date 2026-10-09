@@ -1,0 +1,137 @@
+---
+title: 'ethdebug: a shared language for debug data, in use across projects today'
+date: '2026-10-15'
+draft: false
+summary: 'Compilers can now better explain their bytecode to tools. This post covers what that looks like today, how you can build on it, and what is coming next for the maturing debugging data format.'
+layout: PostBanner
+tags: ['ethdebug']
+---
+
+_Compilers can now better explain their bytecode to tools. This post covers what
+that looks like today, how you can build on it, and what's coming next for the
+maturing debugging data format._
+
+The **ethdebug format** is an open specification for compilers to use in
+structuring their debug output. Like DWARF for traditional computing, but
+designed for the quirks of smart contract languages, it seeks to reduce the
+cost to understand the blockchain. **ethdebug** is an Argot Collective
+project, and this post is its first introduction on this blog.
+
+Today, the format is real: the compilers **solc**, **Fe** and **Solar** produce
+data in it, and tools are starting to consume it. Walnut's **soldb** reads it,
+and Runtime Verification's **Simbolik** uses it internally. We are proud of the
+work on both sides: compilers, who must produce this data, and debuggers and
+other tools, who consume it.
+
+While this tooling continues to improve, there is enough here to show what this
+new information makes possible: tools can stop guessing what the compiler
+meant.
+
+## Tools have always worked backwards
+
+Smart contracts are written in languages for humans to read, but they run as
+machine code and keep their state in the terms of the Ethereum Virtual Machine.
+The compiler serves both sides: it keeps the human's abstractions clear, and it
+makes the machine code cheap to run, because computation on the EVM is
+expensive. Compilers have become very good at this. But with modern optimizers,
+the raw state of the machine can be very hard to decipher, even for experts.
+
+Throughout Ethereum's history, people have needed to see through these
+compiler-managed internals. Public blockchains can control significant value,
+so it is essential to understand how a contract fails: before, during
+development, and after, in case of a security incident. Many independent groups
+have built tools with essentially the same goal: undo the compiler's tricks and
+recover the human abstractions from the machine.
+
+Compilers have given these tools enough information to succeed, but only with
+guesswork: rules learned by watching the compiler, and special cases for each
+version, because compiler internals change from release to release. Each new
+language, and each new compiler for a language, is a new challenge.
+
+This is what a development tool sees when it looks at the machine state in the
+middle of a transaction:
+
+<EthdebugFigure
+  scene="reveal"
+  size="text"
+  beats={[
+    "Compilers producing debug data themselves eliminates guesswork.\nThis allows tools to see exactly where data lives in high-level language terms.",
+    "(Every interactive figure in this post runs on real, language-agnostic ethdebug data, directly from solc, except where otherwise stated.)",
+  ]}
+>
+</EthdebugFigure>
+
+Without this data, a tool has to guess, and usually the guess is right. Tool
+authors learn each compiler's rules by watching what it does: where Solidity
+puts a mapping's entries, how it packs small values into one slot, how it lays
+out a string. They build those rules into their tools, and most of the time the
+tools read the right bytes.
+
+The trouble starts when a rule doesn't fit. A tool can't tell when it has met a
+case its rules never covered. It applies the rule it knows, and the answer it
+gets looks just as plausible as a correct one. Two pitfalls stand out.
+
+The first is data that nests. To find alice's score, a tool hashes her address
+with the mapping's slot to find her record, then picks her score out of six
+small fields packed into that one slot. Her name sits in the next slot, but not
+as plain text: the characters start at one end, their length is tucked into the
+other, and the bytes between mean nothing. Each layer has its own rule, and a
+tool that gets any one of them wrong reads the wrong bytes.
+
+<EthdebugFigure scene="pitfall-nesting" size="wide">
+  [Caption TODO] One player's record: a mapping entry whose fields share one
+  storage slot, and a name stored as a string.
+</EthdebugFigure>
+
+The second is a different compiler. Here is the same game compiled with Vyper,
+read the way a Solidity tool would read it:
+
+<EthdebugFigure scene="pitfall-compiler" size="wide">
+  [Caption TODO] One slot, two answers: alice's score read with Solidity's
+  storage rule (0) and with Vyper's actual layout (30).
+</EthdebugFigure>
+
+_[Glue: first reveal, then the rest of §1: the guess was wrong and nothing warned you (say it plainly: 0, when it is 30). Then: every team built its own decoder; it breaks with every compiler and version; for an auditor, that's a wrong finding. End §1 with what ethdebug is, in one or two lines: the compiler writes down what its bytecode means.]_
+
+## You can get the data today, from three compilers
+
+_[Glue: three compilers emit this today (solc behind a flag, Fe, Solar), and a real debugger already runs on it. Introduce the figure: soldb, Walnut's debugger, stepping the same transaction in Solidity and in Fe, right here in the page, from ethdebug data alone. Tell the reader to switch languages and step.]_
+
+<EthdebugFigure scene="real-debugger" size="wide">
+  [Caption TODO]
+</EthdebugFigure>
+
+_[Glue: after the figure: what soldb gets right today (where you are in the source, in both languages) and what it can't show yet: most of its state rows say "unknown" (it only knows totalScore and totalHits here; Fe's export has no state). Finding where values live is the hard part; that's what pointers are for (hand-off to the next section). Then the smallest unit of the data, one instruction explained (next figure); where to get it (the companion page's settings and hosted builds).]_
+
+<EthdebugFigure todo="one instruction, as solc writes it: its program.instructions entry (offset, operation, context.code.range) beside the highlighted source line `player.combo += 1;` (static is fine)">
+  [Caption TODO] One instruction, as solc writes it: where it is, what it
+  does, which source it came from.
+</EthdebugFigure>
+
+## Pointers: the compiler states the rule, and any tool applies it
+
+_[Glue: why the reader cares: finding where a value lives is the hardest part, and with pointers tools stop re-deriving it per compiler. Tell the reader to press ▶ in the figure and watch the compiler's rule find each player's record.]_
+
+<EthdebugFigure scene="pointer-walkthrough" size="wide" walkthrough>
+  [Caption TODO] How the compiler's pointer finds each player's record: keys
+  from the list, hashed with the mapping's slot.
+</EthdebugFigure>
+
+_[Glue: after the figure: name what they just watched (keys read from the list, hashed with the mapping's slot, then the packed fields), and that any tool can run this same rule.]_
+
+## Today it matches the old outputs; next, it goes where they can't
+
+_[Glue: why the reader cares: facts tools have long struggled with (locals in optimized code, inlined calls) become data. Introduce the figure: stepping optimized BUG code with locals still named. Then what's next for the format, honest about what isn't done.]_
+
+<EthdebugFigure scene="optimized-locals" size="wide">
+  [Caption TODO] Stepping optimized BUG code: locals still named, from the
+  compiler's data.
+</EthdebugFigure>
+
+## Build on it: ten lines of code, and a tool in minutes
+
+_[Glue: heading is a placeholder. Why the reader cares: one small piece of code reads every compiler's output. The ten-line snippet (code block) and what it does per step; then one paragraph on the LLM result (a CLI that shows each storage value a transaction changed, by name, from public material; how the specification let us check it), with a pointer to the appendix.]_
+
+## Pick one guess, and replace it with data
+
+_[Glue: ~150 words: pick one thing your tool guesses today and replace the guess with the compiler's data; tell us what you built. Links: the specification, the packages, the Matrix chat, the companion page. Who 'we' are, said once.]_
