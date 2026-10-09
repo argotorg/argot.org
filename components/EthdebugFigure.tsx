@@ -35,6 +35,8 @@ const HOLD = 0.7
 const RUNWAY = LEAD + BEAT + REVEAL + HOLD
 // (it fits when it takes at most this much of the screen's height)
 const FITS = 0.95
+// (and the room its beats take under it, pinned)
+const BEATS_ROOM = 160
 // a figure's caption, and its beats (an annotated figure's caption, told in
 // parts)
 const CAPTION =
@@ -269,22 +271,35 @@ export default function EthdebugFigure({
   const [screen, setScreen] = useState<number>()
   // which beat shows (-1: none yet)
   const [beat, setBeat] = useState(-1)
+  // (whether it fits goes by the frame's own height plus room for the
+  // beats, not by the stage's, which the decision itself changes; and the
+  // screen's height ignores a phone's toolbar showing and hiding)
+  const [fits, setFits] = useState(false)
   useEffect(() => {
     const el = stage.current
-    if (!reveals || !el) return
+    const frame = box.current
+    if (!reveals || !el || !frame) return
+    let width = 0
+    let height = 0
     const measure = () => {
       setTall(el.offsetHeight)
-      setScreen(innerHeight)
+      if (innerWidth !== width || Math.abs(innerHeight - height) > 160) {
+        width = innerWidth
+        height = innerHeight
+        setScreen(innerHeight)
+      }
+      setFits(frame.offsetHeight + BEATS_ROOM <= height * FITS)
     }
     const ro = new ResizeObserver(measure)
     ro.observe(el)
+    ro.observe(frame)
     addEventListener('resize', measure)
     return () => {
       ro.disconnect()
       removeEventListener('resize', measure)
     }
   }, [reveals])
-  const pinned = !!(reveals && tall && screen && tall <= screen * FITS)
+  const pinned = !!(reveals && tall && screen && fits)
   const story = beats ?? []
   const hold = pinned ? (screen! - tall!) / 2 : 0
 
