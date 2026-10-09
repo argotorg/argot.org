@@ -46,6 +46,9 @@ const CAPTION =
 const ORIGIN = process.env.NEXT_PUBLIC_ETHDEBUG_ORIGIN ?? 'https://ethdebug.github.io'
 const POST = process.env.NEXT_PUBLIC_ETHDEBUG_POST ?? `${ORIGIN}/argot-post-2026-10`
 const DEMO = `${POST}/demos/inspector`
+// how far ahead of the screen a figure starts loading (two screens' heights,
+// above and below)
+const NEAR = '200% 0px'
 // a frame's height before the manifest says better
 const DEFAULT_HEIGHT = 480
 // a frame that reports no height by then shows a note instead
@@ -171,6 +174,20 @@ function Frame({
   const frame = frameRef ?? own
   const [height, setHeight] = useState<number>()
   const [late, setLate] = useState(false)
+  // (a frame starts loading once it is within NEAR of the screen, so it is
+  // ready when the reader gets there; the browser's own lazy loading waits
+  // longer than the figures need)
+  const [near, setNear] = useState(!!eager)
+  const room = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const el = room.current
+    if (near || !el) return
+    const io = new IntersectionObserver(([e]) => e.isIntersecting && setNear(true), {
+      rootMargin: NEAR,
+    })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [near])
 
   useEffect(() => {
     const listen = (e: MessageEvent<Data>) => {
@@ -194,18 +211,20 @@ function Frame({
   const timer = useRef<ReturnType<typeof setTimeout>>()
   useEffect(() => () => clearTimeout(timer.current), [])
   const onLoad = () => {
+    // (an empty frame, not yet near, loads a blank page: not the figure)
+    if (!near) return
     tell()
     timer.current ??= setTimeout(() => setLate(true), TIMEOUT)
   }
 
   return (
-    <div className="relative" style={{ height: height ?? reserve }}>
+    <div ref={room} className="relative" style={{ height: height ?? reserve }}>
       {!height && reserve > 0 && <Placeholder late={late} />}
       <iframe
         ref={frame}
-        src={src}
+        src={near ? src : undefined}
         title={title}
-        loading={eager ? 'eager' : 'lazy'}
+        loading="eager"
         scrolling="no"
         onLoad={onLoad}
         className="block h-full w-full border-0"
