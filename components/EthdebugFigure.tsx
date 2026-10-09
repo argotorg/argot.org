@@ -277,6 +277,7 @@ export default function EthdebugFigure({
   const [frameTall, setFrameTall] = useState<number>()
   const release = row ? `${RELEASE_ROWS * row}px` : FALLBACK
   const [reserve, setReserve] = useState<number>()
+  const [panelReserve, setPanelReserve] = useState<number>()
   const box = useRef<HTMLDivElement>(null)
   const sentinel = useRef<HTMLDivElement>(null)
   const panel = useRef<HTMLIFrameElement>(null)
@@ -404,7 +405,11 @@ export default function EthdebugFigure({
 
   useEffect(() => {
     if (!scene) return
-    heights().then((m) => setReserve(nearest(m[scene], box.current?.offsetWidth ?? 0)))
+    heights().then((m) => {
+      setReserve(nearest(m[scene], box.current?.offsetWidth ?? 0))
+      // (a walkthrough's panel frame, at the text column's width)
+      setPanelReserve(nearest(m[`${scene}#panel`], runway.current?.offsetWidth ?? 0))
+    })
   }, [scene, size])
 
   const onFigure = useCallback((data: Data, el: HTMLIFrameElement) => {
@@ -468,7 +473,7 @@ export default function EthdebugFigure({
                 src={`${DEMO}/embed-panel.html#${hash(`&channel=${channel}`)}`}
                 title={`ethdebug walkthrough: ${scene}`}
                 theme={theme ?? initial}
-                reserve={0}
+                reserve={panelReserve ?? 0}
                 onMessage={onPanel}
                 frameRef={panel}
               />
