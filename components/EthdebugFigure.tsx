@@ -723,7 +723,7 @@ export default function EthdebugFigure({
           // and at rest under it at the end; hidden until the figure's top
           // is in view)
           <div
-            className={`sticky bottom-0 z-10 transition-[opacity,transform] duration-300 ${id}-pc`}
+            className={`sticky bottom-0 z-10 mt-6 transition-[opacity,transform] duration-300 ${id}-pc`}
             style={{
               opacity: shown ? 1 : 0,
               transform: shown ? 'none' : 'translateY(1rem)',
