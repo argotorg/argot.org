@@ -16,7 +16,7 @@ import heights from '@/data/ethdebug-heights.json'
 // panel lets go of the screen's top
 // whether a walkthrough step may scroll the page to bring its lit rows
 // into view (off: testing whether page scrolling drops the panel's clicks)
-const AUTO_SCROLL = true
+const AUTO_SCROLL = false
 // (until a walkthrough figure says where its opening view ends, its panel
 // shows when the figure's top is this far up the screen)
 const SHOW_AT = 0.3
