@@ -102,12 +102,13 @@ other, and the bytes in between are unused.
   way to finding it.
 </EthdebugFigure>
 
-Each layer has its own rule, and a tool that gets any one of them wrong reads the wrong bytes.
-Then a tool has to do it all again for the next language. Sometimes the rules
-match up, and sometimes they are off in subtle ways. Vyper also finds a
-mapping's entry by hashing the key together with the mapping's slot, but it
-hashes them in the other order: slot first, then key. Its slot numbers differ
-too because Vyper reserves room for an array's or a string's full capacity:
+There are different rules for each type of data and each type of nesting, and a
+tool that gets any one of them wrong reads the wrong bytes. Then, for the next
+language, a tool has to do it all again. Sometimes the rules
+match up, and sometimes they are off in subtle ways. Vyper, for instance, also
+finds a mapping's entry by hashing the key together with the mapping's slot,
+but it hashes them in the opposite order: slot first, then key. Its slot numbers
+differ too because Vyper reserves room for an array's or a string's full capacity:
 the game's `players` mapping lands at slot 108 instead of slot 3. A tool that
 applies Solidity's rule to Vyper's storage computes a slot that looks just as
 valid, finds it empty, and reports that Alice's score is 0. Here is the same
@@ -119,11 +120,36 @@ game compiled with Vyper, read the way a Solidity tool would read it:
   layout hashes the slot first and finds her real score: 30.
 </EthdebugFigure>
 
-_[Glue: first reveal, then the rest of §1: the guess was wrong and nothing warned you (say it plainly: 0, when it is 30). Then: every team built its own decoder; it breaks with every compiler and version; for an auditor, that's a wrong finding. End §1 with what ethdebug is, in one or two lines: the compiler writes down what its bytecode means.]_
+Nothing in the bytes says which rule is right. A debugger shows Alice's score as
+0; an auditor concludes the write never happened; both are confidently wrong.
 
-## You can get the data today, from three compilers
+The ethdebug format removes the guess. The compiler already knows exactly where
+it put every value, so it writes that down, in a shared format, alongside the
+bytecode. Tools then read the compiler's own rules instead of
+reverse-engineering them, for any compiler that emits the format, including ones
+that don't exist yet. That is what the colors in the first figure were: the
+compiler explaining its own output.
 
-_[Glue: three compilers emit this today (solc behind a flag, Fe, Solar), and a real debugger already runs on it. Introduce the figure: soldb, Walnut's debugger, stepping the same transaction in Solidity and in Fe, right here in the page, from ethdebug data alone. Tell the reader to switch languages and step.]_
+## Three compilers produce ethdebug data today
+
+Three compilers write ethdebug data today, each at a different stage.
+
+solc writes it behind an experimental flag. Today that covers which piece of
+source each instruction came from: the same information as solc's older source
+maps, in a simpler shape. Walnut, the team building solc's support, is adding
+more in stages; their working branch already lists where every state variable
+lives.
+
+Fe, a separate contract language, writes ethdebug as its only debug output, and
+it works with the optimizer on. Solar, a second Solidity compiler from Paradigm,
+writes it on its main branch, also with the optimizer on, and its bytecode is
+the same with or without the debug data.
+
+Walnut also makes soldb, a debugger. It was written for Solidity. But because it
+reads ethdebug, it can step through a Fe contract too, with no changes to soldb
+itself; we only had to pass it Fe's files. The figure below runs soldb right in
+this page, on the same game transaction compiled both ways. Switch between
+Solidity and Fe, and step through each.
 
 <EthdebugFigure scene="real-debugger" size="wide">
   [Caption TODO]
