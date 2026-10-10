@@ -494,11 +494,13 @@ export default function EthdebugFigure({
       frame = 0
       const r = el.getBoundingClientRect()
       const tall = panel.current?.getBoundingClientRect().height ?? 0
+      // (shown from the moment the figure's opening view is in sight, on
+      // down: through its sticking, its coming to rest under the figure,
+      // and after; hidden again only above that moment)
       const on =
-        r.bottom > 0 &&
-        (showAfter.current === undefined
+        showAfter.current === undefined
           ? r.top <= innerHeight * SHOW_AT
-          : r.top + showAfter.current <= innerHeight - tall)
+          : r.top + showAfter.current <= innerHeight - tall
       if (on === shownRef.current) return
       shownRef.current = on
       setShown(on)
