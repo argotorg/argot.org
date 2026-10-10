@@ -133,6 +133,12 @@ function layout(
     // (on a dark page, a light poster, as rendered before the page knew
     // its theme, stays hidden until the dark one has loaded in its place)
     `.dark .${id}-i[data-shown="light"] { visibility: hidden; }`,
+    // (an annotated figure's poster is revealed: never shown on a page
+    // with its script, where the figure opens raw; in print it is, and
+    // with no script, by a <noscript> rule. Its room is kept, and reader
+    // views still take it)
+    `.${id}-i[data-spoils] { opacity: 0; }`,
+    `@media print { .${id}-i[data-spoils] { opacity: 1; } }`,
   ]
   steps(figure).forEach(([w, h], i) => {
     css.push(at(w, i, `${f}-f { height: ${h}px; }`))
@@ -167,12 +173,15 @@ function Poster({
   theme,
   alt,
   className,
+  spoils,
 }: {
   scene: string
   size: Size
   theme: Theme
   alt: string
   className: string
+  // (it shows the figure's payoff: shown only with no script, and in print)
+  spoils?: boolean
 }) {
   const widths = POSTER_WIDTHS.filter((w) => w <= WIDEST[size])
   const url = (w: number) => `${POSTERS}/${scene}-${theme}-${w}.webp`
@@ -192,6 +201,7 @@ function Poster({
         // (the theme of the poster it shows: light, as rendered; then, on
         // each load, the loaded one's)
         data-shown="light"
+        data-spoils={spoils || undefined}
         onLoad={(e) => {
           const img = e.currentTarget
           img.dataset.shown = img.currentSrc.includes('-dark-') ? 'dark' : 'light'
@@ -549,6 +559,13 @@ export default function EthdebugFigure({
           the room. Its CSS, from `layout`, decides all of this before any
           script runs, so the page's layout is final at first paint.) */}
       {css && <style dangerouslySetInnerHTML={{ __html: css }} />}
+      {story.length > 0 && (
+        <noscript
+          dangerouslySetInnerHTML={{
+            __html: `<style>.${id}-i[data-spoils] { opacity: 1; }</style>`,
+          }}
+        />
+      )}
       <div
         className="flow-root"
         style={walkthrough && scene ? { marginBottom: release } : undefined}
@@ -663,6 +680,7 @@ export default function EthdebugFigure({
                         `ethdebug figure: ${scene}`
                       }
                       className={`${id}-i`}
+                      spoils={story.length > 0}
                     />
                   }
                   // (a figure with a story loads at once, so it is ready by
