@@ -169,18 +169,19 @@ What soldb reads is simple. The format describes compiled code as [**ethdebug
 programs**](https://ethdebug.github.io/format/spec/program). An ethdebug program
 is one piece of bytecode that a compiler produced: a contract's deployed code,
 or the code that creates it. For each program, the compiler lists the
-instructions, in order. Each instruction gives its byte offset in the bytecode
-and its operation (the opcode, plus any data pushed with it), and a [**ethdebug
+instructions, in order, and each instruction gives three things: its byte offset
+in the bytecode, its operation (the opcode, plus any data pushed with it), and
+an [**ethdebug
 context**](https://ethdebug.github.io/format/spec/program/context): what the
 compiler knows to be true once that instruction has run.
 
 The simplest kind of context, and the one every compiler emits today, says which
 range of which source file the instruction came from. That is all soldb needed
 to follow the source. Other kinds describe variables, function calls, and code
-the optimizer moved or merged; we will come back to those.
+the optimizer moved or merged; we'll come back to those.
 
 Solidity and Fe write ethdebug programs in the same shape, so one reader handles
-both. Point at an instruction below to see its entry.
+both. Pick an instruction below to see its entry.
 
 <EthdebugFigure scene="program-xray" size="text">
   Part of `play()`, as solc and Fe each wrote it: one entry per instruction,
@@ -188,24 +189,25 @@ both. Point at an instruction below to see its entry.
   entry and the source its range points to; Fe adds a few fields of its own.
 </EthdebugFigure>
 
-That covers where the code came from. Finding where a value lives, for any type,
-in any language, is the hard part. That's what ethdebug pointers are for.
+That covers which source each instruction came from. Finding where a value
+lives, for any type, in any language, is the hard part. That's what ethdebug
+pointers are for.
 
 ## ethdebug pointers: the compiler states the rule, and any tool applies it
 
-For each variable, the compiler writes a [**ethdebug
-pointer**](https://ethdebug.github.io/format/spec/pointer): a description of
-where the variable's bytes are, written as a recipe a tool can follow. An
-ethdebug pointer names a location (storage, memory, the stack) and computes
-positions from what is already there: read this slot, hash this key with it,
-step to the next slot. Recipes for shapes the compiler uses again and again,
-like a mapping or a string, are written once as templates and reused.
+For each variable, the compiler writes an [**ethdebug
+pointer**](https://ethdebug.github.io/format/spec/pointer): a recipe a tool can
+follow to find the variable's bytes. An ethdebug pointer names a location
+(storage, memory, the stack) and computes positions from what is already there:
+read this slot, hash this key with it, step to the next slot. Shapes the
+compiler uses again and again, like a mapping or a string, are written once as
+templates and reused.
 
 The figure below follows the compiler's ethdebug pointer for `players`, from the
 slot it starts at to every byte of every player's record. Press ▶ to step
 through it. You can also select any other variable in the figure, such as
-`playerList`, `motd` or one player's `score`, and step through the ethdebug
-pointer that finds it.
+`playerList`, `motd` or one player's `score`, and step through its pointer
+instead.
 
 <EthdebugFigure scene="pointer-walkthrough" size="wide" walkthrough>
   The compiler's ethdebug pointer for `players`, followed step by step: from
@@ -213,15 +215,13 @@ pointer that finds it.
   each player's name. The panel shows the piece of the pointer each step uses.
 </EthdebugFigure>
 
-Nothing in those steps is specific to this game, or to Solidity. The keys came
-from the game's list of players, but every rule after that came from the
-compiler's data: where the mapping starts, how a key picks a record, how six
-fields share one slot, and how a string tells its short form from its long one.
-A tool that can follow an ethdebug pointer finds this data without knowing any
-of those rules. The figure itself does exactly that, with our reference
-implementation, the
+The figure ran those steps with our reference implementation, the
 [`@ethdebug/pointers`](https://www.npmjs.com/package/@ethdebug/pointers)
-package.
+package, which knows nothing about this game or about Solidity. The keys came
+from the game's list of players; every rule after that came from the compiler's
+data: where the mapping starts, how a key picks a record, how six fields share
+one slot, and how a string tells its short form from its long one. Any tool that
+follows ethdebug pointers can do the same.
 
 An ethdebug pointer for the Vyper version of the game would hash the slot before
 the key, start at slot 108, and give each field a slot of its own. The tool
