@@ -573,10 +573,9 @@ export default function EthdebugFigure({
         {scene && walkthrough && (
           <>
             <div ref={sentinel} aria-hidden="true" />
-            {/* (the panel at the narrow width, centred over the figure) */}
-            <div
-              className={`sticky top-0 z-10 ${id}-pc ml-[calc((100%_-_var(--w))/2)] w-[var(--w)] ${WIDTH.narrow}`}
-            >
+            {/* (the panel at the text column's width, over the figure, which
+                may be wider) */}
+            <div className={`sticky top-0 z-10 ${id}-pc`}>
               <Frame
                 src={initial && `${DEMO}/embed-panel.html#${hash(`&channel=${channel}`)}`}
                 title={`ethdebug walkthrough: ${scene}`}
