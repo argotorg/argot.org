@@ -57,31 +57,43 @@ transaction:
   scene="reveal"
   size="text"
   beats={[
-    "Compilers producing debug data themselves eliminates guesswork.\nThis allows tools to see exactly where data lives in high-level language terms.",
+    "When compilers provide enough debug data directly, tools can see exactly where data lives, in high-level terms.",
     "(Every interactive figure in this post runs on real, language-agnostic ethdebug data, directly from solc, except where otherwise stated.)",
   ]}
 >
 </EthdebugFigure>
 
-Without this data, a tool has to guess, and usually the guess is right. Tool
-authors learn each compiler's rules by watching what it does: where Solidity
-puts a mapping's entries, how it packs small values into one slot, how it lays
-out a string. They build those rules into their tools, and most of the time the
-tools read the right bytes.
+Without good debug data, a tool has to guess. Usually the guess is right; tool
+authors learn each compiler's rules by observing its behavior: where Solidity
+puts mapping entries, how it saves gas by packing small values into one slot,
+how it lays out a string. They copy their understanding of these rules into
+their tools.
 
-The trouble starts when a rule doesn't fit. A tool can't tell when it has met a
-case its rules never covered. It applies the rule it knows, and the answer it
-gets looks just as plausible as a correct one. And getting every rule right is
-hard.
+It is tedious, unending work to manage these compiler rules this way. Compiler
+behavior changes with new versions, optimizers make rules unpredictable, and
+none of the old rules ever go away: contracts on chain live forever, so a tool
+must keep reading the output of every compiler version anyone ever deployed
+with. The special cases pile up, and each change gets harder to make. In
+practice, tools fall behind: they support some compiler versions and not others,
+one language and not the next, and often not the optimized code that actually
+runs on mainnet.
 
-Even within one language, designing software to use clear abstractions means
-structuring data in nested containers. To find Alice's score in the game, a tool
-hashes her address with the mapping's slot (using keccak, Ethereum's standard
-hash function) to find her record, then picks her score out of six small fields
-packed into that one slot. Her name sits in the next slot, but not as plain
-text: the characters start at one end, their length is tucked into the other,
-and the bytes between mean nothing. Each layer has its own rule, and a tool that
-gets any one of them wrong reads the wrong bytes.
+Sometimes, the guess is wrong. When it is, nothing warns the tool. Wrong answers
+are just as plausible as right answers.
+
+To illustrate the kind of diligence involved: designing software with clear
+abstractions often means structuring data in nested containers, like a record
+inside a mapping. The compiler preserves that nesting; every container still
+exists in storage, holding the same things. But it encodes the nesting in a form
+that looks nothing like the source: a record's location becomes a hash, and
+separate fields share a single word.
+
+For example, to find Alice's score in this smart contract game, a tool hashes
+her address with the mapping's slot (using keccak, Ethereum's standard hash
+function) to find her player record, then picks her score out of six small
+fields packed into that one slot. Her name sits in the next slot, but not as
+plain text: the characters start at one end, their length is tucked into the
+other, and the bytes in between are unused.
 
 <EthdebugFigure scene="pitfall-nesting" size="wide">
   Alice's record, as the compiler's data describes it: six fields packed into
@@ -90,12 +102,13 @@ gets any one of them wrong reads the wrong bytes.
   way to finding it.
 </EthdebugFigure>
 
+Each layer has its own rule, and a tool that gets any one of them wrong reads the wrong bytes.
 Then a tool has to do it all again for the next language. Sometimes the rules
 match up, and sometimes they are off in subtle ways. Vyper also finds a
 mapping's entry by hashing the key together with the mapping's slot, but it
 hashes them in the other order: slot first, then key. Its slot numbers differ
-too, because Vyper reserves room for an array's or a string's full capacity, so
-the game's players mapping lands at slot 108 instead of slot 3. A tool that
+too because Vyper reserves room for an array's or a string's full capacity:
+the game's `players` mapping lands at slot 108 instead of slot 3. A tool that
 applies Solidity's rule to Vyper's storage computes a slot that looks just as
 valid, finds it empty, and reports that Alice's score is 0. Here is the same
 game compiled with Vyper, read the way a Solidity tool would read it:
