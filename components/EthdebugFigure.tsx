@@ -567,29 +567,23 @@ export default function EthdebugFigure({
         />
       )}
       <div
-        className="flow-root [container-type:inline-size]"
+        className="flow-root"
         style={walkthrough && scene ? { marginBottom: release } : undefined}
       >
         {scene && walkthrough && (
           <>
             <div ref={sentinel} aria-hidden="true" />
             {/* (the panel at the text column's width, over the figure, which
-                may be wider; while stuck it sits on a band of the page's own
-                colour as wide as the figure, so the figure never shows at its
-                sides) */}
-            <div
-              className={`sticky top-0 z-10 ml-[calc((100%_-_var(--w))/2)] w-[var(--w)] bg-ecru [--w:100%] dark:bg-anthracite ${WIDTH[size]}`}
-            >
-              <div className={`mx-auto w-[100cqw] ${id}-pc`}>
-                <Frame
-                  src={initial && `${DEMO}/embed-panel.html#${hash(`&channel=${channel}`)}`}
-                  title={`ethdebug walkthrough: ${scene}`}
-                  theme={theme ?? initial}
-                  reserve={HEIGHTS[`${scene}#panel`] && `${id}-p`}
-                  onMessage={onPanel}
-                  frameRef={panel}
-                />
-              </div>
+                may be wider) */}
+            <div className={`sticky top-0 z-10 ${id}-pc`}>
+              <Frame
+                src={initial && `${DEMO}/embed-panel.html#${hash(`&channel=${channel}`)}`}
+                title={`ethdebug walkthrough: ${scene}`}
+                theme={theme ?? initial}
+                reserve={HEIGHTS[`${scene}#panel`] && `${id}-p`}
+                onMessage={onPanel}
+                frameRef={panel}
+              />
             </div>
           </>
         )}
