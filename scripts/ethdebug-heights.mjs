@@ -28,7 +28,7 @@ const DEMO = `${POST}/demos/inspector`
 // 760), where their heights jump
 const WIDTHS = [
   288, 328, 343, 358, 361, 380, 382, 396, 398, 480, 536, 560, 600, 635, 660, 704, 712, 756, 760,
-  770, 860, 960, 1024, 1088, 1136, 1216,
+  770, 790, 860, 960, 1024, 1088, 1136, 1216,
 ]
 // how long a frame's height must hold before it counts, and the most to
 // wait for all of them

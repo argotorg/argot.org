@@ -55,7 +55,7 @@ const DEFAULT_HEIGHT = 480
 // a frame that reports no height by then shows a note instead
 const TIMEOUT = 10_000
 
-type Size = 'text' | 'wide' | 'full'
+type Size = 'narrow' | 'text' | 'wide' | 'full'
 type Theme = 'light' | 'dark'
 type Data = { type?: string; [k: string]: unknown }
 
@@ -63,6 +63,7 @@ type Data = { type?: string; [k: string]: unknown }
 // the text column (the page's own gutter); from `md`, `wide` takes up to
 // 96px more on each side and `full` the page less its 32px gutters.
 const WIDTH: Record<Size, string> = {
+  narrow: '[--w:min(100%,790px)]',
   text: '',
   wide: 'md:[--w:min(100%_+_192px,100vw_-_64px)]',
   full: 'md:[--w:calc(100vw_-_64px)]',
@@ -228,7 +229,8 @@ function Frame({
 }
 
 // A figure from the ethdebug post's inspector, with a caption. Its `size`
-// is `text` (the text column), `wide`, or `full`; without one it follows
+// is `narrow` (at most 790px, centred), `text` (the text column), `wide`, or
+// `full`; without one it follows
 // the embed's columns (2: wide). The caption is always on the text
 // column. With `walkthrough`, the walkthrough panel is its own frame that
 // sticks to the top of the screen while the figure is in view (the two

@@ -84,7 +84,7 @@ practice, tools fall behind: they support some compiler versions and not others,
 one language and not the next, and often not the optimized code that actually
 runs on mainnet.
 
-Sometimes, the guess is wrong. When it is, nothing *warns* the tool. Wrong
+Sometimes, the guess is wrong. When it is, _nothing warns the tool_. Wrong
 answers are just as plausible as right answers.
 
 To illustrate the kind of diligence involved: designing software with clear
@@ -102,10 +102,12 @@ plain text: the characters start at one end, their length is tucked into the
 other, and the bytes in between are unused.
 
 <EthdebugFigure scene="pitfall-nesting" size="wide">
-  Alice's record, as the compiler's data describes it: six fields packed into
-  one slot, then her name, with its characters at one end of the next slot
-  and its length at the other. The grey rows are the ones a tool reads on the
-  way to finding it.
+  The figure opens on Alice's record, as the compiler's data describes it: six
+  fields packed into one slot, then her name, with its characters at one end of
+  the next slot and its length at the other. The grey rows are what the
+  inspector reads to find it; mappings don't store their keys, so it takes
+  Alice's address from the game's list of players. Click around to explore, and
+  ↺ Reset to return.
 </EthdebugFigure>
 
 There are different rules for each type of data and each type of nesting, and a
@@ -121,7 +123,7 @@ slot that looks just as valid, finds it empty, and reports that Alice's score
 is 0. Here is the same game compiled with Vyper, read the way a Solidity tool
 would read it:
 
-<EthdebugFigure scene="pitfall-compiler" size="wide">
+<EthdebugFigure scene="pitfall-compiler" size="narrow">
   The same storage, read two ways. Solidity's rule hashes Alice's address
   before the slot and lands on an empty slot, so her score reads 0. Vyper's
   layout hashes the slot first and finds her real score: 30.
@@ -138,8 +140,6 @@ that don't exist yet. That is what the colors in the first figure were: the
 compiler explaining its own output.
 
 ## Three compilers produce ethdebug data today
-
-Three compilers write ethdebug data today, each at a different stage.
 
 solc writes it behind an experimental flag. Today that covers which piece of
 source each instruction came from: the same information as solc's older source
@@ -159,16 +159,20 @@ itself; we only had to pass it Fe's files. The figure below runs soldb right in
 this page, on the same game transaction compiled both ways. Switch between
 Solidity and Fe, and step through each.
 
-<EthdebugFigure scene="real-debugger" size="wide">
-  [Caption TODO]
+<EthdebugFigure scene="real-debugger" size="narrow">
+  soldb stepping one of the game's transactions, compiled from Solidity and
+  from Fe.
 </EthdebugFigure>
 
-_[Glue: after the figure: what soldb gets right today (where you are in the source, in both languages) and what it can't show yet: most of its state rows say "unknown" (it only knows totalScore and totalHits here; Fe's export has no state). Finding where values live is the hard part; that's what pointers are for (hand-off to the next section). Then the smallest unit of the data, one instruction explained (next figure); where to get it (the companion page's settings and hosted builds).]_
+_[Glue: introduce the next figure: underneath, the data soldb reads is simple: a list of the program's instructions, each saying what it means. Point at an instruction (or step) to see its entry, in Solidity or Fe.]_
 
-<EthdebugFigure todo="one instruction, as solc writes it: its program.instructions entry (offset, operation, context.code.range) beside the highlighted source line `player.combo += 1;` (static is fine)">
-  [Caption TODO] One instruction, as solc writes it: where it is, what it
-  does, which source it came from.
+<EthdebugFigure scene="program-xray" size="wide">
+  [Caption TODO] The data under the debugger: each instruction, and what the
+  compiler says it means.
 </EthdebugFigure>
+
+That covers where the code came from. Finding where a value lives, for any type,
+in any language, is the hard part. That's what the format's pointers are for.
 
 ## Pointers: the compiler states the rule, and any tool applies it
 
