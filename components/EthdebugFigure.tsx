@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from 'react'
 import { useTheme } from 'next-themes'
+import heights from '@/data/ethdebug-heights.json'
 
 // how much of a walkthrough figure's end stays below its panel when the
 // panel lets go of the screen's top
@@ -49,7 +50,7 @@ const DEMO = `${POST}/demos/inspector`
 // how far ahead of the screen a figure starts loading (two screens' heights,
 // above and below)
 const NEAR = '200% 0px'
-// a frame's height before the manifest says better
+// a frame's height for a scene with none measured
 const DEFAULT_HEIGHT = 480
 // a frame that reports no height by then shows a note instead
 const TIMEOUT = 10_000
@@ -67,67 +68,51 @@ const WIDTH: Record<Size, string> = {
   full: 'md:[--w:calc(100vw_-_64px)]',
 }
 
-// The embed's final heights, measured when it is built:
-// { [scene]: { [frame width in px]: height } }. Fetched once per page.
-let manifest: Promise<Record<string, Record<string, number>>> | undefined
-const heights = () =>
-  (manifest ??= fetch(`${DEMO}/heights.json`)
-    .then((r) => (r.ok ? r.json() : {}))
-    .catch(() => ({})))
+// The figures' final heights, measured by scripts/ethdebug-heights.mjs:
+// { [key]: { [frame width in px]: height } }, where the key is the scene,
+// `<scene>#walkthrough` for a figure whose panel is its own frame, and
+// `<scene>#panel` for that panel. (A scene it hasn't measured reserves
+// DEFAULT_HEIGHT: run it again when the figures change.)
+const HEIGHTS: Record<string, Record<string, number>> = heights
 
-// the height measured at the width nearest to this frame's
-function nearest(table: Record<string, number> = {}, width: number) {
-  const widths = Object.keys(table).map(Number).filter(Boolean)
-  if (!widths.length) return undefined
-  const w = widths.reduce((a, b) => (Math.abs(b - width) < Math.abs(a - width) ? b : a))
-  return table[String(w)]
-}
-
-// Keeps the reader's place across a reload. The figures take their full
-// height only after the page loads, so the browser's own restore lands in
-// the wrong place; instead remember the first block of the post on screen
-// (and how far down the screen it was) and hold the page there while the
-// figures settle, until the reader scrolls.
-let placeKept = false
-function keepPlace() {
-  if (placeKept) return
-  placeKept = true
-  const key = `ethdebug-place:${location.pathname}`
-  const blocks = () => [...document.querySelectorAll('main :is(h2, p, figure)')]
-  addEventListener('pagehide', () => {
-    const all = blocks()
-    const i = all.findIndex((el) => el.getBoundingClientRect().bottom > 0)
-    try {
-      if (i >= 0)
-        sessionStorage.setItem(key, JSON.stringify([i, all[i].getBoundingClientRect().top]))
-    } catch {
-      // (no storage: no place kept)
-    }
+// The page's layout is final at first paint (so the browser's own scroll
+// restore lands where the reader was): each frame reserves its measured
+// height in CSS, picked by the frame's own width (a container query, the
+// height at the nearest measured width at or below it), and an annotated
+// figure pins (or not) by a media query on the screen's height, its
+// threshold from that same height. `id` names the figure's elements:
+// `id` the figure's box (the container), `id-f` its frame, `id-pc` and
+// `id-p` the walkthrough panel's box and frame, `id-s` the stage, `id-r`
+// the runway's room, `id-b` the pinned beats, `id-u` the phone's bubbles.
+function layout(
+  id: string,
+  figure?: Record<string, number>,
+  panel?: Record<string, number>,
+  pin?: boolean
+) {
+  const steps = (table: Record<string, number> = {}) =>
+    Object.entries(table)
+      .map(([w, h]) => [Number(w), h])
+      .sort(([a], [b]) => a - b)
+  const at = (w: number, i: number, rules: string) =>
+    i === 0 ? rules : `@container (min-width: ${w}px) { ${rules} }`
+  const f = `.${id} .${id}`
+  const unpinned = `${f}-s { position: relative; top: auto; --pinned: 0; } ${f}-r, ${f}-b { display: none; } ${f}-u { display: block; }`
+  const pinned = (h: number) =>
+    `${f}-s { position: sticky; top: calc((100svh - var(--stage, ${h + BEATS_ROOM}px)) / 2); --pinned: 1; } ${f}-r { display: block; height: ${RUNWAY * 100}svh; } ${f}-b { display: block; } ${f}-u { display: none; }`
+  const css = [`.${id}, .${id}-pc { container-type: inline-size; }`]
+  steps(figure).forEach(([w, h], i) => {
+    css.push(at(w, i, `${f}-f { height: ${h}px; }`))
+    if (!pin) return
+    css.push(at(w, i, unpinned))
+    // (it fits when its frame and its beats' room take at most FITS of
+    // the screen's height)
+    const tall = Math.ceil((h + BEATS_ROOM) / FITS)
+    css.push(at(w, i, `@media (min-height: ${tall}px) { ${pinned(h)} }`))
   })
-  let saved: [number, number] | undefined
-  try {
-    saved = JSON.parse(sessionStorage.getItem(key) ?? 'null') ?? undefined
-  } catch {
-    // (no storage: no place to keep)
-  }
-  if (!saved) return
-  const [i, top] = saved
-  history.scrollRestoration = 'manual'
-  let held = true
-  const until = Date.now() + 10_000
-  const release = () => (held = false)
-  for (const type of ['wheel', 'touchstart', 'keydown', 'mousedown'])
-    addEventListener(type, release, { once: true, passive: true })
-  const hold = () => {
-    if (!held || Date.now() > until) return
-    const el = blocks()[i]
-    if (el) {
-      const y = el.getBoundingClientRect().top + scrollY - top
-      if (Math.abs(y - scrollY) > 1) scrollTo(0, y)
-    }
-    requestAnimationFrame(hold)
-  }
-  hold()
+  if (pin && !figure) css.push(unpinned)
+  steps(panel).forEach(([w, h], i) => css.push(at(w, i, `.${id}-pc .${id}-p { height: ${h}px; }`)))
+  return css.join('\n')
 }
 
 // What a frame shows before its content is ready: a quiet box of the
@@ -146,25 +131,28 @@ function Placeholder({ late }: { late?: boolean }) {
   )
 }
 
-// A frame of the post's inspector. It keeps its reserved height, under a
-// quiet placeholder, until the embed reports its content ready (a height
-// with `ready: false` is a skeleton's, and is ignored); it then takes the
-// content's height. It tells the embed the site's theme, on load and on
-// each change. With no height in TIMEOUT after load (say, a 404 page),
-// the placeholder says the figure is unavailable.
+// A frame of the post's inspector. It keeps its reserved height (by its
+// `reserve` class, from the CSS of `layout`; with none, DEFAULT_HEIGHT),
+// under a quiet placeholder, until the embed reports its content ready (a
+// height with `ready: false` is a skeleton's, and is ignored); it then
+// takes the content's height. It tells the embed the site's theme, on load
+// and on each change. (Without a `src`, as before the site's theme is
+// known, it is the placeholder alone.) With no height in TIMEOUT after
+// load (say, a 404 page), the placeholder says the figure is unavailable.
 function Frame({
   src,
   title,
   theme,
-  reserve = DEFAULT_HEIGHT,
+  reserve,
   onMessage,
   frameRef,
   eager,
 }: {
-  src: string
+  src?: string
   title: string
-  theme: Theme
-  reserve?: number
+  theme?: Theme
+  // (the class that gives it its reserved height)
+  reserve?: string
   onMessage?: (data: Data, el: HTMLIFrameElement) => void
   frameRef?: React.MutableRefObject<HTMLIFrameElement | null>
   // (load at once, not when it nears the screen)
@@ -202,24 +190,29 @@ function Frame({
     return () => removeEventListener('message', listen)
   }, [onMessage])
 
-  const tell = useCallback(
-    () => frame.current?.contentWindow?.postMessage({ type: 'ethdebug:theme', theme }, ORIGIN),
-    [theme]
-  )
+  const tell = useCallback(() => {
+    // (a frame not loading the figure yet has no one to tell)
+    if (!frame.current?.getAttribute('src')) return
+    frame.current.contentWindow?.postMessage({ type: 'ethdebug:theme', theme }, ORIGIN)
+  }, [theme])
   useEffect(tell, [tell])
 
   const timer = useRef<ReturnType<typeof setTimeout>>()
   useEffect(() => () => clearTimeout(timer.current), [])
   const onLoad = () => {
     // (an empty frame, not yet near, loads a blank page: not the figure)
-    if (!near) return
+    if (!near || !src) return
     tell()
     timer.current ??= setTimeout(() => setLate(true), TIMEOUT)
   }
 
   return (
-    <div ref={room} className="relative" style={{ height: height ?? reserve }}>
-      {!height && reserve > 0 && <Placeholder late={late} />}
+    <div
+      ref={room}
+      className={`relative ${reserve ?? ''}`}
+      style={height ? { height } : reserve ? undefined : { height: DEFAULT_HEIGHT }}
+    >
+      {!height && <Placeholder late={late} />}
       <iframe
         ref={frame}
         src={near ? src : undefined}
@@ -228,7 +221,7 @@ function Frame({
         scrolling="no"
         onLoad={onLoad}
         className="block h-full w-full border-0"
-        style={{ colorScheme: theme, opacity: height ? 1 : 0, outline: 'none' }}
+        style={{ colorScheme: src && theme, opacity: height ? 1 : 0, outline: 'none' }}
       />
     </div>
   )
@@ -259,7 +252,6 @@ export default function EthdebugFigure({
   children?: ReactNode
 }) {
   const { resolvedTheme } = useTheme()
-  useEffect(keepPlace, [])
   const theme: Theme | undefined = !resolvedTheme
     ? undefined
     : resolvedTheme === 'dark'
@@ -276,8 +268,6 @@ export default function EthdebugFigure({
   const [storageEnd, setStorageEnd] = useState<number>()
   const [frameTall, setFrameTall] = useState<number>()
   const release = row ? `${RELEASE_ROWS * row}px` : FALLBACK
-  const [reserve, setReserve] = useState<number>()
-  const [panelReserve, setPanelReserve] = useState<number>()
   const box = useRef<HTMLDivElement>(null)
   const sentinel = useRef<HTMLDivElement>(null)
   const panel = useRef<HTMLIFrameElement>(null)
@@ -285,43 +275,34 @@ export default function EthdebugFigure({
   // (a figure with beats is an annotated one; it says so itself too)
   const [reveals, setReveals] = useState(!!beats?.length)
 
-  const runway = useRef<HTMLDivElement>(null)
   const stage = useRef<HTMLDivElement>(null)
-  const [tall, setTall] = useState<number>()
-  const [screen, setScreen] = useState<number>()
+  // (the stage's room for the story, in screens' heights, pinned)
+  const room = useRef<HTMLDivElement>(null)
   // which beat shows (-1: none yet)
   const [beat, setBeat] = useState(-1)
-  // (whether it fits goes by the frame's own height plus room for the
-  // beats, not by the stage's, which the decision itself changes; and the
-  // screen's height ignores a phone's toolbar showing and hiding)
-  const [fits, setFits] = useState(false)
+  const story = beats ?? []
+  // Whether the annotated figure is pinned, as its CSS decides (`layout`:
+  // it fits when its frame's measured height plus room for its beats takes
+  // at most FITS of the screen's height); read here, with the stage's
+  // height, which centres it on the screen
+  const [pinned, setPinned] = useState(false)
   useEffect(() => {
     const el = stage.current
-    const frame = box.current
-    if (!reveals || !el || !frame) return
-    let width = 0
-    let height = 0
+    if (!story.length || !el) return
     const measure = () => {
-      setTall(el.offsetHeight)
-      if (innerWidth !== width || Math.abs(innerHeight - height) > 160) {
-        width = innerWidth
-        height = innerHeight
-        setScreen(innerHeight)
-      }
-      setFits(frame.offsetHeight + BEATS_ROOM <= height * FITS)
+      el.style.setProperty('--stage', `${el.offsetHeight}px`)
+      setPinned(getComputedStyle(el).getPropertyValue('--pinned').trim() === '1')
     }
+    measure()
     const ro = new ResizeObserver(measure)
     ro.observe(el)
-    ro.observe(frame)
+    if (el.parentElement) ro.observe(el.parentElement)
     addEventListener('resize', measure)
     return () => {
       ro.disconnect()
       removeEventListener('resize', measure)
     }
-  }, [reveals])
-  const pinned = !!(reveals && tall && screen && fits)
-  const story = beats ?? []
-  const hold = pinned ? (screen! - tall!) / 2 : 0
+  }, [story.length])
 
   // an annotated figure starts raw and reveals its annotations as the
   // reader scrolls (and goes back when scrolled back), by a progress from
@@ -341,9 +322,13 @@ export default function EthdebugFigure({
       let progress: number
       // (how far through HOLD, 0 to 1: the figure may add notes over it)
       let after = 0
-      if (pinned && runway.current) {
-        // how far into the story, in screens
-        const at = (hold - runway.current.getBoundingClientRect().top) / innerHeight
+      if (pinned && stage.current && room.current) {
+        // how far into the story, in screens (the room's height is
+        // RUNWAY screens; the stage sticks at its `top`)
+        const hold = parseFloat(getComputedStyle(stage.current).top) || 0
+        const screen = room.current.offsetHeight / RUNWAY || innerHeight
+        const top = stage.current.parentElement!.getBoundingClientRect().top
+        const at = (hold - top) / screen
         progress = (at - LEAD - BEAT) / REVEAL
         // (beats after the first share the first half of HOLD)
         const later = Math.max(1, (beats?.length ?? 1) - 1)
@@ -377,7 +362,7 @@ export default function EthdebugFigure({
       removeEventListener('resize', schedule)
       cancelAnimationFrame(frame)
     }
-  }, [reveals, pinned, hold, beats?.length, initial])
+  }, [reveals, pinned, beats?.length, initial])
 
   // the panel is stuck while its sentinel is above the screen's top and
   // the figure is still on screen; it is told, to square its top corners
@@ -403,14 +388,17 @@ export default function EthdebugFigure({
   const channel = useId().replace(/[^a-zA-Z0-9]/g, '')
   const size = declared ?? reported ?? (todo ? 'text' : 'wide')
 
-  useEffect(() => {
-    if (!scene) return
-    heights().then((m) => {
-      setReserve(nearest(m[scene], box.current?.offsetWidth ?? 0))
-      // (a walkthrough's panel frame, at the text column's width)
-      setPanelReserve(nearest(m[`${scene}#panel`], runway.current?.offsetWidth ?? 0))
-    })
-  }, [scene, size])
+  // (the figure's CSS: its reserved heights, and its pin)
+  const id = `ethdebug-${channel}`
+  const key = `${scene}${walkthrough ? '#walkthrough' : ''}`
+  const css = scene
+    ? layout(
+        id,
+        HEIGHTS[key],
+        walkthrough ? HEIGHTS[`${scene}#panel`] : undefined,
+        story.length > 0
+      )
+    : ''
 
   const onFigure = useCallback((data: Data, el: HTMLIFrameElement) => {
     if (data.columns === 1 || data.columns === 2) setReported(data.columns === 2 ? 'wide' : 'text')
@@ -453,27 +441,26 @@ export default function EthdebugFigure({
           measuring), so the panel lets go before the figure does and the
           figure's end shows below it (flow-root: the overhang shortens
           this box instead of collapsing through it). The sentinel just
-          above the panel tells when it is stuck, so it can go flush.) */}
+          above the panel tells when it is stuck, so it can go flush.
+          An annotated figure, pinned, holds still in the middle of the
+          screen while the reader scrolls through RUNWAY screens' heights
+          of room below it: its stage is sticky in a box of the stage and
+          the room. Its CSS, from `layout`, decides all of this before any
+          script runs, so the page's layout is final at first paint.) */}
+      {css && <style dangerouslySetInnerHTML={{ __html: css }} />}
       <div
-        ref={runway}
         className="flow-root"
-        style={
-          walkthrough && scene && initial
-            ? { marginBottom: release }
-            : pinned
-              ? { height: tall! + screen! * RUNWAY }
-              : undefined
-        }
+        style={walkthrough && scene ? { marginBottom: release } : undefined}
       >
-        {scene && initial && walkthrough && (
+        {scene && walkthrough && (
           <>
             <div ref={sentinel} aria-hidden="true" />
-            <div className="sticky top-0 z-10">
+            <div className={`sticky top-0 z-10 ${id}-pc`}>
               <Frame
-                src={`${DEMO}/embed-panel.html#${hash(`&channel=${channel}`)}`}
+                src={initial && `${DEMO}/embed-panel.html#${hash(`&channel=${channel}`)}`}
                 title={`ethdebug walkthrough: ${scene}`}
                 theme={theme ?? initial}
-                reserve={panelReserve ?? 0}
+                reserve={HEIGHTS[`${scene}#panel`] && `${id}-p`}
                 onMessage={onPanel}
                 frameRef={panel}
               />
@@ -481,129 +468,124 @@ export default function EthdebugFigure({
           </>
         )}
         <div
-          ref={stage}
-          className="relative"
-          style={pinned ? { position: 'sticky', top: hold } : undefined}
+          className={`${id} ml-[calc((100%_-_var(--w))/2)] w-[var(--w)] [--w:100%] ${WIDTH[size]}`}
+          style={walkthrough && scene ? { marginBottom: `calc(-1 * ${release})` } : undefined}
         >
-          {story.length > 0 && !pinned && (
-            // (not pinned, as on a phone: the first beat as an amber bubble
-            // near the middle of the screen, the rest as its footnotes. They
-            // take no room: a band over the figure, from a little way into
-            // it to just before the end of its storage dump, holds them in
-            // the middle of the screen while the figure scrolls under them;
-            // then they scroll away with the page)
-            <div
-              className="pointer-events-none absolute inset-x-0 top-11 z-10"
-              style={{ height: Math.max(0, (storageEnd ?? (frameTall ?? 0) * 0.65) - 44 - 16) }}
-            >
-              <div className="sticky top-[30svh] mx-auto max-w-[34rem]">
-                {/* (the first beat is the bubble; the ones after it are its
+          <div ref={stage} className={`relative ${id}-s`}>
+            {story.length > 0 && (
+              // (not pinned, as on a phone: the first beat as an amber bubble
+              // near the middle of the screen, the rest as its footnotes. They
+              // take no room: a band over the figure, from a little way into
+              // it to just before the end of its storage dump, holds them in
+              // the middle of the screen while the figure scrolls under them;
+              // then they scroll away with the page)
+              <div
+                className={`pointer-events-none absolute inset-x-0 top-11 z-10 ${id}-u`}
+                style={{ height: Math.max(0, (storageEnd ?? (frameTall ?? 0) * 0.65) - 44 - 16) }}
+              >
+                <div className="sticky top-[30svh] mx-auto max-w-[34rem]">
+                  {/* (the first beat is the bubble; the ones after it are its
                     footnotes, a drawer that slides out from under it in the
                     same colours, smaller: seen, but not the story) */}
-                <div
-                  aria-hidden={beat < 0}
-                  className="relative z-10 rounded-xl border-l-4 border-amber-500 bg-[#FBEFD9] px-4 py-3 shadow-sm transition-[opacity,transform,border-radius] duration-300 dark:border-amber-400 dark:bg-[#3A2F22]"
-                  style={{
-                    opacity: beat >= 0 ? 1 : 0,
-                    transform: beat >= 0 ? 'none' : 'translateY(0.5rem)',
-                    ...(beat >= 1 ? { borderBottomLeftRadius: 0, borderBottomRightRadius: 0 } : {}),
-                  }}
-                >
-                  <p
-                    className="my-0 text-center text-[16px] font-semibold leading-snug text-anthracite-700 dark:text-ecru-100"
-                    style={{ textWrap: 'balance', whiteSpace: 'pre-line' }}
+                  <div
+                    aria-hidden={beat < 0}
+                    className="relative z-10 rounded-xl border-l-4 border-amber-500 bg-[#FBEFD9] px-4 py-3 shadow-sm transition-[opacity,transform,border-radius] duration-300 dark:border-amber-400 dark:bg-[#3A2F22]"
+                    style={{
+                      opacity: beat >= 0 ? 1 : 0,
+                      transform: beat >= 0 ? 'none' : 'translateY(0.5rem)',
+                      ...(beat >= 1
+                        ? { borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }
+                        : {}),
+                    }}
                   >
-                    {story[0]}
-                  </p>
-                </div>
-                {story.length > 1 && (
-                  <div className="overflow-hidden rounded-b-xl">
-                    <div
-                      aria-hidden={beat < 1}
-                      className="space-y-1 rounded-b-xl border-l-4 border-t border-amber-500 border-t-amber-500/30 bg-[#FBEFD9] px-4 pb-2.5 pt-2 shadow-sm transition-[opacity,transform] duration-300 dark:border-amber-400 dark:border-t-amber-400/30 dark:bg-[#3A2F22]"
-                      style={{
-                        opacity: beat >= 1 ? 1 : 0,
-                        transform: beat >= 1 ? 'none' : 'translateY(-100%)',
-                      }}
+                    <p
+                      className="my-0 text-center text-[16px] font-semibold leading-snug text-anthracite-700 dark:text-ecru-100"
+                      style={{ textWrap: 'balance', whiteSpace: 'pre-line' }}
                     >
-                      {story.slice(1).map((text, i) => (
-                        <p
-                          key={i}
-                          className="my-0 text-center text-[13px] font-medium leading-snug text-anthracite-400 dark:text-ecru-300"
-                          style={{ textWrap: 'balance', whiteSpace: 'pre-line' }}
-                        >
-                          {text}
-                        </p>
-                      ))}
-                    </div>
+                      {story[0]}
+                    </p>
                   </div>
-                )}
+                  {story.length > 1 && (
+                    <div className="overflow-hidden rounded-b-xl">
+                      <div
+                        aria-hidden={beat < 1}
+                        className="space-y-1 rounded-b-xl border-l-4 border-t border-amber-500 border-t-amber-500/30 bg-[#FBEFD9] px-4 pb-2.5 pt-2 shadow-sm transition-[opacity,transform] duration-300 dark:border-amber-400 dark:border-t-amber-400/30 dark:bg-[#3A2F22]"
+                        style={{
+                          opacity: beat >= 1 ? 1 : 0,
+                          transform: beat >= 1 ? 'none' : 'translateY(-100%)',
+                        }}
+                      >
+                        {story.slice(1).map((text, i) => (
+                          <p
+                            key={i}
+                            className="my-0 text-center text-[13px] font-medium leading-snug text-anthracite-400 dark:text-ecru-300"
+                            style={{ textWrap: 'balance', whiteSpace: 'pre-line' }}
+                          >
+                            {text}
+                          </p>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
+            )}
+            <div ref={box}>
+              {!scene ? (
+                <div className="grid h-60 place-items-center rounded border-2 border-dashed border-anthracite-100 text-anthracite-300 dark:border-anthracite-400 dark:text-ecru-600">
+                  FIGURE TODO: {todo}
+                </div>
+              ) : (
+                <Frame
+                  src={
+                    initial &&
+                    `${DEMO}/embed.html#${hash(walkthrough ? `&panel=external&channel=${channel}` : '')}`
+                  }
+                  title={`ethdebug figure: ${scene}`}
+                  theme={theme ?? initial}
+                  reserve={HEIGHTS[key] && `${id}-f`}
+                  onMessage={onFigure}
+                  frameRef={figure}
+                  // (a figure with a story loads at once, so it is ready by
+                  // the time the reader scrolls into it)
+                  eager={story.length > 0}
+                />
+              )}
             </div>
-          )}
-          <div
-            ref={box}
-            className={`ml-[calc((100%_-_var(--w))/2)] w-[var(--w)] [--w:100%] ${WIDTH[size]}`}
-            style={
-              walkthrough && scene && initial
-                ? { marginBottom: `calc(-1 * ${release})` }
-                : undefined
-            }
-          >
-            {!scene ? (
-              <div className="grid h-60 place-items-center rounded border-2 border-dashed border-anthracite-100 text-anthracite-300 dark:border-anthracite-400 dark:text-ecru-600">
-                FIGURE TODO: {todo}
+            {story.length > 0 && (
+              // (pinned, each beat shows once the story reaches it and stays,
+              // under the still figure, marked as the post's narration by an
+              // amber rule; their room is kept from the start, so nothing
+              // moves)
+              <div className={`mt-6 space-y-3 ${id}-b`}>
+                <div
+                  aria-hidden="true"
+                  className="mx-auto h-0.5 w-12 rounded bg-amber-500 transition-opacity duration-500"
+                  style={{ opacity: beat >= 0 ? 1 : 0 }}
+                />
+                {story.map((text, i) => (
+                  <p
+                    key={i}
+                    // (the beats after the first are its footnotes: smaller,
+                    // quieter, right under it)
+                    className={
+                      i === 0
+                        ? `${CAPTION} my-0 transition-opacity duration-500`
+                        : 'mx-auto -mt-1 mb-0 max-w-[50rem] text-center text-sm leading-snug text-anthracite-300 transition-opacity duration-500 dark:text-ecru-400'
+                    }
+                    style={{
+                      textWrap: 'balance',
+                      whiteSpace: 'pre-line',
+                      opacity: beat >= i ? 1 : 0,
+                    }}
+                  >
+                    {text}
+                  </p>
+                ))}
               </div>
-            ) : !initial ? (
-              <div className="relative" style={{ height: reserve ?? DEFAULT_HEIGHT }}>
-                <Placeholder />
-              </div>
-            ) : (
-              <Frame
-                src={`${DEMO}/embed.html#${hash(walkthrough ? `&panel=external&channel=${channel}` : '')}`}
-                title={`ethdebug figure: ${scene}`}
-                theme={theme ?? initial}
-                reserve={reserve}
-                onMessage={onFigure}
-                frameRef={figure}
-                // (a figure with a story loads at once, so it is ready by
-                // the time the reader scrolls into it)
-                eager={story.length > 0}
-              />
             )}
           </div>
-          {story.length > 0 && pinned && (
-            // (pinned, each beat shows once the story reaches it and stays,
-            // under the still figure, marked as the post's narration by an
-            // amber rule; their room is kept from the start, so nothing
-            // moves)
-            <div className="mt-6 space-y-3">
-              <div
-                aria-hidden="true"
-                className="mx-auto h-0.5 w-12 rounded bg-amber-500 transition-opacity duration-500"
-                style={{ opacity: beat >= 0 ? 1 : 0 }}
-              />
-              {story.map((text, i) => (
-                <p
-                  key={i}
-                  // (the beats after the first are its footnotes: smaller,
-                  // quieter, right under it)
-                  className={
-                    i === 0
-                      ? `${CAPTION} my-0 transition-opacity duration-500`
-                      : 'mx-auto -mt-1 mb-0 max-w-[50rem] text-center text-sm leading-snug text-anthracite-300 transition-opacity duration-500 dark:text-ecru-400'
-                  }
-                  style={{
-                    textWrap: 'balance',
-                    whiteSpace: 'pre-line',
-                    opacity: beat >= i ? 1 : 0,
-                  }}
-                >
-                  {text}
-                </p>
-              ))}
-            </div>
-          )}
+          {story.length > 0 && <div ref={room} aria-hidden="true" className={`${id}-r`} />}
         </div>
       </div>
       {children && (
