@@ -210,9 +210,9 @@ through it. You can also select any other variable in the figure, such as
 instead.
 
 <EthdebugFigure scene="pointer-walkthrough" size="wide" walkthrough>
-  The compiler's ethdebug pointer for `players`, followed step by step from slot
-  3 to each record at keccak(key, slot 3), then to the six packed fields and
-  each player's name. The panel shows the piece of the pointer each step uses.
+  Each step shows one piece of the compiler's ethdebug pointer for `players`,
+  and the storage that piece reaches. The steps go from slot 3 to each record at
+  keccak(key, slot 3), and then to the six packed fields and each player's name.
 </EthdebugFigure>
 
 The figure ran those steps with our reference implementation, the
