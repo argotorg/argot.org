@@ -17,9 +17,6 @@ import heights from '@/data/ethdebug-heights.json'
 // whether a walkthrough step may scroll the page to bring its lit rows
 // into view (off: testing whether page scrolling drops the panel's clicks)
 const AUTO_SCROLL = false
-// (until a walkthrough figure says where its opening view ends, its panel
-// shows when the figure's top is this far up the screen)
-const SHOW_AT = 0.3
 // where an annotated figure's top is (as a fraction of the screen's
 // height from its top) when its reveal starts, and when it is complete
 const REVEAL_FROM = 0.25
@@ -470,40 +467,32 @@ export default function EthdebugFigure({
     }
   }, [reveals, pinned, beats?.length, initial])
 
-  // a walkthrough's panel sticks to the screen's bottom, and shows once the
-  // reader can see what the figure opens on (its `players` tree): the figure
-  // says where that ends (`showAfter`, px from its frame's top), and the panel
-  // shows when that point is above the panel's top; it is told, to style
-  // itself as stuck
-  const [shown, setShown] = useState(false)
-  const shownRef = useRef(false)
-  const showAfter = useRef<number>()
+  // a walkthrough's panel rides just under what the figure opens on (its
+  // `players` tree): it comes up with the page from under the screen's
+  // bottom, sticks to that bottom while the figure scrolls by, and comes to
+  // rest under the figure. The figure says where its opening view ends
+  // (`showAfter`, px from its frame's top); until it does, the panel starts
+  // from the figure's end. It is told when it is stuck, to style itself.
+  const flow = useRef<HTMLDivElement>(null)
+  const [startAt, setStartAt] = useState<number>()
+  const stuckRef = useRef(false)
   const tellStuck = useCallback(
     () =>
       panel.current?.contentWindow?.postMessage(
-        { type: 'ethdebug:stuck', stuck: shownRef.current, edge: 'bottom' },
+        { type: 'ethdebug:stuck', stuck: stuckRef.current, edge: 'bottom' },
         ORIGIN
       ),
     []
   )
   useEffect(() => {
-    const el = box.current
-    if (!walkthrough || !el) return
+    if (!walkthrough) return
     let frame = 0
     const check = () => {
       frame = 0
-      const r = el.getBoundingClientRect()
-      const tall = panel.current?.getBoundingClientRect().height ?? 0
-      // (shown from the moment the figure's opening view is in sight, on
-      // down: through its sticking, its coming to rest under the figure,
-      // and after; hidden again only above that moment)
-      const on =
-        showAfter.current === undefined
-          ? r.top <= innerHeight * SHOW_AT
-          : r.top + showAfter.current <= innerHeight - tall
-      if (on === shownRef.current) return
-      shownRef.current = on
-      setShown(on)
+      const r = panel.current?.getBoundingClientRect()
+      const on = !!r && Math.abs(r.bottom - innerHeight) < 1 && r.top > 0
+      if (on === stuckRef.current) return
+      stuckRef.current = on
       tellStuck()
     }
     const schedule = () => (frame ||= requestAnimationFrame(check))
@@ -534,7 +523,11 @@ export default function EthdebugFigure({
   const onFigure = useCallback((data: Data, el: HTMLIFrameElement) => {
     if (data.columns === 1 || data.columns === 2) setReported(data.columns === 2 ? 'wide' : 'text')
     if (typeof data.storageBottom === 'number') setStorageEnd(data.storageBottom)
-    if (typeof data.showAfter === 'number') showAfter.current = data.showAfter
+    if (typeof data.showAfter === 'number' && flow.current) {
+      // (from the figure's frame to the box that holds the panel)
+      const offset = el.getBoundingClientRect().top - flow.current.getBoundingClientRect().top
+      setStartAt(offset + data.showAfter)
+    }
     if (typeof data.height === 'number' && data.height > 0) setFrameTall(data.height)
     if (data.reveal === true) setReveals(true)
     // the figure asks the page to bring a point of it into view, above
@@ -543,7 +536,7 @@ export default function EthdebugFigure({
     if (data.type !== 'ethdebug:scroll-to' || typeof data.y !== 'number') return
     // only when the lit rows [y, bottom] are not in view above the panel
     // (where the panel is now: a read)
-    const over = shownRef.current
+    const over = stuckRef.current
       ? (panel.current?.getBoundingClientRect().top ?? innerHeight)
       : innerHeight
     const frame = el.getBoundingClientRect().top
@@ -583,7 +576,7 @@ export default function EthdebugFigure({
           }}
         />
       )}
-      <div className="flow-root">
+      <div ref={flow} className="relative flow-root">
         <div
           className={`${id} ml-[calc((100%_-_var(--w))/2)] w-[var(--w)] [--w:100%] ${WIDTH[size]}`}
         >
@@ -720,27 +713,32 @@ export default function EthdebugFigure({
           {story.length > 0 && <div ref={room} aria-hidden="true" className={`${id}-r`} />}
         </div>
         {scene && walkthrough && (
-          // (the panel at the text column's width, after the figure in the
-          // flow: sticky at the screen's bottom while the figure scrolls by,
-          // and at rest under it at the end; hidden until the figure's top
-          // is in view)
-          <div
-            className={`sticky bottom-0 z-10 mt-6 transition-[opacity,transform] duration-300 ${id}-pc`}
-            style={{
-              opacity: shown ? 1 : 0,
-              transform: shown ? 'none' : 'translateY(1rem)',
-              pointerEvents: shown ? undefined : 'none',
-            }}
-          >
-            <Frame
-              src={initial && `${DEMO}/embed-panel.html#${hash(`&channel=${channel}`)}`}
-              title={`ethdebug walkthrough: ${scene}`}
-              theme={theme ?? initial}
-              reserve={HEIGHTS[`${scene}#panel`] && `${id}-p`}
-              onMessage={onPanel}
-              frameRef={panel}
-            />
-          </div>
+          <>
+            {/* (the panel's place under the figure: the usual gap, then
+                room the panel's height) */}
+            <div className={`mt-6 ${id}-pc`} aria-hidden="true">
+              <div className={`${id}-p`} />
+            </div>
+            {/* (the panel, at the text column's width, in a box from just
+                under the figure's opening view to its place under the
+                figure: sticky to the screen's bottom within it, so it rides
+                in under the opening view, sticks, and comes to rest) */}
+            <div
+              className="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col justify-end"
+              style={{ top: startAt ?? '100%' }}
+            >
+              <div className={`pointer-events-auto sticky bottom-0 z-10 ${id}-pc`}>
+                <Frame
+                  src={initial && `${DEMO}/embed-panel.html#${hash(`&channel=${channel}`)}`}
+                  title={`ethdebug walkthrough: ${scene}`}
+                  theme={theme ?? initial}
+                  reserve={HEIGHTS[`${scene}#panel`] && `${id}-p`}
+                  onMessage={onPanel}
+                  frameRef={panel}
+                />
+              </div>
+            </div>
+          </>
         )}
       </div>
       {children && (
