@@ -164,9 +164,13 @@ Solidity and Fe, and step through each.
   from Fe.
 </EthdebugFigure>
 
-_[Glue: introduce the next figure: underneath, the data soldb reads is simple: a list of the program's instructions, each saying what it means. Point at an instruction (or step) to see its entry, in Solidity or Fe.]_
+What soldb reads is simple. For each instruction in the compiled program, the
+compiler writes down where it sits in the bytecode, what operation it performs,
+and which piece of source it came from. Solidity and Fe write it in the same
+shape, so one reader handles both. Point at an instruction below to see its
+entry.
 
-<EthdebugFigure scene="program-xray" size="wide">
+<EthdebugFigure scene="program-xray" size="narrow">
   [Caption TODO] The data under the debugger: each instruction, and what the
   compiler says it means.
 </EthdebugFigure>
