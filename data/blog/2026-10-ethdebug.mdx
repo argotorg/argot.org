@@ -129,15 +129,16 @@ would read it:
   layout hashes the slot first and finds her real score: 30.
 </EthdebugFigure>
 
-Nothing in the bytes says which rule is right. A debugger shows Alice's score as
-0; an auditor concludes the write never happened; both are confidently wrong.
+Nothing in the bytes says which rule is right, so the tool just shows a score of
+0.
 
-The ethdebug format removes the guess. The compiler *already knows* exactly
-where it put every value, so it writes that down, in a shared format, alongside
-the bytecode. Tools then read the compiler's own rules instead of
-reverse-engineering them, for any compiler that emits the format, including ones
-that don't exist yet. That is what the colors in the first figure were: the
-compiler explaining its own output.
+The ethdebug format moves the rule into the compiler's output. The compiler
+already knows where it put every value, so it writes the rule down: for
+`players`, hash the key with slot 3, or, for Vyper, slot 108 with the key. A
+tool follows whatever rule it's given, so it reads Alice's 30 from Vyper's
+storage without knowing anything about Vyper. The right side of the figure above
+works exactly that way, from hand-written ethdebug data; the storage colors in
+the first figure came the same way, from solc's own output.
 
 ## Three compilers produce ethdebug data today
 
@@ -164,11 +165,22 @@ Solidity and Fe, and step through each.
   from Fe.
 </EthdebugFigure>
 
-What soldb reads is simple. For each instruction in the compiled program, the
-compiler writes down where it sits in the bytecode, what operation it performs,
-and which piece of source it came from. Solidity and Fe write it in the same
-shape, so one reader handles both. Point at an instruction below to see its
-entry.
+What soldb reads is simple. The format describes compiled code as
+[**programs**](https://ethdebug.github.io/format/spec/program). A program is one
+piece of bytecode that a compiler produced: a contract's deployed code, or the
+code that creates it. For each program, the compiler lists the instructions, in
+order. Each instruction gives its byte offset in the bytecode and its operation
+(the opcode, plus any data pushed with it), and a
+[**context**](https://ethdebug.github.io/format/spec/program/context): what the
+compiler knows to be true once that instruction has run.
+
+The simplest kind of context, and the one every compiler emits today, says which
+range of which source file the instruction came from. That is all soldb needed
+to follow the source. Other kinds describe variables, function calls, and code
+the optimizer moved or merged; we will come back to those.
+
+Solidity and Fe write programs in the same shape, so one reader handles both.
+Point at an instruction below to see its entry.
 
 <EthdebugFigure scene="program-xray" size="narrow">
   [Caption TODO] The data under the debugger: each instruction, and what the
