@@ -11,17 +11,22 @@ _Compilers can now better explain their bytecode to tools. This post covers what
 that looks like today, how you can build on it, and what's coming next for the
 maturing debugging data format._
 
-The **ethdebug format** is an open specification for compilers to use in
-structuring their debug output. Like DWARF for traditional computing, but
-designed for the quirks of smart contract languages, it seeks to reduce the
-cost to understand the blockchain. **ethdebug** is an Argot Collective
+The [**ethdebug format**](https://ethdebug.github.io/format/) is an open
+specification for compilers to use in structuring their debug output. Like
+[DWARF](https://dwarfstd.org/) for traditional computing, but designed for the
+quirks of smart contract languages, it seeks to reduce the cost to understand
+the blockchain. **ethdebug** is an [Argot Collective](https://www.argot.org/)
 project, and this post is its first introduction on this blog.
 
-Today, the format is real: the compilers **solc**, **Fe** and **Solar** produce
-data in it, and tools are starting to consume it. Walnut's **soldb** reads it,
-and Runtime Verification's **Simbolik** uses it internally. We are proud of the
-work on both sides: compilers, who must produce this data, and debuggers and
-other tools, who consume it.
+Today, the format is real: the compilers [**solc**](https://soliditylang.org/),
+[**Fe**](https://fe-lang.org/) and
+[**Solar**](https://github.com/paradigmxyz/solar) produce data in it, and tools
+are starting to consume it. [Walnut](https://www.walnut.dev/)'s
+[**soldb**](https://github.com/walnuthq/soldb) reads it, and [Runtime
+Verification](https://runtimeverification.com/)'s
+[**Simbolik**](https://marketplace.visualstudio.com/items?itemName=runtimeverification.simbolik)
+uses it internally. We are proud of the work on both sides: compilers, who must
+produce this data, and debuggers and other tools, who consume it.
 
 While this tooling continues to improve, there is enough here to show what this
 new information makes possible: tools can stop guessing what the compiler
@@ -64,10 +69,11 @@ transaction:
 </EthdebugFigure>
 
 Without good debug data, a tool has to guess. Usually the guess is right; tool
-authors learn each compiler's rules by observing its behavior: where Solidity
-puts mapping entries, how it saves gas by packing small values into one slot,
-how it lays out a string. They copy their understanding of these rules into
-their tools.
+authors learn each compiler's rules by observing its behavior: [where Solidity
+puts mapping
+entries](https://docs.soliditylang.org/en/latest/internals/layout_in_storage.html),
+how it saves gas by packing small values into one slot, how it lays out a
+string. They copy their understanding of these rules into their tools.
 
 It is tedious, unending work to manage these compiler rules this way. Compiler
 behavior changes with new versions, optimizers make rules unpredictable, and
@@ -78,8 +84,8 @@ practice, tools fall behind: they support some compiler versions and not others,
 one language and not the next, and often not the optimized code that actually
 runs on mainnet.
 
-Sometimes, the guess is wrong. When it is, nothing warns the tool. Wrong answers
-are just as plausible as right answers.
+Sometimes, the guess is wrong. When it is, nothing *warns* the tool. Wrong
+answers are just as plausible as right answers.
 
 To illustrate the kind of diligence involved: designing software with clear
 abstractions often means structuring data in nested containers, like a record
@@ -104,15 +110,16 @@ other, and the bytes in between are unused.
 
 There are different rules for each type of data and each type of nesting, and a
 tool that gets any one of them wrong reads the wrong bytes. Then, for the next
-language, a tool has to do it all again. Sometimes the rules
-match up, and sometimes they are off in subtle ways. Vyper, for instance, also
-finds a mapping's entry by hashing the key together with the mapping's slot,
-but it hashes them in the opposite order: slot first, then key. Its slot numbers
-differ too because Vyper reserves room for an array's or a string's full capacity:
-the game's `players` mapping lands at slot 108 instead of slot 3. A tool that
-applies Solidity's rule to Vyper's storage computes a slot that looks just as
-valid, finds it empty, and reports that Alice's score is 0. Here is the same
-game compiled with Vyper, read the way a Solidity tool would read it:
+language, a tool has to do it all again. Sometimes the rules match up, and
+sometimes they are off in subtle ways. [Vyper](https://vyperlang.org/), for
+instance, also finds a mapping's entry by hashing the key together with the
+mapping's slot, but it hashes them in the opposite order: slot first, then key.
+Its slot numbers differ too because Vyper reserves room for an array's or a
+string's full capacity: the game's `players` mapping lands at slot 108 instead
+of slot 3. A tool that applies Solidity's rule to Vyper's storage computes a
+slot that looks just as valid, finds it empty, and reports that Alice's score
+is 0. Here is the same game compiled with Vyper, read the way a Solidity tool
+would read it:
 
 <EthdebugFigure scene="pitfall-compiler" size="wide">
   The same storage, read two ways. Solidity's rule hashes Alice's address
@@ -123,9 +130,9 @@ game compiled with Vyper, read the way a Solidity tool would read it:
 Nothing in the bytes says which rule is right. A debugger shows Alice's score as
 0; an auditor concludes the write never happened; both are confidently wrong.
 
-The ethdebug format removes the guess. The compiler already knows exactly where
-it put every value, so it writes that down, in a shared format, alongside the
-bytecode. Tools then read the compiler's own rules instead of
+The ethdebug format removes the guess. The compiler *already knows* exactly
+where it put every value, so it writes that down, in a shared format, alongside
+the bytecode. Tools then read the compiler's own rules instead of
 reverse-engineering them, for any compiler that emits the format, including ones
 that don't exist yet. That is what the colors in the first figure were: the
 compiler explaining its own output.
@@ -140,10 +147,11 @@ maps, in a simpler shape. Walnut, the team building solc's support, is adding
 more in stages; their working branch already lists where every state variable
 lives.
 
-Fe, a separate contract language, writes ethdebug as its only debug output, and
-it works with the optimizer on. Solar, a second Solidity compiler from Paradigm,
-writes it on its main branch, also with the optimizer on, and its bytecode is
-the same with or without the debug data.
+Fe, a separate contract language and another Argot project, writes ethdebug as
+its only debug output, and it works with the optimizer on. Solar, a second
+Solidity compiler from [Paradigm](https://www.paradigm.xyz/), writes it on its
+main branch, also with the optimizer on, and its bytecode is the same with or
+without the debug data.
 
 Walnut also makes soldb, a debugger. It was written for Solidity. But because it
 reads ethdebug, it can step through a Fe contract too, with no changes to soldb
