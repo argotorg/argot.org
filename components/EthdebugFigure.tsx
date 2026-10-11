@@ -12,7 +12,32 @@ import {
 import { useTheme } from 'next-themes'
 import heights from '@/data/ethdebug-heights.json'
 
-// a figure's caption
+// where an annotated figure's top is (as a fraction of the screen's
+// height from its top) when its reveal starts, and when it is complete
+const REVEAL_FROM = 0.25
+const REVEAL_TO = -0.45
+// (not pinned, the same story in screens' heights of scrolling: the first
+// beat shows at REVEAL_FROM, the bytes stay raw for STILL more, the reveal
+// runs to REVEAL_TO, then the second beat, and the figure's own note STILL
+// later)
+const STILL = 0.25
+// an annotated figure that fits on the screen instead holds still in its
+// middle while the reader scrolls through its story, in parts measured in
+// screens' heights: LEAD, the raw bytes alone, for a look first; BEAT,
+// the first beat (a paragraph under the figure) shows; REVEAL, the
+// annotations come in; HOLD, the finished figure, the other beats added
+// in turn over it
+const LEAD = 0.25
+const BEAT = 0.35
+const REVEAL = 0.7
+const HOLD = 0.7
+const RUNWAY = LEAD + BEAT + REVEAL + HOLD
+// (it fits when it takes at most this much of the screen's height)
+const FITS = 0.95
+// (and the room its beats take under it, pinned)
+const BEATS_ROOM = 160
+// a figure's caption, and its beats (an annotated figure's caption, told in
+// parts)
 const CAPTION =
   'mx-auto max-w-[50rem] text-center text-lg font-medium leading-snug text-anthracite-500 dark:text-ecru-200'
 // where the post's figures come from (to try unpublished figure changes,
@@ -68,10 +93,13 @@ const HEIGHTS: Record<string, Record<string, number>> = heights
 // The page's layout is final at first paint (so the browser's own scroll
 // restore lands where the reader was): each frame reserves its measured
 // height in CSS, picked by the frame's own width (a container query, the
-// height at the nearest measured width at or below it). `id` names the
-// figure's elements: `id` the figure's box (the container), `id-f` its
-// frame.
-function layout(id: string, figure?: Record<string, number>) {
+// height at the nearest measured width at or below it), and an annotated
+// figure pins (or not) by a media query on the screen's height, its
+// threshold from that same height. `id` names the figure's elements:
+// `id` the figure's box (the container), `id-f` its frame, `id-s` the
+// stage, `id-r` the runway's room, `id-b` the pinned beats, `id-u` the
+// phone's bubbles.
+function layout(id: string, figure?: Record<string, number>, pin?: boolean) {
   const steps = (table: Record<string, number> = {}) =>
     Object.entries(table)
       .map(([w, h]) => [Number(w), h])
@@ -79,13 +107,31 @@ function layout(id: string, figure?: Record<string, number>) {
   const at = (w: number, i: number, rules: string) =>
     i === 0 ? rules : `@container (min-width: ${w}px) { ${rules} }`
   const f = `.${id} .${id}`
+  const unpinned = `${f}-s { position: relative; top: auto; --pinned: 0; } ${f}-r, ${f}-b { display: none; } ${f}-u { display: block; }`
+  const pinned = (h: number) =>
+    `${f}-s { position: sticky; top: calc((100svh - var(--stage, ${h + BEATS_ROOM}px)) / 2); --pinned: 1; } ${f}-r { display: block; height: ${RUNWAY * 100}svh; } ${f}-b { display: block; } ${f}-u { display: none; }`
   const css = [
     `.${id} { container-type: inline-size; }`,
     // (on a dark page, a light poster, as rendered before the page knew
     // its theme, stays hidden until the dark one has loaded in its place)
     `.dark .${id}-i[data-shown="light"] { visibility: hidden; }`,
+    // (an annotated figure's poster is revealed: never shown on a page
+    // with its script, where the figure opens raw; in print it is, and
+    // with no script, by a <noscript> rule. Its room is kept, and reader
+    // views still take it)
+    `.${id}-i[data-spoils] { opacity: 0; }`,
+    `@media print { .${id}-i[data-spoils] { opacity: 1; } }`,
   ]
-  steps(figure).forEach(([w, h], i) => css.push(at(w, i, `${f}-f { height: ${h}px; }`)))
+  steps(figure).forEach(([w, h], i) => {
+    css.push(at(w, i, `${f}-f { height: ${h}px; }`))
+    if (!pin) return
+    css.push(at(w, i, unpinned))
+    // (it fits when its frame and its beats' room take at most FITS of
+    // the screen's height)
+    const tall = Math.ceil((h + BEATS_ROOM) / FITS)
+    css.push(at(w, i, `@media (min-height: ${tall}px) { ${pinned(h)} }`))
+  })
+  if (pin && !figure) css.push(unpinned)
   return css.join('\n')
 }
 
@@ -108,12 +154,15 @@ function Poster({
   theme,
   alt,
   className,
+  spoils,
 }: {
   scene: string
   size: Size
   theme: Theme
   alt: string
   className: string
+  // (it shows the figure's payoff: shown only with no script, and in print)
+  spoils?: boolean
 }) {
   const widths = POSTER_WIDTHS.filter((w) => w <= WIDEST[size])
   const url = (w: number) => `${POSTERS}/${scene}-${theme}-${w}.webp`
@@ -133,6 +182,7 @@ function Poster({
         // (the theme of the poster it shows: light, as rendered; then, on
         // each load, the loaded one's)
         data-shown="light"
+        data-spoils={spoils || undefined}
         onLoad={(e) => {
           const img = e.currentTarget
           img.dataset.shown = img.currentSrc.includes('-dark-') ? 'dark' : 'light'
@@ -175,6 +225,9 @@ function Frame({
   title,
   theme,
   reserve,
+  onMessage,
+  frameRef,
+  eager,
   poster,
 }: {
   src?: string
@@ -182,15 +235,20 @@ function Frame({
   theme?: Theme
   // (the class that gives it its reserved height)
   reserve?: string
+  onMessage?: (data: Data, el: HTMLIFrameElement) => void
+  frameRef?: React.MutableRefObject<HTMLIFrameElement | null>
+  // (load at once, not when it nears the screen)
+  eager?: boolean
   poster?: ReactNode
 }) {
-  const frame = useRef<HTMLIFrameElement>(null)
+  const own = useRef<HTMLIFrameElement>(null)
+  const frame = frameRef ?? own
   const [height, setHeight] = useState<number>()
   const [late, setLate] = useState(false)
   // (a frame starts loading once it is within NEAR of the screen, so it is
   // ready when the reader gets there; the browser's own lazy loading waits
   // longer than the figures need)
-  const [near, setNear] = useState(false)
+  const [near, setNear] = useState(!!eager)
   const room = useRef<HTMLDivElement>(null)
   useEffect(() => {
     const el = room.current
@@ -209,10 +267,11 @@ function Frame({
       const { type, height: h, ready } = e.data ?? {}
       if (type === 'ethdebug:height' && typeof h === 'number' && h > 0 && ready !== false)
         setHeight(Math.ceil(h))
+      onMessage?.(e.data, el)
     }
     addEventListener('message', listen)
     return () => removeEventListener('message', listen)
-  }, [])
+  }, [onMessage])
 
   const tell = useCallback(() => {
     // (a frame not loading the figure yet has no one to tell)
@@ -265,10 +324,15 @@ function Frame({
 export default function EthdebugFigure({
   scene,
   size,
+  beats,
   children,
 }: {
   scene: string
   size: Size
+  // an annotated figure's story: paragraphs added under it in turn while
+  // it is pinned (before its reveal, and once it is done)
+  // (a \n in one breaks its line there)
+  beats?: string[]
   children?: ReactNode
 }) {
   const { resolvedTheme } = useTheme()
@@ -281,39 +345,248 @@ export default function EthdebugFigure({
   const [initial, setInitial] = useState<Theme>()
   useEffect(() => setInitial((t) => t ?? theme), [theme])
 
-  // (the figure's CSS: its reserved heights)
+  // (where the figure's storage dump ends, in its frame, as it says: the
+  // phone's beat bubbles let go before it; until it says, a guess)
+  const [storageEnd, setStorageEnd] = useState<number>()
+  const [frameTall, setFrameTall] = useState<number>()
+  const figure = useRef<HTMLIFrameElement>(null)
+  // (a figure with beats is an annotated one; it says so itself too)
+  const [reveals, setReveals] = useState(!!beats?.length)
+
+  const stage = useRef<HTMLDivElement>(null)
+  // (the stage's room for the story, in screens' heights, pinned)
+  const room = useRef<HTMLDivElement>(null)
+  // which beat shows (-1: none yet)
+  const [beat, setBeat] = useState(-1)
+  const story = beats ?? []
+  // Whether the annotated figure is pinned, as its CSS decides (`layout`:
+  // it fits when its frame's measured height plus room for its beats takes
+  // at most FITS of the screen's height); read here, with the stage's
+  // height, which centres it on the screen
+  const [pinned, setPinned] = useState(false)
+  useEffect(() => {
+    const el = stage.current
+    if (!story.length || !el) return
+    const measure = () => {
+      el.style.setProperty('--stage', `${el.offsetHeight}px`)
+      setPinned(getComputedStyle(el).getPropertyValue('--pinned').trim() === '1')
+    }
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(el)
+    if (el.parentElement) ro.observe(el.parentElement)
+    addEventListener('resize', measure)
+    return () => {
+      ro.disconnect()
+      removeEventListener('resize', measure)
+    }
+  }, [story.length])
+
+  // an annotated figure starts raw and reveals its annotations as the
+  // reader scrolls (and goes back when scrolled back), by a progress from
+  // 0 to 1 that the embed stages its annotations by. Pinned, the figure
+  // holds still in the middle of the screen while the reader scrolls
+  // through its story (LEAD, BEAT, REVEAL, HOLD), and progress runs over
+  // REVEAL;
+  // otherwise it runs from the figure's top REVEAL_FROM of the way down
+  // the screen to REVEAL_TO.
+  useEffect(() => {
+    const el = figure.current
+    if (!reveals || !el) return
+    let last = -1
+    let frame = 0
+    const tell = () => {
+      frame = 0
+      let progress: number
+      // (how far through HOLD, 0 to 1: the figure may add notes over it)
+      let after = 0
+      if (pinned && stage.current && room.current) {
+        // how far into the story, in screens (the room's height is
+        // RUNWAY screens; the stage sticks at its `top`)
+        const hold = parseFloat(getComputedStyle(stage.current).top) || 0
+        const screen = room.current.offsetHeight / RUNWAY || innerHeight
+        const top = stage.current.parentElement!.getBoundingClientRect().top
+        const at = (hold - top) / screen
+        progress = (at - LEAD - BEAT) / REVEAL
+        // (beats after the first share the first half of HOLD)
+        const later = Math.max(1, (beats?.length ?? 1) - 1)
+        const held = (at - LEAD - BEAT - REVEAL) / (HOLD / 2)
+        after = Math.min(1, Math.max(0, held / 2))
+        setBeat(at < LEAD ? -1 : held < 0 ? 0 : 1 + Math.min(later - 1, Math.floor(held * later)))
+      } else {
+        const top = el.getBoundingClientRect().top
+        const start = innerHeight * REVEAL_FROM
+        const begin = start - innerHeight * STILL
+        const end = innerHeight * REVEAL_TO
+        progress = (begin - top) / (begin - end)
+        after = top < end - innerHeight * STILL ? 1 : 0
+        const final = (beats?.length ?? 1) - 1
+        setBeat(top > start ? -1 : progress < 1 ? 0 : final)
+      }
+      progress = Math.min(1, Math.max(0, progress))
+      if (progress + after === last) return
+      last = progress + after
+      el.contentWindow?.postMessage({ type: 'ethdebug:reveal', progress, after }, ORIGIN)
+    }
+    const schedule = () => (frame ||= requestAnimationFrame(tell))
+    tell()
+    addEventListener('scroll', schedule, { passive: true })
+    addEventListener('resize', schedule)
+    return () => {
+      removeEventListener('scroll', schedule)
+      removeEventListener('resize', schedule)
+      cancelAnimationFrame(frame)
+    }
+  }, [reveals, pinned, beats?.length, initial])
+
+  // (the figure's CSS: its reserved heights, and its pin)
   const id = `ethdebug-${useId().replace(/[^a-zA-Z0-9]/g, '')}`
-  const css = layout(id, HEIGHTS[scene])
+  const css = layout(id, HEIGHTS[scene], story.length > 0)
+
+  const onFigure = useCallback((data: Data) => {
+    if (typeof data.storageBottom === 'number') setStorageEnd(data.storageBottom)
+    if (typeof data.height === 'number' && data.height > 0) setFrameTall(data.height)
+    if (data.reveal === true) setReveals(true)
+  }, [])
 
   return (
     <figure className="my-12 [&+h2]:mt-16">
+      {/* (an annotated figure, pinned, holds still in the middle of the
+          screen while the reader scrolls through RUNWAY screens' heights
+          of room below it: its stage is sticky in a box of the stage and
+          the room. Its CSS, from `layout`, decides all of this before any
+          script runs, so the page's layout is final at first paint.) */}
       <style dangerouslySetInnerHTML={{ __html: css }} />
+      {story.length > 0 && (
+        <noscript
+          dangerouslySetInnerHTML={{
+            __html: `<style>.${id}-i[data-spoils] { opacity: 1; }</style>`,
+          }}
+        />
+      )}
       <div
         className={`${id} ml-[calc((100%_-_var(--w))/2)] w-[var(--w)] [--w:100%] ${WIDTH[size]}`}
       >
-        <div>
-          <Frame
-            src={initial && `${DEMO}/embed.html#scene=${scene}&theme=${initial}`}
-            title={`ethdebug figure: ${scene}`}
-            theme={theme ?? initial}
-            reserve={HEIGHTS[scene] && `${id}-f`}
-            poster={
-              <Poster
-                scene={scene}
-                size={size}
-                // (before the page's theme is known here, light, as
-                // rendered on the server)
-                theme={(initial && theme) || 'light'}
-                alt={
-                  textOf(children).replace(/\s+/g, ' ').trim() ||
-                  DESCRIBED[scene] ||
-                  `ethdebug figure: ${scene}`
-                }
-                className={`${id}-i`}
+        <div ref={stage} className={`relative ${id}-s`}>
+          {story.length > 0 && (
+            // (not pinned, as on a phone: the first beat as an amber bubble
+            // near the middle of the screen, the rest as its footnotes. They
+            // take no room: a band over the figure, from a little way into
+            // it to just before the end of its storage dump, holds them in
+            // the middle of the screen while the figure scrolls under them;
+            // then they scroll away with the page)
+            <div
+              className={`pointer-events-none absolute inset-x-0 top-11 z-10 ${id}-u`}
+              style={{ height: Math.max(0, (storageEnd ?? (frameTall ?? 0) * 0.65) - 44 - 16) }}
+            >
+              <div className="sticky top-[30svh] mx-auto max-w-[34rem]">
+                {/* (the first beat is the bubble; the ones after it are its
+                    footnotes, a drawer that slides out from under it in the
+                    same colours, smaller: seen, but not the story) */}
+                <div
+                  aria-hidden={beat < 0}
+                  className="relative z-10 rounded-xl border-l-4 border-amber-500 bg-[#FBEFD9] px-4 py-3 shadow-sm transition-[opacity,transform,border-radius] duration-300 dark:border-amber-400 dark:bg-[#3A2F22]"
+                  style={{
+                    opacity: beat >= 0 ? 1 : 0,
+                    transform: beat >= 0 ? 'none' : 'translateY(0.5rem)',
+                    ...(beat >= 1 ? { borderBottomLeftRadius: 0, borderBottomRightRadius: 0 } : {}),
+                  }}
+                >
+                  <p
+                    className="my-0 text-center text-[16px] font-semibold leading-snug text-anthracite-700 dark:text-ecru-100"
+                    style={{ textWrap: 'balance', whiteSpace: 'pre-line' }}
+                  >
+                    {story[0]}
+                  </p>
+                </div>
+                {story.length > 1 && (
+                  <div className="overflow-hidden rounded-b-xl">
+                    <div
+                      aria-hidden={beat < 1}
+                      className="space-y-1 rounded-b-xl border-l-4 border-t border-amber-500 border-t-amber-500/30 bg-[#FBEFD9] px-4 pb-2.5 pt-2 shadow-sm transition-[opacity,transform] duration-300 dark:border-amber-400 dark:border-t-amber-400/30 dark:bg-[#3A2F22]"
+                      style={{
+                        opacity: beat >= 1 ? 1 : 0,
+                        transform: beat >= 1 ? 'none' : 'translateY(-100%)',
+                      }}
+                    >
+                      {story.slice(1).map((text, i) => (
+                        <p
+                          key={i}
+                          className="my-0 text-center text-[13px] font-medium leading-snug text-anthracite-400 dark:text-ecru-300"
+                          style={{ textWrap: 'balance', whiteSpace: 'pre-line' }}
+                        >
+                          {text}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+          <div>
+            <Frame
+              src={initial && `${DEMO}/embed.html#scene=${scene}&theme=${initial}`}
+              title={`ethdebug figure: ${scene}`}
+              theme={theme ?? initial}
+              reserve={HEIGHTS[scene] && `${id}-f`}
+              onMessage={onFigure}
+              frameRef={figure}
+              poster={
+                <Poster
+                  scene={scene}
+                  size={size}
+                  // (before the page's theme is known here, light, as
+                  // rendered on the server)
+                  theme={(initial && theme) || 'light'}
+                  alt={
+                    textOf(children).replace(/\s+/g, ' ').trim() ||
+                    DESCRIBED[scene] ||
+                    `ethdebug figure: ${scene}`
+                  }
+                  className={`${id}-i`}
+                  spoils={story.length > 0}
+                />
+              }
+              // (a figure with a story loads at once, so it is ready by
+              // the time the reader scrolls into it)
+              eager={story.length > 0}
+            />
+          </div>
+          {story.length > 0 && (
+            // (pinned, each beat shows once the story reaches it and stays,
+            // under the still figure, marked as the post's narration by an
+            // amber rule; their room is kept from the start, so nothing
+            // moves)
+            <div className={`mt-6 space-y-3 ${id}-b`}>
+              <div
+                aria-hidden="true"
+                className="mx-auto h-0.5 w-12 rounded bg-amber-500 transition-opacity duration-500"
+                style={{ opacity: beat >= 0 ? 1 : 0 }}
               />
-            }
-          />
+              {story.map((text, i) => (
+                <p
+                  key={i}
+                  // (the beats after the first are its footnotes: smaller,
+                  // quieter, right under it)
+                  className={
+                    i === 0
+                      ? `${CAPTION} my-0 transition-opacity duration-500`
+                      : 'mx-auto -mt-1 mb-0 max-w-[50rem] text-center text-sm leading-snug text-anthracite-300 transition-opacity duration-500 dark:text-ecru-400'
+                  }
+                  style={{
+                    textWrap: 'balance',
+                    whiteSpace: 'pre-line',
+                    opacity: beat >= i ? 1 : 0,
+                  }}
+                >
+                  {text}
+                </p>
+              ))}
+            </div>
+          )}
         </div>
+        {story.length > 0 && <div ref={room} aria-hidden="true" className={`${id}-r`} />}
       </div>
       {children && (
         <figcaption className={`${CAPTION} mb-0 mt-4`} style={{ textWrap: 'balance' }}>
