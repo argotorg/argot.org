@@ -11,6 +11,9 @@ const CAPTION =
 const ORIGIN = process.env.NEXT_PUBLIC_ETHDEBUG_ORIGIN ?? 'https://ethdebug.github.io'
 const POST = process.env.NEXT_PUBLIC_ETHDEBUG_POST ?? `${ORIGIN}/argot-post-2026-10`
 const DEMO = `${POST}/demos/inspector`
+// how far ahead of the screen a figure starts loading (two screens' heights,
+// above and below)
+const NEAR = '200% 0px'
 // a frame's height until its content is ready
 const DEFAULT_HEIGHT = 480
 // a frame that reports no height by then shows a note instead
@@ -56,6 +59,20 @@ function Frame({ src, title, theme }: { src?: string; title: string; theme?: The
   const frame = useRef<HTMLIFrameElement>(null)
   const [height, setHeight] = useState<number>()
   const [late, setLate] = useState(false)
+  // (a frame starts loading once it is within NEAR of the screen, so it is
+  // ready when the reader gets there; the browser's own lazy loading waits
+  // longer than the figures need)
+  const [near, setNear] = useState(false)
+  const room = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const el = room.current
+    if (near || !el) return
+    const io = new IntersectionObserver(([e]) => e.isIntersecting && setNear(true), {
+      rootMargin: NEAR,
+    })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [near])
 
   useEffect(() => {
     const listen = (e: MessageEvent<Data>) => {
@@ -79,20 +96,20 @@ function Frame({ src, title, theme }: { src?: string; title: string; theme?: The
   const timer = useRef<ReturnType<typeof setTimeout>>()
   useEffect(() => () => clearTimeout(timer.current), [])
   const onLoad = () => {
-    // (an empty frame, before its `src`, loads a blank page: not the figure)
-    if (!src) return
+    // (an empty frame, not yet near, loads a blank page: not the figure)
+    if (!near || !src) return
     tell()
     timer.current ??= setTimeout(() => setLate(true), TIMEOUT)
   }
 
   return (
-    <div className="relative" style={{ height: height ?? DEFAULT_HEIGHT }}>
+    <div ref={room} className="relative" style={{ height: height ?? DEFAULT_HEIGHT }}>
       {!height && <Placeholder late={late} />}
       <iframe
         ref={frame}
-        src={src}
+        src={near ? src : undefined}
         title={title}
-        loading="lazy"
+        loading="eager"
         scrolling="no"
         onLoad={onLoad}
         className="absolute inset-0 block h-full w-full border-0"
