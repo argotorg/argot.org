@@ -1,7 +1,8 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from 'react'
 import { useTheme } from 'next-themes'
+import heights from '@/data/ethdebug-heights.json'
 
 // a figure's caption
 const CAPTION =
@@ -14,7 +15,7 @@ const DEMO = `${POST}/demos/inspector`
 // how far ahead of the screen a figure starts loading (two screens' heights,
 // above and below)
 const NEAR = '200% 0px'
-// a frame's height until its content is ready
+// a frame's height for a scene with none measured
 const DEFAULT_HEIGHT = 480
 // a frame that reports no height by then shows a note instead
 const TIMEOUT = 10_000
@@ -30,6 +31,30 @@ const WIDTH: Record<Size, string> = {
   narrow: '[--w:min(100%,790px)]',
   text: '',
   wide: 'md:[--w:min(100%_+_192px,100vw_-_64px)]',
+}
+
+// The figures' final heights, measured by scripts/ethdebug-heights.mjs:
+// { [scene]: { [frame width in px]: height } }. (A scene it hasn't
+// measured reserves DEFAULT_HEIGHT: run it again when the figures change.)
+const HEIGHTS: Record<string, Record<string, number>> = heights
+
+// The page's layout is final at first paint (so the browser's own scroll
+// restore lands where the reader was): each frame reserves its measured
+// height in CSS, picked by the frame's own width (a container query, the
+// height at the nearest measured width at or below it). `id` names the
+// figure's elements: `id` the figure's box (the container), `id-f` its
+// frame.
+function layout(id: string, figure?: Record<string, number>) {
+  const steps = (table: Record<string, number> = {}) =>
+    Object.entries(table)
+      .map(([w, h]) => [Number(w), h])
+      .sort(([a], [b]) => a - b)
+  const at = (w: number, i: number, rules: string) =>
+    i === 0 ? rules : `@container (min-width: ${w}px) { ${rules} }`
+  const f = `.${id} .${id}`
+  const css = [`.${id} { container-type: inline-size; }`]
+  steps(figure).forEach(([w, h], i) => css.push(at(w, i, `${f}-f { height: ${h}px; }`)))
+  return css.join('\n')
 }
 
 // What a frame shows before its content is ready: a quiet box of the
@@ -48,14 +73,26 @@ function Placeholder({ late }: { late?: boolean }) {
   )
 }
 
-// A frame of the post's inspector. It keeps DEFAULT_HEIGHT, under a quiet
-// placeholder, until the embed reports its content ready (a height with
-// `ready: false` is a skeleton's, and is ignored); it then takes the
-// content's height. It tells the embed the site's theme, on load
+// A frame of the post's inspector. It keeps its reserved height (by its
+// `reserve` class, from the CSS of `layout`; with none, DEFAULT_HEIGHT),
+// under a quiet placeholder, until the embed reports its content ready (a
+// height with `ready: false` is a skeleton's, and is ignored); it then
+// takes the content's height. It tells the embed the site's theme, on load
 // and on each change. (Without a `src`, as before the site's theme is
 // known, it is the placeholder alone.) With no height in TIMEOUT after
 // load (say, a 404 page), the placeholder says the figure is unavailable.
-function Frame({ src, title, theme }: { src?: string; title: string; theme?: Theme }) {
+function Frame({
+  src,
+  title,
+  theme,
+  reserve,
+}: {
+  src?: string
+  title: string
+  theme?: Theme
+  // (the class that gives it its reserved height)
+  reserve?: string
+}) {
   const frame = useRef<HTMLIFrameElement>(null)
   const [height, setHeight] = useState<number>()
   const [late, setLate] = useState(false)
@@ -103,7 +140,11 @@ function Frame({ src, title, theme }: { src?: string; title: string; theme?: The
   }
 
   return (
-    <div ref={room} className="relative" style={{ height: height ?? DEFAULT_HEIGHT }}>
+    <div
+      ref={room}
+      className={`relative ${reserve ?? ''}`}
+      style={height ? { height } : reserve ? undefined : { height: DEFAULT_HEIGHT }}
+    >
       {!height && <Placeholder late={late} />}
       <iframe
         ref={frame}
@@ -141,14 +182,22 @@ export default function EthdebugFigure({
   const [initial, setInitial] = useState<Theme>()
   useEffect(() => setInitial((t) => t ?? theme), [theme])
 
+  // (the figure's CSS: its reserved heights)
+  const id = `ethdebug-${useId().replace(/[^a-zA-Z0-9]/g, '')}`
+  const css = layout(id, HEIGHTS[scene])
+
   return (
     <figure className="my-12 [&+h2]:mt-16">
-      <div className={`ml-[calc((100%_-_var(--w))/2)] w-[var(--w)] [--w:100%] ${WIDTH[size]}`}>
+      <style dangerouslySetInnerHTML={{ __html: css }} />
+      <div
+        className={`${id} ml-[calc((100%_-_var(--w))/2)] w-[var(--w)] [--w:100%] ${WIDTH[size]}`}
+      >
         <div>
           <Frame
             src={initial && `${DEMO}/embed.html#scene=${scene}&theme=${initial}`}
             title={`ethdebug figure: ${scene}`}
             theme={theme ?? initial}
+            reserve={HEIGHTS[scene] && `${id}-f`}
           />
         </div>
       </div>
