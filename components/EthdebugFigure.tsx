@@ -1,6 +1,14 @@
 'use client'
 
-import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from 'react'
+import {
+  isValidElement,
+  useCallback,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react'
 import { useTheme } from 'next-themes'
 import heights from '@/data/ethdebug-heights.json'
 
@@ -12,6 +20,22 @@ const CAPTION =
 const ORIGIN = process.env.NEXT_PUBLIC_ETHDEBUG_ORIGIN ?? 'https://ethdebug.github.io'
 const POST = process.env.NEXT_PUBLIC_ETHDEBUG_POST ?? `${ORIGIN}/argot-post-2026-10`
 const DEMO = `${POST}/demos/inspector`
+// each figure's poster, a still of it as it opens (the reveal: revealed),
+// for reader views, print, readers with no script, and link previews; it
+// holds the figure's place until the frame is ready, and stays under it.
+// From the published post always: a local copy of its site has none (the
+// post's deploy makes them, bin/posters.mjs), at the frame widths
+// POSTER_WIDTHS, light and dark, twice the pixels below 1024
+const POSTERS = 'https://ethdebug.github.io/argot-post-2026-10/demos/inspector/posters'
+const POSTER_WIDTHS = [343, 358, 680, 790, 960, 1024, 1216]
+// (a poster is chosen by the screen's width, from which its frame is at
+// least the poster's width: a frame is the screen less its gutters, 2 ×
+// 16px below `md` and 2 × 32px from it, up to its size's widest)
+const from = (w: number) => (w + 32 < 768 ? w + 32 : w + 64)
+// a figure's poster's description, for a scene with no caption
+const DESCRIBED: Record<string, string> = {
+  reveal: "A contract's storage as raw bytes, annotated with the variables they hold",
+}
 // how far ahead of the screen a figure starts loading (two screens' heights,
 // above and below)
 const NEAR = '200% 0px'
@@ -23,6 +47,9 @@ const TIMEOUT = 10_000
 type Size = 'narrow' | 'text' | 'wide'
 type Theme = 'light' | 'dark'
 type Data = { type?: string; [k: string]: unknown }
+
+// (each size's widest frame)
+const WIDEST: Record<Size, number> = { narrow: 790, text: 1024, wide: 1216 }
 
 // The frame's width, centred on the text column. Below `md` each size is
 // the text column (the page's own gutter); from `md`, `wide` takes up to
@@ -52,9 +79,69 @@ function layout(id: string, figure?: Record<string, number>) {
   const at = (w: number, i: number, rules: string) =>
     i === 0 ? rules : `@container (min-width: ${w}px) { ${rules} }`
   const f = `.${id} .${id}`
-  const css = [`.${id} { container-type: inline-size; }`]
+  const css = [
+    `.${id} { container-type: inline-size; }`,
+    // (on a dark page, a light poster, as rendered before the page knew
+    // its theme, stays hidden until the dark one has loaded in its place)
+    `.dark .${id}-i[data-shown="light"] { visibility: hidden; }`,
+  ]
   steps(figure).forEach(([w, h], i) => css.push(at(w, i, `${f}-f { height: ${h}px; }`)))
   return css.join('\n')
+}
+
+// A caption's words, for its poster's description
+function textOf(node: ReactNode): string {
+  if (typeof node === 'string' || typeof node === 'number') return String(node)
+  if (Array.isArray(node)) return node.map(textOf).join('')
+  if (isValidElement<{ children?: ReactNode }>(node)) return textOf(node.props.children)
+  return ''
+}
+
+// A figure's poster, in normal flow at its own size (centred; never wider
+// than the frame; cut at the frame's reserved height), the one for the
+// frame's width: a <source> for each poster width its size reaches, by the
+// screen's width, and its `src` the widest up to the text column's, for
+// readers that take that alone.
+function Poster({
+  scene,
+  size,
+  theme,
+  alt,
+  className,
+}: {
+  scene: string
+  size: Size
+  theme: Theme
+  alt: string
+  className: string
+}) {
+  const widths = POSTER_WIDTHS.filter((w) => w <= WIDEST[size])
+  const url = (w: number) => `${POSTERS}/${scene}-${theme}-${w}.webp`
+  const set = (w: number) => `${url(w)} ${w < 1024 ? 2 : 1}x`
+  return (
+    <picture>
+      {widths
+        .slice(1)
+        .reverse()
+        .map((w) => (
+          <source key={w} media={`(min-width: ${from(w)}px)`} srcSet={set(w)} />
+        ))}
+      <img
+        src={url(Math.max(...widths.filter((w) => w <= 1024)))}
+        srcSet={set(widths[0])}
+        alt={alt}
+        // (the theme of the poster it shows: light, as rendered; then, on
+        // each load, the loaded one's)
+        data-shown="light"
+        onLoad={(e) => {
+          const img = e.currentTarget
+          img.dataset.shown = img.currentSrc.includes('-dark-') ? 'dark' : 'light'
+        }}
+        loading="lazy"
+        className={`mx-auto my-0 block max-w-full ${className}`}
+      />
+    </picture>
+  )
 }
 
 // What a frame shows before its content is ready: a quiet box of the
@@ -77,7 +164,9 @@ function Placeholder({ late }: { late?: boolean }) {
 // `reserve` class, from the CSS of `layout`; with none, DEFAULT_HEIGHT),
 // under a quiet placeholder, until the embed reports its content ready (a
 // height with `ready: false` is a skeleton's, and is ignored); it then
-// takes the content's height. It tells the embed the site's theme, on load
+// takes the content's height. With a `poster`, that is what it shows
+// instead of the placeholder, in the flow, the frame over it (opaque, in
+// the page's colour, once ready). It tells the embed the site's theme, on load
 // and on each change. (Without a `src`, as before the site's theme is
 // known, it is the placeholder alone.) With no height in TIMEOUT after
 // load (say, a 404 page), the placeholder says the figure is unavailable.
@@ -86,12 +175,14 @@ function Frame({
   title,
   theme,
   reserve,
+  poster,
 }: {
   src?: string
   title: string
   theme?: Theme
   // (the class that gives it its reserved height)
   reserve?: string
+  poster?: ReactNode
 }) {
   const frame = useRef<HTMLIFrameElement>(null)
   const [height, setHeight] = useState<number>()
@@ -143,9 +234,15 @@ function Frame({
     <div
       ref={room}
       className={`relative ${reserve ?? ''}`}
-      style={height ? { height } : reserve ? undefined : { height: DEFAULT_HEIGHT }}
+      // (a poster cut at the frame's height; inline, as a class with
+      // "hidden" in it makes reader views drop the box)
+      style={{
+        overflow: poster ? 'hidden' : undefined,
+        ...(height ? { height } : reserve ? undefined : { height: DEFAULT_HEIGHT }),
+      }}
     >
-      {!height && <Placeholder late={late} />}
+      {poster}
+      {!height && (!poster || late) && <Placeholder late={late} />}
       <iframe
         ref={frame}
         src={near ? src : undefined}
@@ -153,7 +250,9 @@ function Frame({
         loading="eager"
         scrolling="no"
         onLoad={onLoad}
-        className="absolute inset-0 block h-full w-full border-0"
+        className={`absolute inset-0 block h-full w-full border-0 ${
+          height ? 'bg-ecru dark:bg-anthracite' : ''
+        } ${poster ? 'print:hidden' : ''}`}
         style={{ colorScheme: src && theme, opacity: height ? 1 : 0, outline: 'none' }}
       />
     </div>
@@ -198,6 +297,21 @@ export default function EthdebugFigure({
             title={`ethdebug figure: ${scene}`}
             theme={theme ?? initial}
             reserve={HEIGHTS[scene] && `${id}-f`}
+            poster={
+              <Poster
+                scene={scene}
+                size={size}
+                // (before the page's theme is known here, light, as
+                // rendered on the server)
+                theme={(initial && theme) || 'light'}
+                alt={
+                  textOf(children).replace(/\s+/g, ' ').trim() ||
+                  DESCRIBED[scene] ||
+                  `ethdebug figure: ${scene}`
+                }
+                className={`${id}-i`}
+              />
+            }
           />
         </div>
       </div>
