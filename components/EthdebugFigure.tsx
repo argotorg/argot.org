@@ -317,6 +317,11 @@ function Frame({
         loading="eager"
         scrolling="no"
         onLoad={onLoad}
+        // (the pointer out of the frame: its hovers end, however fast it left)
+        onPointerLeave={() => {
+          if (frame.current?.getAttribute('src'))
+            frame.current.contentWindow?.postMessage({ type: 'ethdebug:pointer-out' }, ORIGIN)
+        }}
         className={`absolute inset-0 block h-full w-full border-0 ${
           height ? 'bg-ecru dark:bg-anthracite' : ''
         } ${poster ? 'print:hidden' : ''}`}
