@@ -5,9 +5,11 @@
 //   cd <a directory where Playwright is installed>
 //   node <this repo>/scripts/ethdebug-heights.mjs
 //
-// It loads each figure the posts use in frames of each width in WIDTHS, as
-// the post does, and records the height each frame reports once ready:
-// { [scene]: { [frame width]: height } }. The figures come from
+// It loads each figure the posts use (and a walkthrough's panel) in frames
+// of each width in WIDTHS, as the post does, and records the height each
+// frame reports once ready: { [key]: { [frame width]: height } }, where
+// the key is the scene, `<scene>#walkthrough` for a figure whose panel is
+// its own frame, and `<scene>#panel` for that panel. The figures come from
 // NEXT_PUBLIC_ETHDEBUG_POST, as on the site (default: the published post).
 import { createRequire } from 'node:module'
 import { readFileSync, readdirSync, writeFileSync } from 'node:fs'
@@ -35,25 +37,45 @@ const LIMIT = 120_000
 
 const { chromium } = createRequire(join(process.cwd(), 'x.js'))('@playwright/test')
 
-// the scenes the posts use
-const scenes = new Set()
+// the figures the posts use: { scene, walkthrough }
+const figures = new Map()
 const blog = join(ROOT, 'data/blog')
 for (const file of readdirSync(blog, { recursive: true })) {
   if (!String(file).endsWith('.mdx')) continue
   const text = readFileSync(join(blog, String(file)), 'utf8')
   for (const [, attrs] of text.matchAll(/<EthdebugFigure\b([^>]*)>/g)) {
     const scene = attrs.match(/\bscene="([^"]+)"/)?.[1]
-    if (scene) scenes.add(scene)
+    if (!scene) continue
+    // (on demand: its panel takes no room until opened, so the figure's
+    // own height, under the scene's key, as the page reserves it)
+    const onDemand = /\bwalkthrough="on-demand"/.test(attrs)
+    const walkthrough = !onDemand && /\bwalkthrough\b/.test(attrs)
+    figures.set(`${scene}${walkthrough ? '#walkthrough' : ''}`, { scene, walkthrough, onDemand })
   }
 }
 
-// one page per scene, with a frame per width
-async function measure(page, scene) {
-  const frames = WIDTHS.map((w) => ({
-    key: scene,
-    w,
-    src: `${DEMO}/embed.html#scene=${scene}&theme=light`,
-  }))
+// one page per figure, with a frame (or a figure and its panel) per width
+async function measure(page, { scene, walkthrough, onDemand }) {
+  const frames = WIDTHS.flatMap((w, i) => {
+    const hash = `scene=${scene}&theme=light`
+    const channel = `c${i}`
+    return walkthrough
+      ? [
+          { key: `${scene}#panel`, w, src: `${DEMO}/embed-panel.html#${hash}&channel=${channel}` },
+          {
+            key: `${scene}#walkthrough`,
+            w,
+            src: `${DEMO}/embed.html#${hash}&panel=external&channel=${channel}`,
+          },
+        ]
+      : [
+          {
+            key: scene,
+            w,
+            src: `${DEMO}/embed.html#${hash}${onDemand ? `&panel=ondemand&channel=${channel}` : ''}`,
+          },
+        ]
+  })
   return page.evaluate(
     ({ frames, origin, SETTLE, LIMIT }) =>
       new Promise((done) => {
@@ -96,9 +118,9 @@ async function measure(page, scene) {
 const browser = await chromium.launch()
 const out = {}
 await Promise.all(
-  [...scenes].map(async (scene) => {
+  [...figures.values()].map(async (figure) => {
     const page = await browser.newPage({ viewport: { width: 1600, height: 900 } })
-    for (const [key, w, h] of await measure(page, scene)) {
+    for (const [key, w, h] of await measure(page, figure)) {
       if (h === undefined) console.warn(`no height: ${key} at ${w}px`)
       else (out[key] ??= {})[w] = h
     }

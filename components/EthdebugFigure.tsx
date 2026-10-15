@@ -86,8 +86,10 @@ const WIDTH: Record<Size, string> = {
 }
 
 // The figures' final heights, measured by scripts/ethdebug-heights.mjs:
-// { [scene]: { [frame width in px]: height } }. (A scene it hasn't
-// measured reserves DEFAULT_HEIGHT: run it again when the figures change.)
+// { [key]: { [frame width in px]: height } }, where the key is the scene,
+// `<scene>#walkthrough` for a figure whose panel is its own frame, and
+// `<scene>#panel` for that panel. (A scene it hasn't measured reserves
+// DEFAULT_HEIGHT: run it again when the figures change.)
 const HEIGHTS: Record<string, Record<string, number>> = heights
 
 // The page's layout is final at first paint (so the browser's own scroll
@@ -96,10 +98,15 @@ const HEIGHTS: Record<string, Record<string, number>> = heights
 // height at the nearest measured width at or below it), and an annotated
 // figure pins (or not) by a media query on the screen's height, its
 // threshold from that same height. `id` names the figure's elements:
-// `id` the figure's box (the container), `id-f` its frame, `id-s` the
-// stage, `id-r` the runway's room, `id-b` the pinned beats, `id-u` the
-// phone's bubbles.
-function layout(id: string, figure?: Record<string, number>, pin?: boolean) {
+// `id` the figure's box (the container), `id-f` its frame, `id-pc` and
+// `id-p` the walkthrough panel's box and frame, `id-s` the stage, `id-r`
+// the runway's room, `id-b` the pinned beats, `id-u` the phone's bubbles.
+function layout(
+  id: string,
+  figure?: Record<string, number>,
+  panel?: Record<string, number>,
+  pin?: boolean
+) {
   const steps = (table: Record<string, number> = {}) =>
     Object.entries(table)
       .map(([w, h]) => [Number(w), h])
@@ -111,7 +118,7 @@ function layout(id: string, figure?: Record<string, number>, pin?: boolean) {
   const pinned = (h: number) =>
     `${f}-s { position: sticky; top: calc((100svh - var(--stage, ${h + BEATS_ROOM}px)) / 2); --pinned: 1; } ${f}-r { display: block; height: ${RUNWAY * 100}svh; } ${f}-b { display: block; } ${f}-u { display: none; }`
   const css = [
-    `.${id} { container-type: inline-size; }`,
+    `.${id}, .${id}-pc { container-type: inline-size; }`,
     // (on a dark page, a light poster, as rendered before the page knew
     // its theme, stays hidden until the dark one has loaded in its place)
     `.dark .${id}-i[data-shown="light"] { visibility: hidden; }`,
@@ -132,6 +139,7 @@ function layout(id: string, figure?: Record<string, number>, pin?: boolean) {
     css.push(at(w, i, `@media (min-height: ${tall}px) { ${pinned(h)} }`))
   })
   if (pin && !figure) css.push(unpinned)
+  steps(panel).forEach(([w, h], i) => css.push(at(w, i, `.${id}-pc .${id}-p { height: ${h}px; }`)))
   return css.join('\n')
 }
 
@@ -320,15 +328,21 @@ function Frame({
 
 // A figure from the ethdebug post's inspector, with a caption. Its `size`
 // is `narrow` (at most 790px, centred), `text` (the text column), or
-// `wide`. The caption is always on the text column.
+// `wide`. The caption is always on the text column. With `walkthrough`,
+// the walkthrough panel is its own frame that sticks to the bottom of the
+// screen while the figure is in view (the two frames share a channel);
+// with `walkthrough="on-demand"`, the same, but its slot is 0 tall until
+// the reader starts a walkthrough in the figure (the panel says so).
 export default function EthdebugFigure({
   scene,
   size,
+  walkthrough,
   beats,
   children,
 }: {
   scene: string
   size: Size
+  walkthrough?: boolean | 'on-demand'
   // an annotated figure's story: paragraphs added under it in turn while
   // it is pinned (before its reveal, and once it is done)
   // (a \n in one breaks its line there)
@@ -349,6 +363,7 @@ export default function EthdebugFigure({
   // phone's beat bubbles let go before it; until it says, a guess)
   const [storageEnd, setStorageEnd] = useState<number>()
   const [frameTall, setFrameTall] = useState<number>()
+  const panel = useRef<HTMLIFrameElement>(null)
   const figure = useRef<HTMLIFrameElement>(null)
   // (a figure with beats is an annotated one; it says so itself too)
   const [reveals, setReveals] = useState(!!beats?.length)
@@ -439,19 +454,98 @@ export default function EthdebugFigure({
     }
   }, [reveals, pinned, beats?.length, initial])
 
-  // (the figure's CSS: its reserved heights, and its pin)
-  const id = `ethdebug-${useId().replace(/[^a-zA-Z0-9]/g, '')}`
-  const css = layout(id, HEIGHTS[scene], story.length > 0)
+  // a walkthrough's panel rides just under what the figure opens on (its
+  // `players` tree): it comes up with the page from under the screen's
+  // bottom, sticks to that bottom while the figure scrolls by, and comes to
+  // rest under the figure. The figure says where its opening view ends
+  // (`showAfter`, px from its frame's top); until it does, the panel starts
+  // from the figure's end. It is told when it is stuck, to style itself.
+  const flow = useRef<HTMLDivElement>(null)
+  // (on demand: whether the panel is open, and its height, as it says)
+  const onDemand = walkthrough === 'on-demand'
+  const [open, setOpen] = useState(false)
+  const [panelTall, setPanelTall] = useState(0)
+  const [startAt, setStartAt] = useState<number>()
+  const stuckRef = useRef(false)
+  const tellStuck = useCallback(
+    () =>
+      panel.current?.contentWindow?.postMessage(
+        { type: 'ethdebug:stuck', stuck: stuckRef.current, edge: 'bottom' },
+        ORIGIN
+      ),
+    []
+  )
+  useEffect(() => {
+    if (!walkthrough) return
+    let frame = 0
+    const check = () => {
+      frame = 0
+      const r = panel.current?.getBoundingClientRect()
+      const on = !!r && Math.abs(r.bottom - innerHeight) < 1 && r.top > 0
+      if (on === stuckRef.current) return
+      stuckRef.current = on
+      tellStuck()
+    }
+    const schedule = () => (frame ||= requestAnimationFrame(check))
+    check()
+    addEventListener('scroll', schedule, { passive: true })
+    addEventListener('resize', schedule)
+    return () => {
+      removeEventListener('scroll', schedule)
+      removeEventListener('resize', schedule)
+      cancelAnimationFrame(frame)
+    }
+  }, [walkthrough, initial, scene, tellStuck])
+  const channel = useId().replace(/[^a-zA-Z0-9]/g, '')
 
-  const onFigure = useCallback((data: Data) => {
+  // (the figure's CSS: its reserved heights, and its pin)
+  const id = `ethdebug-${channel}`
+  const key = `${scene}${walkthrough && !onDemand ? '#walkthrough' : ''}`
+  const css = layout(
+    id,
+    HEIGHTS[key],
+    walkthrough && !onDemand ? HEIGHTS[`${scene}#panel`] : undefined,
+    story.length > 0
+  )
+
+  const onFigure = useCallback((data: Data, el: HTMLIFrameElement) => {
     if (typeof data.storageBottom === 'number') setStorageEnd(data.storageBottom)
+    if (typeof data.showAfter === 'number' && flow.current) {
+      // (from the figure's frame to the box that holds the panel)
+      const offset = el.getBoundingClientRect().top - flow.current.getBoundingClientRect().top
+      setStartAt(offset + data.showAfter)
+    }
     if (typeof data.height === 'number' && data.height > 0) setFrameTall(data.height)
     if (data.reveal === true) setReveals(true)
   }, [])
+  const onPanel = useCallback(
+    (data: Data) => {
+      // (a panel that has just loaded learns whether it is stuck)
+      if (data.type === 'ethdebug:height') tellStuck()
+      if (data.type === 'ethdebug:height' && typeof data.height === 'number')
+        setPanelTall(data.height)
+      if (data.type === 'ethdebug:height') setOpen(data.open === true)
+    },
+    [tellStuck]
+  )
+  // (on demand: its room, 0 until open, moving to and from its height)
+  const slot = onDemand
+    ? {
+        className:
+          'overflow-hidden transition-[height,margin] duration-300 motion-reduce:transition-none',
+        style: { height: open ? panelTall : 0, marginTop: open ? undefined : 0 },
+      }
+    : undefined
+
+  const hash = (more = '') => `scene=${scene}&theme=${initial}${more}`
 
   return (
     <figure className="my-12 [&+h2]:mt-16">
-      {/* (an annotated figure, pinned, holds still in the middle of the
+      {/* (with a walkthrough: the panel, at the text column's width, a
+          sticky child after the figure in a plain box that holds both, so
+          it sticks to the bottom of the screen while the figure is in view
+          and comes to rest under it.
+          An annotated figure, pinned, holds still in the middle of the
           screen while the reader scrolls through RUNWAY screens' heights
           of room below it: its stage is sticky in a box of the stage and
           the room. Its CSS, from `layout`, decides all of this before any
@@ -464,129 +558,174 @@ export default function EthdebugFigure({
           }}
         />
       )}
-      <div
-        className={`${id} ml-[calc((100%_-_var(--w))/2)] w-[var(--w)] [--w:100%] ${WIDTH[size]}`}
-      >
-        <div ref={stage} className={`relative ${id}-s`}>
-          {story.length > 0 && (
-            // (not pinned, as on a phone: the first beat as an amber bubble
-            // near the middle of the screen, the rest as its footnotes. They
-            // take no room: a band over the figure, from a little way into
-            // it to just before the end of its storage dump, holds them in
-            // the middle of the screen while the figure scrolls under them;
-            // then they scroll away with the page)
-            <div
-              className={`pointer-events-none absolute inset-x-0 top-11 z-10 ${id}-u`}
-              style={{ height: Math.max(0, (storageEnd ?? (frameTall ?? 0) * 0.65) - 44 - 16) }}
-            >
-              <div className="sticky top-[30svh] mx-auto max-w-[34rem]">
-                {/* (the first beat is the bubble; the ones after it are its
+      <div ref={flow} className="relative flow-root">
+        <div
+          className={`${id} ml-[calc((100%_-_var(--w))/2)] w-[var(--w)] [--w:100%] ${WIDTH[size]}`}
+        >
+          <div ref={stage} className={`relative ${id}-s`}>
+            {story.length > 0 && (
+              // (not pinned, as on a phone: the first beat as an amber bubble
+              // near the middle of the screen, the rest as its footnotes. They
+              // take no room: a band over the figure, from a little way into
+              // it to just before the end of its storage dump, holds them in
+              // the middle of the screen while the figure scrolls under them;
+              // then they scroll away with the page)
+              <div
+                className={`pointer-events-none absolute inset-x-0 top-11 z-10 ${id}-u`}
+                style={{ height: Math.max(0, (storageEnd ?? (frameTall ?? 0) * 0.65) - 44 - 16) }}
+              >
+                <div className="sticky top-[30svh] mx-auto max-w-[34rem]">
+                  {/* (the first beat is the bubble; the ones after it are its
                     footnotes, a drawer that slides out from under it in the
                     same colours, smaller: seen, but not the story) */}
-                <div
-                  aria-hidden={beat < 0}
-                  className="relative z-10 rounded-xl border-l-4 border-amber-500 bg-[#FBEFD9] px-4 py-3 shadow-sm transition-[opacity,transform,border-radius] duration-300 dark:border-amber-400 dark:bg-[#3A2F22]"
-                  style={{
-                    opacity: beat >= 0 ? 1 : 0,
-                    transform: beat >= 0 ? 'none' : 'translateY(0.5rem)',
-                    ...(beat >= 1 ? { borderBottomLeftRadius: 0, borderBottomRightRadius: 0 } : {}),
-                  }}
-                >
-                  <p
-                    className="my-0 text-center text-[16px] font-semibold leading-snug text-anthracite-700 dark:text-ecru-100"
-                    style={{ textWrap: 'balance', whiteSpace: 'pre-line' }}
+                  <div
+                    aria-hidden={beat < 0}
+                    className="relative z-10 rounded-xl border-l-4 border-amber-500 bg-[#FBEFD9] px-4 py-3 shadow-sm transition-[opacity,transform,border-radius] duration-300 dark:border-amber-400 dark:bg-[#3A2F22]"
+                    style={{
+                      opacity: beat >= 0 ? 1 : 0,
+                      transform: beat >= 0 ? 'none' : 'translateY(0.5rem)',
+                      ...(beat >= 1
+                        ? { borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }
+                        : {}),
+                    }}
                   >
-                    {story[0]}
-                  </p>
-                </div>
-                {story.length > 1 && (
-                  <div className="overflow-hidden rounded-b-xl">
-                    <div
-                      aria-hidden={beat < 1}
-                      className="space-y-1 rounded-b-xl border-l-4 border-t border-amber-500 border-t-amber-500/30 bg-[#FBEFD9] px-4 pb-2.5 pt-2 shadow-sm transition-[opacity,transform] duration-300 dark:border-amber-400 dark:border-t-amber-400/30 dark:bg-[#3A2F22]"
-                      style={{
-                        opacity: beat >= 1 ? 1 : 0,
-                        transform: beat >= 1 ? 'none' : 'translateY(-100%)',
-                      }}
+                    <p
+                      className="my-0 text-center text-[16px] font-semibold leading-snug text-anthracite-700 dark:text-ecru-100"
+                      style={{ textWrap: 'balance', whiteSpace: 'pre-line' }}
                     >
-                      {story.slice(1).map((text, i) => (
-                        <p
-                          key={i}
-                          className="my-0 text-center text-[13px] font-medium leading-snug text-anthracite-400 dark:text-ecru-300"
-                          style={{ textWrap: 'balance', whiteSpace: 'pre-line' }}
-                        >
-                          {text}
-                        </p>
-                      ))}
-                    </div>
+                      {story[0]}
+                    </p>
                   </div>
-                )}
+                  {story.length > 1 && (
+                    <div className="overflow-hidden rounded-b-xl">
+                      <div
+                        aria-hidden={beat < 1}
+                        className="space-y-1 rounded-b-xl border-l-4 border-t border-amber-500 border-t-amber-500/30 bg-[#FBEFD9] px-4 pb-2.5 pt-2 shadow-sm transition-[opacity,transform] duration-300 dark:border-amber-400 dark:border-t-amber-400/30 dark:bg-[#3A2F22]"
+                        style={{
+                          opacity: beat >= 1 ? 1 : 0,
+                          transform: beat >= 1 ? 'none' : 'translateY(-100%)',
+                        }}
+                      >
+                        {story.slice(1).map((text, i) => (
+                          <p
+                            key={i}
+                            className="my-0 text-center text-[13px] font-medium leading-snug text-anthracite-400 dark:text-ecru-300"
+                            style={{ textWrap: 'balance', whiteSpace: 'pre-line' }}
+                          >
+                            {text}
+                          </p>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+            <div>
+              <Frame
+                src={
+                  initial &&
+                  `${DEMO}/embed.html#${hash(walkthrough ? `&panel=${onDemand ? 'ondemand' : 'external'}&channel=${channel}` : '')}`
+                }
+                title={`ethdebug figure: ${scene}`}
+                theme={theme ?? initial}
+                reserve={HEIGHTS[key] && `${id}-f`}
+                onMessage={onFigure}
+                frameRef={figure}
+                poster={
+                  <Poster
+                    scene={scene}
+                    size={size}
+                    // (before the page's theme is known here, light, as
+                    // rendered on the server)
+                    theme={(initial && theme) || 'light'}
+                    alt={
+                      textOf(children).replace(/\s+/g, ' ').trim() ||
+                      DESCRIBED[scene] ||
+                      `ethdebug figure: ${scene}`
+                    }
+                    className={`${id}-i`}
+                    spoils={story.length > 0}
+                  />
+                }
+                // (a figure with a story loads at once, so it is ready by
+                // the time the reader scrolls into it)
+                eager={story.length > 0}
+              />
+            </div>
+            {story.length > 0 && (
+              // (pinned, each beat shows once the story reaches it and stays,
+              // under the still figure, marked as the post's narration by an
+              // amber rule; their room is kept from the start, so nothing
+              // moves)
+              <div className={`mt-6 space-y-3 ${id}-b`}>
+                <div
+                  aria-hidden="true"
+                  className="mx-auto h-0.5 w-12 rounded bg-amber-500 transition-opacity duration-500"
+                  style={{ opacity: beat >= 0 ? 1 : 0 }}
+                />
+                {story.map((text, i) => (
+                  <p
+                    key={i}
+                    // (the beats after the first are its footnotes: smaller,
+                    // quieter, right under it)
+                    className={
+                      i === 0
+                        ? `${CAPTION} my-0 transition-opacity duration-500`
+                        : 'mx-auto -mt-1 mb-0 max-w-[50rem] text-center text-sm leading-snug text-anthracite-300 transition-opacity duration-500 dark:text-ecru-400'
+                    }
+                    style={{
+                      textWrap: 'balance',
+                      whiteSpace: 'pre-line',
+                      opacity: beat >= i ? 1 : 0,
+                    }}
+                  >
+                    {text}
+                  </p>
+                ))}
+              </div>
+            )}
+          </div>
+          {story.length > 0 && <div ref={room} aria-hidden="true" className={`${id}-r`} />}
+        </div>
+        {walkthrough && (
+          <>
+            {/* (the panel's place under the figure: the usual gap, then
+                room the panel's height) */}
+            <div
+              className={`mt-6 ${id}-pc ${slot?.className ?? ''}`}
+              style={slot?.style}
+              aria-hidden="true"
+            >
+              <div className={`${id}-p`} />
+            </div>
+            {/* (the panel, at the text column's width, in a box from just
+                under the figure's opening view to its place under the
+                figure: sticky to the screen's bottom within it, so it rides
+                in under the opening view, sticks, and comes to rest) */}
+            <div
+              className="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col justify-end"
+              style={{ top: startAt ?? '100%' }}
+            >
+              <div
+                className={`pointer-events-auto sticky bottom-0 z-10 ${id}-pc ${slot?.className ?? ''}`}
+                style={slot && { height: slot.style.height }}
+              >
+                <Frame
+                  src={
+                    initial &&
+                    `${DEMO}/embed-panel.html#${hash(`&channel=${channel}${onDemand ? '&ondemand=1' : ''}`)}`
+                  }
+                  title={`ethdebug walkthrough: ${scene}`}
+                  theme={theme ?? initial}
+                  reserve={HEIGHTS[`${scene}#panel`] && `${id}-p`}
+                  onMessage={onPanel}
+                  frameRef={panel}
+                />
               </div>
             </div>
-          )}
-          <div>
-            <Frame
-              src={initial && `${DEMO}/embed.html#scene=${scene}&theme=${initial}`}
-              title={`ethdebug figure: ${scene}`}
-              theme={theme ?? initial}
-              reserve={HEIGHTS[scene] && `${id}-f`}
-              onMessage={onFigure}
-              frameRef={figure}
-              poster={
-                <Poster
-                  scene={scene}
-                  size={size}
-                  // (before the page's theme is known here, light, as
-                  // rendered on the server)
-                  theme={(initial && theme) || 'light'}
-                  alt={
-                    textOf(children).replace(/\s+/g, ' ').trim() ||
-                    DESCRIBED[scene] ||
-                    `ethdebug figure: ${scene}`
-                  }
-                  className={`${id}-i`}
-                  spoils={story.length > 0}
-                />
-              }
-              // (a figure with a story loads at once, so it is ready by
-              // the time the reader scrolls into it)
-              eager={story.length > 0}
-            />
-          </div>
-          {story.length > 0 && (
-            // (pinned, each beat shows once the story reaches it and stays,
-            // under the still figure, marked as the post's narration by an
-            // amber rule; their room is kept from the start, so nothing
-            // moves)
-            <div className={`mt-6 space-y-3 ${id}-b`}>
-              <div
-                aria-hidden="true"
-                className="mx-auto h-0.5 w-12 rounded bg-amber-500 transition-opacity duration-500"
-                style={{ opacity: beat >= 0 ? 1 : 0 }}
-              />
-              {story.map((text, i) => (
-                <p
-                  key={i}
-                  // (the beats after the first are its footnotes: smaller,
-                  // quieter, right under it)
-                  className={
-                    i === 0
-                      ? `${CAPTION} my-0 transition-opacity duration-500`
-                      : 'mx-auto -mt-1 mb-0 max-w-[50rem] text-center text-sm leading-snug text-anthracite-300 transition-opacity duration-500 dark:text-ecru-400'
-                  }
-                  style={{
-                    textWrap: 'balance',
-                    whiteSpace: 'pre-line',
-                    opacity: beat >= i ? 1 : 0,
-                  }}
-                >
-                  {text}
-                </p>
-              ))}
-            </div>
-          )}
-        </div>
-        {story.length > 0 && <div ref={room} aria-hidden="true" className={`${id}-r`} />}
+          </>
+        )}
       </div>
       {children && (
         <figcaption className={`${CAPTION} mb-0 mt-4`} style={{ textWrap: 'balance' }}>
