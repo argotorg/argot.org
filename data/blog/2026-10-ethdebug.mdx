@@ -1,0 +1,315 @@
+---
+title: 'ethdebug: a shared language for debug data, in use across projects today'
+date: '2026-10-15'
+draft: false
+summary: 'Compilers can now better explain their bytecode to tools. This post covers what that looks like today, how you can build on it, and what is coming next for the maturing debugging data format.'
+layout: PostBanner
+tags: ['ethdebug']
+---
+
+_Compilers can now better explain their output. This post covers what that
+looks like for tools today, how you can build on it, and what's coming next for
+the maturing debugging data format._
+
+The [**ethdebug format**](https://ethdebug.github.io/format/) is an open
+specification for compilers to use in structuring their debug output. Like
+[DWARF](https://dwarfstd.org/) for traditional computing but designed for the
+quirks of smart contract languages, it seeks to reduce the cost to understand
+the blockchain.
+
+**ethdebug** is an [Argot Collective](https://www.argot.org/) project. We're its
+team at Argot, and in our first post here on this blog, we're glad to share the
+latest progress in Ethereum debugging. We'll start with what changed this year,
+especially how fast solc's debug output has improved since Argot partnered with
+[Walnut](https://www.walnut.dev/). Then, with interactive figures that run on
+real compiler data (fudging only a little where support or specification lags),
+we'll cover the problem of Ethereum debugging at large and how we're solving it.
+
+## What changed this year
+
+Since our [talk at the Solidity Summit](https://youtu.be/KKvkXFv-GXM) last
+November, ethdebug has gone from a design to data in use. The compilers
+[**solc**](https://soliditylang.org/), [**Fe**](https://fe-lang.org/), and
+[**Solar**](https://github.com/paradigmxyz/solar) produce it,
+[Walnut](https://www.walnut.dev/)'s
+[**soldb**](https://github.com/walnuthq/soldb) reads it, and [Runtime
+Verification](https://runtimeverification.com/), the team behind the
+[**Simbolik**](https://marketplace.visualstudio.com/items?itemName=runtimeverification.simbolik)
+debugger, has started [a Python library for reading
+it](https://github.com/runtimeverification/ethdebug.py).
+
+In May, Argot and Walnut began adding ethdebug to solc in stages. The first
+stage, which added internal systems to solc so it could track debug data
+([argotorg/solidity#16780](https://github.com/argotorg/solidity/pull/16780)),
+merged in August. The second stage, currently in review
+([argotorg/solidity#16990](https://github.com/argotorg/solidity/pull/16990)),
+will let solc use those systems to report how a contract organizes its state.
+Walnut's fork holds the next stages, queued for later rounds of review. They
+locate every value a contract stores, and in our tests they match what solc's
+storage layout output already says.
+
+Walnut has also been helping shape the format. Their questions have improved the
+specification ([ethdebug/format#307](https://github.com/ethdebug/format/issues/307)),
+and to support their solc work they wrote a conformance test suite for ethdebug
+([ethdebug/format#215](https://github.com/ethdebug/format/pull/215)). It checks
+how closely compilers and debuggers follow the format, and today it covers just
+solc, soldb, and ethdebug's own reference implementations.
+
+In released solc, this output is experimental. It needs a
+[flag](https://docs.soliditylang.org/en/latest/using-the-compiler.html), the
+optimizer off, and the
+[via-IR](https://docs.soliditylang.org/en/latest/ir-breaking-changes.html)
+pipeline. The output maps each instruction to its source, and it matched solc's
+[source
+maps](https://docs.soliditylang.org/en/latest/internals/source_mappings.html) at
+every step we tested. The figures in this post use a preview build with
+[Walnut's stages](https://github.com/walnuthq/solidity/pulls). Argot and Walnut's
+plan goes further, to local variables and then to optimized code, which would
+lift the optimizer-off restriction.
+
+Fe, another Argot project, writes ethdebug as its only debug output, with the
+optimizer on. Solar, a second Solidity compiler from
+[Paradigm](https://www.paradigm.xyz/), writes it on its main branch, also with
+the optimizer on, and its bytecode is the same with or without it. Walnut wrote
+Solar's support too.
+
+AI also changed how people build tools this year. In the [2025 Solidity
+Developer Survey](https://soliditylang.org/survey-2025/), most developers said
+they use AI at least monthly, and nearly half said they distrust its output.
+ethdebug data comes from the compiler, so a tool built on it by a person or an
+AI can be checked against what the compiler did. Auditors and incident
+responders also need claims about a contract that others can check.
+
+Read on to see why tools need this data, how a debugger reads it, and what comes
+next. Most of the figures run on real compiler output, so explore them as you
+go.
+
+## What we're solving
+
+Smart contracts are written for humans to read, but they run as machine code and
+keep their state in the Ethereum Virtual Machine's terms. A compiler turns one
+into the other, and modern optimizers make the result very hard to read, even
+for experts.
+
+People have always needed to see through it during development and after a
+security incident, when a lot of value may be at stake. Many groups have built
+tools to recover the human view from the machine. In the same survey, a third of
+developers named debugging as a recurring problem, at every level of experience.
+
+Compilers have given these tools enough to succeed, but only with guesswork.
+Tool authors learn the rules by watching the compiler and add special cases for
+each version. Six open-source projects, [Remix](https://remix.ethereum.org/) and
+[Truffle](https://github.com/trufflesuite/truffle) among them, have each built
+their own decoder for Solidity's data.
+[Truffle's](https://github.com/trufflesuite/truffle/tree/develop/packages/codec),
+which some of us helped build, grew to 24,000 lines of rules learned from the
+compiler before Consensys [retired
+Truffle](https://consensys.com/blog/consensys-announces-the-sunset-of-truffle-and-ganache-and-new-hardhat)
+in 2023. Even [Foundry](https://getfoundry.sh/), today's most-used toolkit,
+finds function names by parsing the source text, and its [tracking issue for
+debugger improvements](https://github.com/foundry-rs/foundry/issues/927) has
+been open since 2022.
+
+This post uses one small example throughout. It's a multiplayer game where
+players join and make moves that may earn them points. This is what a
+development tool sees when it looks at the game's state in the middle of a
+transaction:
+
+<EthdebugFigure
+  scene="reveal"
+  size="text"
+  beats={[
+    "With enough debug data from the compiler, tools can see exactly where each value lives in high-level terms.",
+  ]}
+>
+</EthdebugFigure>
+
+The highlights above come from the compiler saying what each byte is. Without
+that, a tool has only the raw bytes, and it must work out the rest itself:
+[where Solidity puts mapping
+entries](https://docs.soliditylang.org/en/latest/internals/layout_in_storage.html),
+how it packs small values into one slot, how it lays out a string. The rules
+change with compiler versions and optimizers, and none of the old ones go away,
+because contracts on chain live forever. Most tools support only some compiler
+versions and often not the optimized code that runs on mainnet. A wrong guess
+gives no error; the tool just shows a wrong value.
+
+To find Alice's score in this game, a tool hashes her address with the mapping's
+slot (using keccak, Ethereum's standard hash function) to find her record, then
+picks her score out of six small fields packed into one slot. Her name is in the
+next slot, with its characters at one end and its length at the other.
+
+<EthdebugFigure scene="pitfall-nesting" size="wide">
+  Alice's record, as the compiler's data describes it. The grey rows are what
+  the inspector reads to find the record. Mappings don't store their keys, so it
+  takes Alice's address from the game's list of players. Click around to
+  explore, and ↺ Reset to return.
+</EthdebugFigure>
+
+Each new language needs all of this again, and the rules are often off in subtle
+ways. [Vyper](https://vyperlang.org/) also hashes the key with the mapping's
+slot, but in the opposite order, and it puts `players` at slot 108 instead of 3.
+A tool that applies Solidity's rule to Vyper's storage finds an empty slot that
+looks just as valid, and reports that Alice's score is 0:
+
+<EthdebugFigure scene="pitfall-compiler" size="narrow">
+  The same storage, read two ways. Solidity's rule hashes Alice's address
+  before the slot and lands on an empty slot, so her score reads 0. Vyper's
+  layout hashes the slot first and finds her real score: 30.
+</EthdebugFigure>
+
+The ethdebug format moves the rule into the compiler's output. The compiler
+already knows where it put every value, so it writes the rule down, and a tool
+follows whatever rule it's given. The right side of the figure above works that
+way from hand-written ethdebug data.
+
+To show 30, a tool also has to know what those bytes mean, and the format can't
+say that well yet. We're
+[reworking](https://github.com/ethdebug/format/issues/282) its [type
+schemas](https://ethdebug.github.io/format/spec/type) for the richer type
+systems of newer languages. Until then, the figures in this post read the bytes
+with their own code.
+
+## Reading compiled code
+
+The first thing a debugger needs is which piece of source each instruction came
+from. [Walnut](https://www.walnut.dev/)'s soldb is a debugger written for
+Solidity. Because it reads ethdebug, it can step through a contract written in
+Fe. soldb's code didn't change; we only had to repackage Fe's files for it. The
+figure below runs soldb right in this page, on the same game transaction
+compiled both ways. Switch between Solidity and Fe, and step through each. soldb
+shows no call stack here. Neither compiler marks function calls in its ethdebug
+output yet.
+
+<EthdebugFigure scene="real-debugger" size="narrow">
+  soldb stepping one of the game's transactions, compiled from Solidity and
+  from Fe.
+</EthdebugFigure>
+
+The format describes compiled code as [**ethdebug
+programs**](https://ethdebug.github.io/format/spec/program). An ethdebug program
+covers one piece of bytecode that a compiler produced, such as a contract's
+deployed code or the code that creates it. For each program, the compiler lists
+the instructions in order. Each instruction gives its byte offset in the
+bytecode, its operation, and an [**ethdebug
+context**](https://ethdebug.github.io/format/spec/program/context). The context
+says what is true after the instruction runs.
+
+The simplest kind of context says which range of which source file the
+instruction came from. Every compiler emits it today, and it is all soldb needed
+to follow the source. Other kinds describe variables and code the optimizer
+moved or merged. Some mark where a call to a function starts and ends and name
+the function, even when the optimizer inlined the call. Only bugc writes those
+today.
+
+Solidity and Fe write ethdebug programs in the same basic shape, so one reader
+handles both. Pick an instruction below to see its entry.
+
+<EthdebugFigure scene="program-xray" size="text">
+  Part of `play()`, as solc and Fe each wrote it. There is one entry per
+  instruction, with its offset, its operation, and its context. Pick an
+  instruction to see its entry and the source its range points to. Fe adds a few
+  fields of its own.
+</EthdebugFigure>
+
+## Finding a variable's bytes
+
+A compiler describes each variable with an [**ethdebug
+pointer**](https://ethdebug.github.io/format/spec/pointer), a recipe a tool
+follows to find the variable's bytes. It names a location such as storage,
+memory, or the stack and says how to compute positions from the raw, observable
+machine state. Following it, a tool might read a slot, hash a key with the
+slot's number, or step to the next slot. Shapes the compiler uses again and
+again, like a mapping or a string, are written once as templates and reused.
+
+The figure below follows the compiler's ethdebug pointer for `players`, from the
+slot it starts at to every byte of every player's record. Press ▶ to step
+through it, or select any other variable and step through its pointer.
+
+<EthdebugFigure scene="pointer-walkthrough" size="wide" walkthrough>
+  Each step shows one piece of the compiler's ethdebug pointer for `players`,
+  and the storage that piece reaches. The steps go from slot 3 to each record at
+  keccak(key, slot 3), and then to the six packed fields and each player's name.
+</EthdebugFigure>
+
+The figure ran those steps with our TypeScript reference implementation, the
+[@ethdebug/pointers](https://www.npmjs.com/package/@ethdebug/pointers) npm
+package, which knows nothing about this game or about Solidity. The keys came
+from the game's list of players, and every rule after that came from the
+compiler's data. For the Vyper version of the game, the pointer would hash the
+slot before the key and start at slot 108. The same package would follow it
+unchanged, and no tool author would have to learn Vyper's rules.
+
+## The harder cases
+
+Storage is the easy case because where a value lives there doesn't change as the
+code runs. Local variables in optimized code are where debuggers usually lose
+track. An optimizer inlines calls and reuses one variable's bytes for another,
+and the older outputs have no way to say so. The format can say where each local
+is at each step. No production compiler writes local variables yet. Our
+reference compiler, bugc, does. It compiles BUG, a small language we made to
+test the format. Its optimizer exists for the same reason: it inlines calls and
+reuses bytes the way solc's optimizer does, so we can test the format on that
+kind of code.
+
+The figure below follows three of the game's transactions, rewritten in BUG and
+compiled with optimizations on. Carol joins, Alice plays and hits, and Bob plays
+and misses. At each moment, the compiler's ethdebug pointers say where each
+local's bytes are: on the stack, in the call's data, or in memory. Watch `mult`
+take over `combo`'s bytes instead of copying them. Step through it with ◀ ▶;
+each step runs through every instruction between two moments.
+
+<EthdebugFigure scene="optimized-locals" size="wide" walkthrough="on-demand">
+  The game in BUG, compiled at optimization level 2. Where each local lives at
+  each moment comes from the compiler's ethdebug pointers.
+</EthdebugFigure>
+
+BUG and bugc exist to test the format, not to replace real smart contract
+languages. (Do not use BUG in production; its compiler was not built to save
+gas, and it has never been audited.) The figure shows that the format can
+already carry these facts and that a tool can read them. We don't yet know how
+to describe a value that the optimizer turned into an expression instead of
+storing it. We are also still settling exactly when a call's frame starts and
+ends ([ethdebug/format#348](https://github.com/ethdebug/format/issues/348)).
+
+Contracts that are already deployed will never get ethdebug data from their
+compilers. But the rules that today's tools use to guess their layouts are
+usually right. We can write those rules down once as ethdebug data, so that each
+tool doesn't need its own copy. The Vyper figure earlier in this post uses
+ethdebug data written by hand in the same way. Runtime Verification had the same
+idea, and earlier this year they started a tool that adds ethdebug data to
+existing solc output. That work isn't finished, and we'd welcome help.
+
+## Beyond this post
+
+You can try ethdebug on solc's output today. Compile a contract with the
+[experimental
+settings](https://docs.soliditylang.org/en/latest/using-the-compiler.html) above
+and read what it writes next to the [ethdebug format
+specification](https://ethdebug.github.io/format/) to learn how these fit
+together.
+
+You don't need to build a debugger to use this data. Think of a question about a
+transaction that a tool could answer from it. Which source lines did it run?
+Which variable did a storage write change? Then ask your AI coding tool to build
+that tool, and point it at the spec and your compiler's output. For example,
+[this short
+script](https://github.com/ethdebug/argot-post-2026-10/tree/main/demos/stepper)
+prints the source lines a transaction ran, from solc's output or Fe's. Tool
+builders can use our [npm packages](https://www.npmjs.com/org/ethdebug) to
+follow ethdebug pointers. Compiler writers can start with source ranges and add
+ethdebug pointers for state variables next.
+
+If something in the format is missing, unclear, or wrong for your language or
+tool, [open an issue](https://github.com/ethdebug/format/issues). Some of this
+year's changes began as questions from implementers.
+
+The format will keep changing as more compilers write it and solc's support
+grows. To follow along or ask a question, join [our Matrix
+chat](https://matrix.to/#/#ethdebug:matrix.org).
+
+Thanks to Djordje and Roman at [Walnut](https://www.walnut.dev/), the
+[Fe](https://fe-lang.org/) team, Raoul at [Runtime
+Verification](https://runtimeverification.com/), cameel and the
+[Solidity](https://soliditylang.org/) team, [Sourcify](https://sourcify.dev/),
+and Lea at Argot for their work, their questions, and their patience.
