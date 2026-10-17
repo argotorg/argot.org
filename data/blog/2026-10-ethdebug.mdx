@@ -63,15 +63,14 @@ pipeline. The output maps each instruction to its source, and it matched solc's
 [source
 maps](https://docs.soliditylang.org/en/latest/internals/source_mappings.html) at
 every step we tested. The figures in this post use a preview build with
-[Walnut's stages](https://github.com/walnuthq/solidity/pulls). Argot and Walnut's
+[Walnut's upcoming work](https://github.com/walnuthq/solidity/pulls). Argot and Walnut's
 plan goes further, to local variables and then to optimized code, which would
 lift the optimizer-off restriction.
 
 Fe, another Argot project, writes ethdebug as its only debug output, with the
 optimizer on. Solar, a second Solidity compiler from
 [Paradigm](https://www.paradigm.xyz/), writes it on its main branch, also with
-the optimizer on, and its bytecode is the same with or without it. Walnut wrote
-Solar's support too.
+the optimizer on, and its bytecode is the same with or without it.
 
 AI also changed how people build tools this year. In the [2025 Solidity
 Developer Survey](https://soliditylang.org/survey-2025/), most developers said
