@@ -57,6 +57,7 @@ A compiler turns one into the other, and the result is hard to map back to the s
 Optimizers make that harder still by inlining, reordering, and merging code.
 
 Developers need the human view of a running smart contract while they build, and incident responders need it after an attack, when funds may be at risk.
+Responders work with contracts already on chain, compiled before ethdebug existed, so they need ethdebug data written after the fact, which we come back to later.
 In the same survey, a third of developers named debugging as a recurring problem, at every level of experience.
 
 Many groups have built tools for this.
@@ -198,8 +199,9 @@ The figure shows that the format can already carry these facts and that a tool c
 We don't yet know how to describe a value that the optimizer turned into an expression instead of storing it.
 We are also still settling exactly when a call's frame starts and ends ([ethdebug/format#348](https://github.com/ethdebug/format/issues/348)).
 
-Contracts that are already deployed will never get ethdebug data from their compilers.
-But the rules that today's tools use to guess their layouts are usually right.
+The compilers that built almost every contract on chain today don't write ethdebug data, and they won't be changed to.
+Recompiling a contract's verified source, such as from [Sourcify](https://sourcify.dev/), with a newer compiler gives different bytecode, though the storage layout usually carries over.
+But the rules that today's tools use to guess layouts are usually right.
 We can write those rules down once as ethdebug data, so that each tool doesn't need its own copy.
 The Vyper figure earlier in this post uses ethdebug data written by hand in the same way.
 Runtime Verification had the same idea, and earlier this year they started a tool that adds ethdebug data to existing solc output.
