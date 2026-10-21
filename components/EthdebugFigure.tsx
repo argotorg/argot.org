@@ -376,6 +376,9 @@ export default function EthdebugFigure({
   const stage = useRef<HTMLDivElement>(null)
   // (the stage's room for the story, in screens' heights, pinned)
   const room = useRef<HTMLDivElement>(null)
+  // (the phone's bubbles' band, and the bubbles, sticky in it)
+  const band = useRef<HTMLDivElement>(null)
+  const bubble = useRef<HTMLDivElement>(null)
   // which beat shows (-1: none yet)
   const [beat, setBeat] = useState(-1)
   const story = beats ?? []
@@ -408,7 +411,8 @@ export default function EthdebugFigure({
   // holds still in the middle of the screen while the reader scrolls
   // through its story (LEAD, BEAT, REVEAL, HOLD), and progress runs over
   // REVEAL;
-  // otherwise it runs from the figure's top REVEAL_FROM of the way down
+  // otherwise, with the phone's bubble, it runs as the bubble comes down
+  // its band; with none, from the figure's top REVEAL_FROM of the way down
   // the screen to REVEAL_TO.
   useEffect(() => {
     const el = figure.current
@@ -433,6 +437,19 @@ export default function EthdebugFigure({
         const held = (at - LEAD - BEAT - REVEAL) / (HOLD / 2)
         after = Math.min(1, Math.max(0, held / 2))
         setBeat(at < LEAD ? -1 : held < 0 ? 0 : 1 + Math.min(later - 1, Math.floor(held * later)))
+      } else if (band.current && bubble.current) {
+        // (with the phone's bubble: by how far the bubble has come down
+        // its band, sticky, so the colours fill in just under its text as
+        // the figure scrolls under it, and finish as it lets go)
+        const top = el.getBoundingClientRect().top
+        const start = innerHeight * REVEAL_FROM
+        const hold = parseFloat(getComputedStyle(bubble.current).top) || 0
+        const travel = band.current.offsetHeight - bubble.current.offsetHeight
+        const down = hold - band.current.getBoundingClientRect().top
+        progress = travel > 0 ? down / travel : 1
+        after = down - travel > innerHeight * STILL ? 1 : 0
+        const final = (beats?.length ?? 1) - 1
+        setBeat(top > start ? -1 : progress < 1 ? 0 : final)
       } else {
         const top = el.getBoundingClientRect().top
         const start = innerHeight * REVEAL_FROM
@@ -576,10 +593,11 @@ export default function EthdebugFigure({
               // the middle of the screen while the figure scrolls under them;
               // then they scroll away with the page)
               <div
+                ref={band}
                 className={`pointer-events-none absolute inset-x-0 top-11 z-10 ${id}-u`}
                 style={{ height: Math.max(0, (storageEnd ?? (frameTall ?? 0) * 0.65) - 44 - 16) }}
               >
-                <div className="sticky top-[30svh] mx-auto max-w-[34rem]">
+                <div ref={bubble} className="sticky top-[30svh] mx-auto max-w-[34rem]">
                   {/* (the first beat is the bubble; the ones after it are its
                     footnotes, a drawer that slides out from under it in the
                     same colours, smaller: seen, but not the story) */}
