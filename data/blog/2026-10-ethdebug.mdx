@@ -11,8 +11,8 @@ _Compilers can now better explain their output.
 This post covers what that looks like for tools today, how you can build on it, and what's coming next for the maturing debugging data format._
 
 The [**ethdebug format**](https://ethdebug.github.io/format/) is an open specification for compilers to use in structuring their debug output.
-Like [DWARF](https://dwarfstd.org/) for traditional computing but designed for the quirks of smart contract languages, it seeks to reduce the cost to understand the blockchain.
-With billions of dollars running through contracts that the EVM shows only as bytes, experts spend real time and money making sense of them, and the format lets compilers help.
+Like [DWARF](https://dwarfstd.org/) for traditional computing but designed for the quirks of smart contract languages, it lets compilers explain their output to tools.
+Without it, tools reverse-engineer each compiler's choices, version by version, and can get them subtly wrong about contracts that hold real money.
 
 **ethdebug** is an [Argot Collective](https://www.argot.org/) project, and in our first post here on this blog, we're glad to share the latest progress in Ethereum debugging.
 We'll start with what changed this year, including the work [Walnut](https://www.walnut.dev/) and the Solidity team began in May to extend solc's ethdebug output.
@@ -21,7 +21,7 @@ Where compilers or the specification lag, the figures fudge a little, and they s
 
 ## What changed this year
 
-Since our [talk at the Solidity Summit](https://youtu.be/KKvkXFv-GXM) last November, ethdebug has gone from a design to data in use.
+Since our [talk at the Solidity Summit](https://youtu.be/KKvkXFv-GXM) last November, more compilers write ethdebug data, solc writes more of it, and tools have started to read it.
 The compilers [**solc**](https://soliditylang.org/), [**Fe**](https://fe-lang.org/), and [**Solar**](https://github.com/paradigmxyz/solar) produce it, [Walnut](https://www.walnut.dev/)'s [**soldb**](https://github.com/walnuthq/soldb) reads it, and [Runtime Verification](https://runtimeverification.com/), the team behind the [**Simbolik**](https://marketplace.visualstudio.com/items?itemName=runtimeverification.simbolik) debugger, has started [a Python library for reading it](https://github.com/runtimeverification/ethdebug.py).
 
 solc has written ethdebug data since 0.8.29 in March 2025, from the Solidity team's work: each instruction and the source range it came from.
@@ -222,7 +222,6 @@ If something in the format is missing, unclear, or wrong for your language or to
 Some of this year's changes began as questions from implementers.
 
 The format will keep growing as more compilers write it and solc's support expands.
-Each tool that reads it instead of guessing makes the bytes that billions of dollars run through a little easier to understand.
 To follow along or ask a question, join [our Matrix chat](https://matrix.to/#/#ethdebug:matrix.org).
 
 Thanks to Djordje and Roman at [Walnut](https://www.walnut.dev/), the [Fe](https://fe-lang.org/) team, Raoul at [Runtime Verification](https://runtimeverification.com/), cameel and the [Solidity](https://soliditylang.org/) team, [Sourcify](https://sourcify.dev/), and Lea at Argot for their work, their questions, and their patience.
