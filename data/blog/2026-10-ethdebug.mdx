@@ -53,7 +53,8 @@ Most of the figures run on real compiler output, so explore them as you go.
 ## What we're solving
 
 Smart contracts are written for humans to read, but they run as machine code and keep their state in the Ethereum Virtual Machine's terms.
-A compiler turns one into the other, and modern optimizers make the result very hard to read, even for experts.
+A compiler turns one into the other, and the result is hard to map back to the source even without optimization.
+Optimizers make that harder still by inlining, reordering, and merging code.
 
 Developers need the human view of a running smart contract while they build, and incident responders need it after an attack, when funds may be at risk.
 In the same survey, a third of developers named debugging as a recurring problem, at every level of experience.
@@ -94,7 +95,7 @@ Her name is in the next slot, with its characters at one end and its length at t
   Click around to explore, and ↺ Reset to return.
 </EthdebugFigure>
 
-Each new language needs all of this again, and the rules are often off in subtle ways.
+Each new language means learning these rules again, and they often differ from Solidity's in small ways that are easy to miss.
 [Vyper](https://vyperlang.org/) also hashes the key with the mapping's slot, but in the opposite order, and it puts `players` at slot 108 instead of 3.
 A tool that applies Solidity's rule to Vyper's storage finds an empty slot that looks just as valid, and reports that Alice's score is 0:
 
@@ -128,7 +129,7 @@ Neither compiler marks function calls in its ethdebug output yet.
 </EthdebugFigure>
 
 The format describes compiled code as [**ethdebug programs**](https://ethdebug.github.io/format/spec/program).
-An ethdebug program covers one piece of bytecode that a compiler produced, such as a contract's deployed code or the code that creates it.
+An ethdebug program describes either a contract's creation code or its runtime code (so a contract usually has two).
 For each program, the compiler lists the instructions in order.
 Each instruction gives its byte offset in the bytecode, its operation, and an [**ethdebug context**](https://ethdebug.github.io/format/spec/program/context).
 The context says what is true after the instruction runs.
