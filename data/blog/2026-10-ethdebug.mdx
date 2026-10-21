@@ -120,7 +120,7 @@ Until then, the figures in this post read the bytes with their own code.
 The first thing a debugger needs is which piece of source each instruction came from.
 [Walnut](https://www.walnut.dev/)'s soldb is a debugger written for Solidity.
 Because it reads ethdebug, it can step through a contract written in Fe.
-soldb's code didn't change; we only had to repackage Fe's files for it.
+soldb's code didn't change; we only had to give it the source files that Fe's output names but doesn't include.
 The figure below runs soldb right in this page, on the same game transaction compiled both ways.
 Switch between Solidity and Fe, and step through each.
 soldb shows no call stack here.
