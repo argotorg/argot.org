@@ -42,6 +42,10 @@ Argot and Walnut's plan goes further, to local variables and then to optimized c
 The Fe compiler, another Argot project, writes ethdebug data as its only debug output, with the optimizer on.
 Solar, a second Solidity compiler from [Paradigm](https://www.paradigm.xyz/), writes it on its main branch, also with the optimizer on.
 
+So far, each compiler's ethdebug data mostly tells a debugger where in the source each instruction came from.
+That is hard enough when the optimizer is on.
+The harder part is for a compiler to say how it arranged each variable, in any program its optimizer produces, and no production compiler does that yet.
+
 AI also changed how people build tools this year.
 In the [2025 Solidity Developer Survey](https://soliditylang.org/survey-2025/), nearly nine in ten developers said they use AI at least monthly, and nearly half said they distrust its output.
 A tool that reads ethdebug data doesn't need to know how the compiler works inside.
