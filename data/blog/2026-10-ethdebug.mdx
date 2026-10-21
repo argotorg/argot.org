@@ -32,21 +32,21 @@ Walnut has also been helping shape the format.
 Their questions have improved the specification ([ethdebug/format#307](https://github.com/ethdebug/format/issues/307)), and to support their solc work they wrote a conformance test suite for ethdebug ([ethdebug/format#215](https://github.com/ethdebug/format/pull/215)).
 It checks how closely compilers and debuggers follow the format, and today it covers just solc, soldb, and ethdebug's own reference implementations.
 
-In released solc, this output is experimental.
-It needs a [flag](https://docs.soliditylang.org/en/latest/using-the-compiler.html), the optimizer off, and the [via-IR](https://docs.soliditylang.org/en/latest/ir-breaking-changes.html) pipeline.
-The output maps each instruction to its source, and it matched solc's [source maps](https://docs.soliditylang.org/en/latest/internals/source_mappings.html) at every step we tested.
-The figures in this post use a preview build with [Walnut's upcoming work](https://github.com/walnuthq/solidity/pulls).
+In released solc, this output is [experimental](https://docs.soliditylang.org/en/v0.8.37/using-the-compiler.html#experimental-mode).
+It needs the `--experimental` and `--via-ir` flags, an ethdebug output such as `--ethdebug-program`, and the optimizer off.
+It maps each instruction to its source range.
+The figures in this post use a preview build with Walnut's work in progress.
 Argot and Walnut's plan goes further, to local variables and then to optimized code, which would lift the optimizer-off restriction.
 
 The Fe compiler, another Argot project, writes ethdebug as its only debug output, with the optimizer on.
 Solar, a second Solidity compiler from [Paradigm](https://www.paradigm.xyz/), writes it on its main branch, also with the optimizer on.
 
 AI also changed how people build tools this year.
-In the [2025 Solidity Developer Survey](https://soliditylang.org/survey-2025/), most developers said they use AI at least monthly, and nearly half said they distrust its output.
+In the [2025 Solidity Developer Survey](https://soliditylang.org/survey-2025/), nearly nine in ten developers said they use AI at least monthly, and nearly half said they distrust its output.
 ethdebug data comes from the compiler, so a tool built on it by a person or an AI can be checked against what the compiler did.
 Auditors and incident responders also need claims about a contract that others can check.
 
-Read on to see why tools need this data, how a debugger reads it, and what comes next.
+Read on to see what tools lose without this data, how a debugger reads it, and what comes next.
 Most of the figures run on real compiler output, so explore them as you go.
 
 ## What we're solving
@@ -78,7 +78,7 @@ This is what a development tool sees when it looks at the game's state in the mi
 </EthdebugFigure>
 
 The highlights above come from the compiler saying what each byte is.
-Without that, a tool has only the raw bytes, and it must work out the rest itself: [where Solidity puts mapping entries](https://docs.soliditylang.org/en/latest/internals/layout_in_storage.html), how it packs small values into one slot, how it lays out a string.
+Without that, a tool has only the raw bytes, and it must work out the rest itself: [where Solidity puts mapping entries](https://docs.soliditylang.org/en/v0.8.37/internals/layout_in_storage.html#mappings-and-dynamic-arrays), how it packs small values into one slot, how it lays out a string.
 The rules change with compiler versions and optimizers, and none of the old ones go away, because contracts on chain live forever.
 Most tools support only some compiler versions and often not the optimized code that runs on mainnet.
 A wrong guess gives no error; the tool just shows a wrong value.
@@ -138,7 +138,7 @@ Other kinds describe variables and code the optimizer moved or merged.
 Some mark where a call to a function starts and ends and name the function, even when the optimizer inlined the call.
 Only bugc writes those today.
 
-Solidity and Fe write ethdebug programs in the same basic shape, so one reader handles both.
+solc and Fe write ethdebug programs in the same basic shape, so one reader handles both.
 Pick an instruction below to see its entry.
 
 <EthdebugFigure scene="program-xray" size="text">
@@ -206,7 +206,7 @@ That work isn't finished, and we'd welcome help.
 ## Beyond this post
 
 You can try ethdebug on solc's output today.
-Compile a contract with the [experimental settings](https://docs.soliditylang.org/en/latest/using-the-compiler.html) above and read what it writes next to the [ethdebug format specification](https://ethdebug.github.io/format/) to learn how these fit together.
+Compile a contract with the [experimental settings](https://docs.soliditylang.org/en/v0.8.37/using-the-compiler.html#experimental-mode) above and read what it writes next to the [ethdebug format specification](https://ethdebug.github.io/format/) to learn how these fit together.
 
 You don't need to build a debugger to use this data.
 Think of a question about a transaction that a tool could answer from it.
