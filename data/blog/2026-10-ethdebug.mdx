@@ -16,7 +16,8 @@ With billions of dollars running through contracts that the EVM shows only as by
 
 **ethdebug** is an [Argot Collective](https://www.argot.org/) project, and in our first post here on this blog, we're glad to share the latest progress in Ethereum debugging.
 We'll start with what changed this year, including the work [Walnut](https://www.walnut.dev/) and the Solidity team began in May to extend solc's ethdebug output.
-Then, with interactive figures that run on real compiler data (fudging only a little where compilers or the specification lag), we'll cover the problem at large and how we're solving it.
+Then we'll cover the problem compilers leave tools with and how the format solves it, with interactive figures that run on real compiler data.
+Where compilers or the specification lag, the figures fudge a little, and they say so where they do.
 
 ## What changed this year
 
@@ -43,8 +44,8 @@ Solar, a second Solidity compiler from [Paradigm](https://www.paradigm.xyz/), wr
 
 AI also changed how people build tools this year.
 In the [2025 Solidity Developer Survey](https://soliditylang.org/survey-2025/), nearly nine in ten developers said they use AI at least monthly, and nearly half said they distrust its output.
-ethdebug data comes from the compiler, so a tool built on it by a person or an AI can be checked against what the compiler did.
-Auditors and incident responders also need claims about a contract that others can check.
+A tool that reads ethdebug data doesn't need to know how the compiler works inside.
+So an AI that writes such a tool has less to get wrong, and what the tool reports comes from the compiler instead of from guesses about it.
 
 Read on to see what tools lose without this data, how a debugger reads it, and what comes next.
 Most of the figures run on real compiler output, so explore them as you go.
