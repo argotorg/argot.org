@@ -21,8 +21,8 @@ Where compilers or the specification lag, the figures fudge a little, and they s
 
 ## What changed this year
 
-Since our [talk at the Solidity Summit](https://youtu.be/KKvkXFv-GXM) last November, [**Fe**](https://fe-lang.org/) and [**Solar**](https://github.com/paradigmxyz/solar) have started to write ethdebug data, and work is under way to extend [**solc**](https://soliditylang.org/)'s existing ethdebug output.
-Walnut's [**soldb**](https://github.com/walnuthq/soldb) reads it, and [Runtime Verification](https://runtimeverification.com/), the team behind the [**Simbolik**](https://marketplace.visualstudio.com/items?itemName=runtimeverification.simbolik) debugger, has started [a Python library for reading it](https://github.com/runtimeverification/ethdebug.py).
+Since our [talk at the Solidity Summit](https://youtu.be/KKvkXFv-GXM) last November, [**Fe**](https://fe-lang.org/) and [**Solar**](https://github.com/paradigmxyz/solar) have started to write initial ethdebug data, and for [**solc**](https://soliditylang.org/), work now in review is the first step toward tools that read a contract's variables without guessing.
+Walnut's [**soldb**](https://github.com/walnuthq/soldb) reads ethdebug data, and [Runtime Verification](https://runtimeverification.com/), the team behind the [**Simbolik**](https://marketplace.visualstudio.com/items?itemName=runtimeverification.simbolik) debugger, has started [a Python library for reading it](https://github.com/runtimeverification/ethdebug.py).
 
 solc has written ethdebug data since 0.8.29 in March 2025, from the Solidity team's work: each instruction and the source range it came from.
 Since May, Walnut has been extending that output, and the Solidity team reviews each stage.
