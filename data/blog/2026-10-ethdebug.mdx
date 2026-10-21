@@ -140,7 +140,7 @@ The simplest kind of context says which range of which source file the instructi
 Every compiler emits it today, and it is all soldb needed to follow the source.
 Other kinds describe variables and code the optimizer moved or merged.
 Some mark where a call to a function starts and ends and name the function, even when the optimizer inlined the call.
-Only bugc writes those today.
+No production compiler writes those yet, and we show what they look like later in this post.
 
 solc and Fe write ethdebug programs in the same basic shape, so one reader handles both.
 Pick an instruction below to see its entry.
