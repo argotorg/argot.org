@@ -14,7 +14,7 @@ The [**ethdebug format**](https://ethdebug.github.io/format/) is an open specifi
 Like [DWARF](https://dwarfstd.org/) for traditional computing but designed for the quirks of smart contract languages, it lets compilers explain their output to tools.
 Without it, tools reverse-engineer each compiler's choices, version by version, and can get them subtly wrong about contracts that hold real money.
 
-**ethdebug** is an [Argot Collective](https://www.argot.org/) project, and in our first post here on this blog, we're glad to share the latest progress in Ethereum debugging.
+The **ethdebug** project is part of [Argot Collective](https://www.argot.org/), and in our first post here on this blog, we're glad to share the latest progress in Ethereum debugging.
 We'll start with what changed this year, including the work [Walnut](https://www.walnut.dev/) and the Solidity team began in May to extend solc's ethdebug output.
 Then we'll cover the problem compilers leave tools with and how the format solves it, with interactive figures that run on real compiler data.
 Where compilers or the specification lag, the figures fudge a little, and they say so where they do.
@@ -31,7 +31,7 @@ Later stages, for state variables, function parameters, and return values, are i
 
 Walnut has also been helping shape the format.
 Their questions led us to improve the specification ([ethdebug/format#307](https://github.com/ethdebug/format/issues/307)), and to support their solc work they wrote a conformance test suite for ethdebug ([ethdebug/format#215](https://github.com/ethdebug/format/pull/215)).
-It checks how closely compilers and debuggers follow the format, and today it covers just solc, soldb, and ethdebug's own reference implementations.
+It checks how closely compilers and debuggers follow the format, and today it covers just solc, soldb, and the format's own reference implementations.
 
 In released solc, this output is [experimental](https://docs.soliditylang.org/en/v0.8.37/using-the-compiler.html#experimental-mode).
 It needs the `--experimental` and `--via-ir` flags, an ethdebug output such as `--ethdebug-program`, and the optimizer off.
@@ -39,7 +39,7 @@ It maps each instruction to its source range.
 The figures in this post use a preview build with Walnut's work in progress.
 Argot and Walnut's plan goes further, to local variables and then to optimized code, which would lift the optimizer-off restriction.
 
-The Fe compiler, another Argot project, writes ethdebug as its only debug output, with the optimizer on.
+The Fe compiler, another Argot project, writes ethdebug data as its only debug output, with the optimizer on.
 Solar, a second Solidity compiler from [Paradigm](https://www.paradigm.xyz/), writes it on its main branch, also with the optimizer on.
 
 AI also changed how people build tools this year.
@@ -57,14 +57,14 @@ A compiler turns one into the other, and the result is hard to map back to the s
 Optimizers make that harder still by inlining, reordering, and merging code.
 
 Developers need the human view of a running smart contract while they build, and incident responders need it after an attack, when funds may be at risk.
-Responders work with contracts already on chain, compiled before ethdebug existed, so they need ethdebug data written after the fact, which we come back to later.
+Responders work with contracts already on chain, compiled before the format existed, so they need ethdebug data written after the fact, which we come back to later.
 In the same survey, a third of developers named debugging as a recurring problem, at every level of experience.
 
 Many groups have built tools for this.
 Compilers have given them enough to succeed, but only with guesswork.
 Tool authors learn the rules by watching the compiler and add special cases for each version.
 Six open-source projects, [Remix](https://remix.ethereum.org/) and [Truffle](https://github.com/trufflesuite/truffle) among them, have each built their own decoder for solc's data.
-[Truffle's](https://github.com/trufflesuite/truffle/tree/develop/packages/codec), whose lessons ethdebug builds on, grew to 24,000 lines of rules learned from the compiler before Consensys [retired Truffle](https://consensys.com/blog/consensys-announces-the-sunset-of-truffle-and-ganache-and-new-hardhat) in 2023.
+[Truffle's](https://github.com/trufflesuite/truffle/tree/develop/packages/codec), whose lessons the format builds on, grew to 24,000 lines of rules learned from the compiler before Consensys [retired Truffle](https://consensys.com/blog/consensys-announces-the-sunset-of-truffle-and-ganache-and-new-hardhat) in 2023.
 Even [Foundry](https://getfoundry.sh/), today's most-used toolkit, finds function names by parsing the source text, and its [tracking issue for debugger improvements](https://github.com/foundry-rs/foundry/issues/927) has been open since 2022.
 
 Here's what that guesswork involves.
@@ -119,7 +119,7 @@ Until then, the figures in this post read the bytes with their own code.
 
 The first thing a debugger needs is which piece of source each instruction came from.
 Walnut's soldb is a debugger written for Solidity.
-Because it reads ethdebug, it can step through a contract written in Fe.
+Because it reads ethdebug data, it can step through a contract written in Fe.
 soldb's code didn't change; we only had to give it the source files that Fe's output names but doesn't include.
 The figure below runs soldb right in this page, on the same game transaction compiled both ways.
 Switch between Solidity and Fe, and step through each.
@@ -211,7 +211,7 @@ That work isn't finished, and we'd welcome help.
 
 ## Beyond this post
 
-You can try ethdebug on solc's output today.
+You can try solc's ethdebug data today.
 Compile a contract with the [experimental settings](https://docs.soliditylang.org/en/v0.8.37/using-the-compiler.html#experimental-mode) above and read what it writes next to the [ethdebug format specification](https://ethdebug.github.io/format/) to learn how these fit together.
 
 You don't need to build a debugger to use this data.
