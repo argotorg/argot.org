@@ -15,7 +15,7 @@ Like [DWARF](https://dwarfstd.org/) for traditional computing but designed for t
 With billions of dollars running through contracts that the EVM shows only as bytes, experts spend real time and money making sense of them, and the format lets compilers help.
 
 **ethdebug** is an [Argot Collective](https://www.argot.org/) project, and in our first post here on this blog, we're glad to share the latest progress in Ethereum debugging.
-We'll start with what changed this year, especially how fast solc's debug output has improved since Argot partnered with [Walnut](https://www.walnut.dev/).
+We'll start with what changed this year, including the work [Walnut](https://www.walnut.dev/) and the Solidity team began in May to extend solc's ethdebug output.
 Then, with interactive figures that run on real compiler data (fudging only a little where compilers or the specification lag), we'll cover the problem at large and how we're solving it.
 
 ## What changed this year
@@ -23,11 +23,10 @@ Then, with interactive figures that run on real compiler data (fudging only a li
 Since our [talk at the Solidity Summit](https://youtu.be/KKvkXFv-GXM) last November, ethdebug has gone from a design to data in use.
 The compilers [**solc**](https://soliditylang.org/), [**Fe**](https://fe-lang.org/), and [**Solar**](https://github.com/paradigmxyz/solar) produce it, [Walnut](https://www.walnut.dev/)'s [**soldb**](https://github.com/walnuthq/soldb) reads it, and [Runtime Verification](https://runtimeverification.com/), the team behind the [**Simbolik**](https://marketplace.visualstudio.com/items?itemName=runtimeverification.simbolik) debugger, has started [a Python library for reading it](https://github.com/runtimeverification/ethdebug.py).
 
-In May, Argot and Walnut began adding ethdebug to solc in stages.
-The first stage, which added internal systems to solc so it could track debug data ([argotorg/solidity#16780](https://github.com/argotorg/solidity/pull/16780)), merged in August.
-The second stage, currently in review ([argotorg/solidity#16990](https://github.com/argotorg/solidity/pull/16990)), will let solc use those systems to report how a contract organizes its state.
-Walnut's fork holds the next stages, queued for later rounds of review.
-They locate every value a contract stores, and in our tests they match what solc's storage layout output already says.
+solc has written ethdebug data since 0.8.29 in March 2025, from the Solidity team's work: each instruction and the source range it came from.
+Since May, Walnut has been extending that output, and the Solidity team reviews each stage.
+The stage now in review ([argotorg/solidity#16990](https://github.com/argotorg/solidity/pull/16990)) describes how a contract lays out its storage, and in our tests it matches what solc's storage layout output already says.
+Later stages, for state variables, function parameters, and return values, are in development on Walnut's fork.
 
 Walnut has also been helping shape the format.
 Their questions have improved the specification ([ethdebug/format#307](https://github.com/ethdebug/format/issues/307)), and to support their solc work they wrote a conformance test suite for ethdebug ([ethdebug/format#215](https://github.com/ethdebug/format/pull/215)).
