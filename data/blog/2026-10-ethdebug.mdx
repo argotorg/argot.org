@@ -22,7 +22,7 @@ Where compilers or the specification lag, the figures fudge a little, and they s
 ## What changed this year
 
 Since our [talk at the Solidity Summit](https://youtu.be/KKvkXFv-GXM) last November, more compilers write ethdebug data, solc writes more of it, and tools have started to read it.
-The compilers [**solc**](https://soliditylang.org/), [**Fe**](https://fe-lang.org/), and [**Solar**](https://github.com/paradigmxyz/solar) produce it, [Walnut](https://www.walnut.dev/)'s [**soldb**](https://github.com/walnuthq/soldb) reads it, and [Runtime Verification](https://runtimeverification.com/), the team behind the [**Simbolik**](https://marketplace.visualstudio.com/items?itemName=runtimeverification.simbolik) debugger, has started [a Python library for reading it](https://github.com/runtimeverification/ethdebug.py).
+The compilers [**solc**](https://soliditylang.org/), [**Fe**](https://fe-lang.org/), and [**Solar**](https://github.com/paradigmxyz/solar) produce it, Walnut's [**soldb**](https://github.com/walnuthq/soldb) reads it, and [Runtime Verification](https://runtimeverification.com/), the team behind the [**Simbolik**](https://marketplace.visualstudio.com/items?itemName=runtimeverification.simbolik) debugger, has started [a Python library for reading it](https://github.com/runtimeverification/ethdebug.py).
 
 solc has written ethdebug data since 0.8.29 in March 2025, from the Solidity team's work: each instruction and the source range it came from.
 Since May, Walnut has been extending that output, and the Solidity team reviews each stage.
@@ -30,7 +30,7 @@ The stage now in review ([argotorg/solidity#16990](https://github.com/argotorg/s
 Later stages, for state variables, function parameters, and return values, are in development on Walnut's fork.
 
 Walnut has also been helping shape the format.
-Their questions have improved the specification ([ethdebug/format#307](https://github.com/ethdebug/format/issues/307)), and to support their solc work they wrote a conformance test suite for ethdebug ([ethdebug/format#215](https://github.com/ethdebug/format/pull/215)).
+Their questions led us to improve the specification ([ethdebug/format#307](https://github.com/ethdebug/format/issues/307)), and to support their solc work they wrote a conformance test suite for ethdebug ([ethdebug/format#215](https://github.com/ethdebug/format/pull/215)).
 It checks how closely compilers and debuggers follow the format, and today it covers just solc, soldb, and ethdebug's own reference implementations.
 
 In released solc, this output is [experimental](https://docs.soliditylang.org/en/v0.8.37/using-the-compiler.html#experimental-mode).
@@ -63,7 +63,7 @@ In the same survey, a third of developers named debugging as a recurring problem
 Many groups have built tools for this.
 Compilers have given them enough to succeed, but only with guesswork.
 Tool authors learn the rules by watching the compiler and add special cases for each version.
-Six open-source projects, [Remix](https://remix.ethereum.org/) and [Truffle](https://github.com/trufflesuite/truffle) among them, have each built their own decoder for Solidity's data.
+Six open-source projects, [Remix](https://remix.ethereum.org/) and [Truffle](https://github.com/trufflesuite/truffle) among them, have each built their own decoder for solc's data.
 [Truffle's](https://github.com/trufflesuite/truffle/tree/develop/packages/codec), whose lessons ethdebug builds on, grew to 24,000 lines of rules learned from the compiler before Consensys [retired Truffle](https://consensys.com/blog/consensys-announces-the-sunset-of-truffle-and-ganache-and-new-hardhat) in 2023.
 Even [Foundry](https://getfoundry.sh/), today's most-used toolkit, finds function names by parsing the source text, and its [tracking issue for debugger improvements](https://github.com/foundry-rs/foundry/issues/927) has been open since 2022.
 
@@ -82,7 +82,7 @@ This is what a development tool sees when it looks at the game's state in the mi
 </EthdebugFigure>
 
 The highlights above come from the compiler saying what each byte is.
-Without that, a tool has only the raw bytes, and it must work out the rest itself: [where Solidity puts mapping entries](https://docs.soliditylang.org/en/v0.8.37/internals/layout_in_storage.html#mappings-and-dynamic-arrays), how it packs small values into one slot, how it lays out a string.
+Without that, a tool has only the raw bytes, and it must work out the rest itself: [where solc puts mapping entries](https://docs.soliditylang.org/en/v0.8.37/internals/layout_in_storage.html#mappings-and-dynamic-arrays), how it packs small values into one slot, how it lays out a string.
 The rules change with compiler versions and optimizers, and none of the old ones go away, because contracts on chain live forever.
 Most tools support only some compiler versions and often not the optimized code that runs on mainnet.
 A wrong guess gives no error; the tool just shows a wrong value.
@@ -118,7 +118,7 @@ Until then, the figures in this post read the bytes with their own code.
 ## Reading compiled code
 
 The first thing a debugger needs is which piece of source each instruction came from.
-[Walnut](https://www.walnut.dev/)'s soldb is a debugger written for Solidity.
+Walnut's soldb is a debugger written for Solidity.
 Because it reads ethdebug, it can step through a contract written in Fe.
 soldb's code didn't change; we only had to give it the source files that Fe's output names but doesn't include.
 The figure below runs soldb right in this page, on the same game transaction compiled both ways.
@@ -229,4 +229,4 @@ Some of this year's changes began as questions from implementers.
 The format will keep growing as more compilers write it and solc's support expands.
 To follow along or ask a question, join [our Matrix chat](https://matrix.to/#/#ethdebug:matrix.org).
 
-Thanks to Djordje and Roman at [Walnut](https://www.walnut.dev/), the [Fe](https://fe-lang.org/) team, Raoul at [Runtime Verification](https://runtimeverification.com/), cameel and the [Solidity](https://soliditylang.org/) team, [Sourcify](https://sourcify.dev/), and Lea at Argot for their work, their questions, and their patience.
+Thanks to Djordje and Roman at Walnut, the Fe team, Raoul at Runtime Verification, cameel and the Solidity team, Sourcify, and Lea at Argot for their work, their questions, and their patience.
