@@ -114,7 +114,7 @@ The compiler already knows where it put every value, so it writes the rule down,
 The right side of the figure above works that way from hand-written ethdebug data.
 
 To show Alice's real score of 30, a tool also has to know what those bytes mean, and the format can't say that well yet.
-We're [reworking](https://github.com/ethdebug/format/issues/282) its [type schemas](https://ethdebug.github.io/format/spec/type) for the richer type systems of newer languages.
+We're [reworking](https://github.com/ethdebug/format/issues/282) its [type schemas](https://ethdebug.github.io/format/spec/type/overview/) for the richer type systems of newer languages.
 Until then, the figures in this post read the bytes with their own code.
 
 ## Reading compiled code
@@ -132,10 +132,10 @@ Neither compiler marks function calls in its ethdebug output yet.
   soldb stepping one of the game's transactions, compiled from Solidity and from Fe.
 </EthdebugFigure>
 
-The format describes compiled code as [**ethdebug programs**](https://ethdebug.github.io/format/spec/program).
+The format describes compiled code as [**ethdebug programs**](https://ethdebug.github.io/format/spec/program/overview/).
 An ethdebug program describes either a contract's creation code or its runtime code (so a contract usually has two).
 For each program, the compiler lists the instructions in order.
-Each instruction gives its byte offset in the bytecode, its operation, and an [**ethdebug context**](https://ethdebug.github.io/format/spec/program/context).
+Each instruction gives its byte offset in the bytecode, its operation, and an [**ethdebug context**](https://ethdebug.github.io/format/spec/program/concepts/#instructions-describe-high-level-context-details).
 The context says what is true after the instruction runs.
 
 The simplest kind of context says which range of which source file the instruction came from.
@@ -156,7 +156,7 @@ Pick an instruction below to see its entry.
 
 ## Finding a variable's bytes
 
-A compiler describes each variable with an [**ethdebug pointer**](https://ethdebug.github.io/format/spec/pointer).
+A compiler describes each variable with an [**ethdebug pointer**](https://ethdebug.github.io/format/spec/pointer/overview/).
 Unlike a pointer in most languages, it is not a fixed address.
 It names where the variable's bytes are, such as storage, memory, or the stack, and says how to compute their positions from the machine state a tool can observe.
 Following it, a tool might read a slot, hash a key with the slot's number, or step to the next slot.
