@@ -34,9 +34,8 @@ const HOLD = 0.7
 const RUNWAY = LEAD + BEAT + REVEAL + HOLD
 // (it fits when it takes at most this much of the screen's height)
 const FITS = 0.95
-// (and the room its beats take under it, as measured on the page; until
-// then, a guess)
-const BEATS_ROOM = 88
+// (and the room its beats take under it, pinned)
+const BEATS_ROOM = 160
 // a figure's caption, and its beats (an annotated figure's caption, told in
 // parts)
 const CAPTION =
@@ -101,14 +100,12 @@ const HEIGHTS: Record<string, Record<string, number>> = heights
 // threshold from that same height. `id` names the figure's elements:
 // `id` the figure's box (the container), `id-f` its frame, `id-pc` and
 // `id-p` the walkthrough panel's box and frame, `id-s` the stage, `id-r`
-// the runway's room, `id-b` the beats under the figure, `id-u` the
-// phone's bubbles. `beats` is the beats' height (with their gap).
+// the runway's room, `id-b` the pinned beats, `id-u` the phone's bubbles.
 function layout(
   id: string,
   figure?: Record<string, number>,
   panel?: Record<string, number>,
-  pin?: boolean,
-  beats = BEATS_ROOM
+  pin?: boolean
 ) {
   const steps = (table: Record<string, number> = {}) =>
     Object.entries(table)
@@ -117,11 +114,9 @@ function layout(
   const at = (w: number, i: number, rules: string) =>
     i === 0 ? rules : `@container (min-width: ${w}px) { ${rules} }`
   const f = `.${id} .${id}`
-  // (not pinned, the beats are under the figure as when pinned; on a
-  // phone, below `md`, they are its bubbles instead)
-  const unpinned = `${f}-s { position: relative; top: auto; --pinned: 0; } ${f}-r, ${f}-b { display: none; } ${f}-u { display: block; } @media (min-width: 768px) { ${f}-b { display: block; } ${f}-u { display: none; } }`
+  const unpinned = `${f}-s { position: relative; top: auto; --pinned: 0; } ${f}-r, ${f}-b { display: none; } ${f}-u { display: block; }`
   const pinned = (h: number) =>
-    `${f}-s { position: sticky; top: calc((100svh - var(--stage, ${h + beats}px)) / 2); --pinned: 1; } ${f}-r { display: block; height: ${RUNWAY * 100}svh; } ${f}-b { display: block; } ${f}-u { display: none; }`
+    `${f}-s { position: sticky; top: calc((100svh - var(--stage, ${h + BEATS_ROOM}px)) / 2); --pinned: 1; } ${f}-r { display: block; height: ${RUNWAY * 100}svh; } ${f}-b { display: block; } ${f}-u { display: none; }`
   const css = [
     `.${id}, .${id}-pc { container-type: inline-size; }`,
     // (on a dark page, a light poster, as rendered before the page knew
@@ -138,9 +133,9 @@ function layout(
     css.push(at(w, i, `${f}-f { height: ${h}px; }`))
     if (!pin) return
     css.push(at(w, i, unpinned))
-    // (it fits when its frame and its beats take at most FITS of the
-    // screen's height)
-    const tall = Math.ceil((h + beats) / FITS)
+    // (it fits when its frame and its beats' room take at most FITS of
+    // the screen's height)
+    const tall = Math.ceil((h + BEATS_ROOM) / FITS)
     css.push(at(w, i, `@media (min-height: ${tall}px) { ${pinned(h)} }`))
   })
   if (pin && !figure) css.push(unpinned)
@@ -385,28 +380,21 @@ export default function EthdebugFigure({
   const [beat, setBeat] = useState(-1)
   const story = beats ?? []
   // Whether the annotated figure is pinned, as its CSS decides (`layout`:
-  // it fits when its frame's measured height plus its beats' takes at most
-  // FITS of the screen's height); read here, with the stage's height, which
-  // centres it on the screen, and the beats' height (with their gap), for
-  // that CSS (while they are not shown, as on a phone, the last one seen)
+  // it fits when its frame's measured height plus room for its beats takes
+  // at most FITS of the screen's height); read here, with the stage's
+  // height, which centres it on the screen
   const [pinned, setPinned] = useState(false)
-  const told = useRef<HTMLDivElement>(null)
-  const [beatsTall, setBeatsTall] = useState<number>()
   useEffect(() => {
     const el = stage.current
     if (!story.length || !el) return
     const measure = () => {
       el.style.setProperty('--stage', `${el.offsetHeight}px`)
       setPinned(getComputedStyle(el).getPropertyValue('--pinned').trim() === '1')
-      const b = told.current
-      if (b?.offsetHeight)
-        setBeatsTall(Math.ceil(b.offsetHeight + parseFloat(getComputedStyle(b).marginTop)))
     }
     measure()
     const ro = new ResizeObserver(measure)
     ro.observe(el)
     if (el.parentElement) ro.observe(el.parentElement)
-    if (told.current) ro.observe(told.current)
     addEventListener('resize', measure)
     return () => {
       ro.disconnect()
@@ -522,8 +510,7 @@ export default function EthdebugFigure({
     id,
     HEIGHTS[key],
     walkthrough && !onDemand ? HEIGHTS[`${scene}#panel`] : undefined,
-    story.length > 0,
-    beatsTall
+    story.length > 0
   )
 
   const onFigure = useCallback((data: Data, el: HTMLIFrameElement) => {
@@ -582,7 +569,7 @@ export default function EthdebugFigure({
         >
           <div ref={stage} className={`relative ${id}-s`}>
             {story.length > 0 && (
-              // (on a phone, not pinned: the first beat as an amber bubble
+              // (not pinned, as on a phone: the first beat as an amber bubble
               // near the middle of the screen, the rest as its footnotes. They
               // take no room: a band over the figure, from a little way into
               // it to just before the end of its storage dump, holds them in
@@ -672,11 +659,11 @@ export default function EthdebugFigure({
               />
             </div>
             {story.length > 0 && (
-              // (each beat shows once the story reaches it and stays, under
-              // the figure (still, when pinned), marked as the post's
-              // narration by an amber rule; their room is kept from the
-              // start, so nothing moves)
-              <div ref={told} className={`mt-6 space-y-3 ${id}-b`}>
+              // (pinned, each beat shows once the story reaches it and stays,
+              // under the still figure, marked as the post's narration by an
+              // amber rule; their room is kept from the start, so nothing
+              // moves)
+              <div className={`mt-6 space-y-3 ${id}-b`}>
                 <div
                   aria-hidden="true"
                   className="mx-auto h-0.5 w-12 rounded bg-amber-500 transition-opacity duration-500"
