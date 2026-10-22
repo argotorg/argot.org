@@ -39,7 +39,8 @@ It maps each instruction to its source range.
 The figures in this post use a preview build with Walnut's work in progress.
 Argot and Walnut's plan goes further, to local variables and then to optimized code, which would lift the optimizer-off restriction.
 
-The Fe compiler, another Argot project, writes ethdebug data as its only debug output, with the optimizer on.
+The Fe compiler, another Argot project, writes ethdebug data for each instruction and its source range, with the optimizer on.
+It wraps that data in a file format of its own, so a tool adapts the file before it reads it.
 Solar, a second Solidity compiler from [Paradigm](https://www.paradigm.xyz/), writes it on its main branch, also with the optimizer on.
 
 So far, each compiler's ethdebug data mostly tells a debugger where in the source each instruction came from.
@@ -124,7 +125,7 @@ Until then, the figures in this post read the bytes with their own code.
 The first thing a debugger needs is which piece of source each instruction came from.
 Walnut's soldb is a debugger written for Solidity.
 Because it reads ethdebug data, it can step through a contract written in Fe.
-soldb's code didn't change; we only had to give it the source files that Fe's output names but doesn't include.
+soldb's code didn't change; we only had to pick out the program it runs from Fe's file and give it the source files that Fe's file names but doesn't include.
 The figure below runs soldb in this page on the same game transaction, once compiled with solc and once with Fe.
 Switch between the two and step through each.
 soldb shows no call stack here, because neither compiler marks function calls in its ethdebug output yet.
