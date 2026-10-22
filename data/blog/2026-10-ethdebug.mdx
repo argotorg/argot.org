@@ -182,8 +182,8 @@ The same package would follow it unchanged, and no tool author would have to lea
 
 ## The harder cases
 
-Storage is the easy case because where a value lives there doesn't change as the code runs.
-Local variables in optimized code are where debuggers usually lose track.
+One pointer was enough for `players` because its place in storage is set once and never moves.
+A local variable's place can change as the code runs: it can move from place to place in memory, or leave the stack for a while.
 An optimizer inlines calls and reuses one variable's bytes for another, and the older outputs have no way to say so.
 The format can say where each local is at each step.
 While no production compiler writes local variables yet, our reference compiler, bugc, does.
