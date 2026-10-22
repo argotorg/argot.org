@@ -33,8 +33,7 @@ Walnut has also been helping shape the format.
 Their questions led us to improve the specification ([ethdebug/format#307](https://github.com/ethdebug/format/issues/307)), and to support their solc work they wrote a conformance test suite for ethdebug ([ethdebug/format#215](https://github.com/ethdebug/format/pull/215)).
 It checks how closely compilers and debuggers follow the format, and today it covers just solc, soldb, and the format's own reference implementations.
 
-In released solc, this output is [experimental](https://docs.soliditylang.org/en/v0.8.37/using-the-compiler.html#experimental-mode).
-It needs the `--experimental` and `--via-ir` flags, an ethdebug output such as `--ethdebug-program`, and the optimizer off.
+In released solc, this output is [experimental](https://docs.soliditylang.org/en/v0.8.38/using-the-compiler.html#experimental-mode), and it needs the IR pipeline with the optimizer off.
 It maps each instruction to its source range.
 The figures in this post use a preview build with Walnut's work in progress.
 Argot and Walnut's plan goes further, to local variables and then to optimized code, which would lift the optimizer-off restriction.
@@ -88,7 +87,7 @@ This is what a development tool sees when it looks at the game's state in the mi
 </EthdebugFigure>
 
 The highlights above come from the compiler saying what each byte is.
-Without that, a tool has only the raw bytes, and it must work out the rest itself: [where solc puts mapping entries](https://docs.soliditylang.org/en/v0.8.37/internals/layout_in_storage.html#mappings-and-dynamic-arrays), how it packs small values into one slot, how it lays out a string.
+Without that, a tool has only the raw bytes, and it must work out the rest itself: [where solc puts mapping entries](https://docs.soliditylang.org/en/v0.8.38/internals/layout_in_storage.html#mappings-and-dynamic-arrays), how it packs small values into one slot, how it lays out a string.
 The rules change with compiler versions and optimizers, and none of the old ones go away, because contracts on chain live forever.
 Most tools support only some compiler versions and often not the optimized code that runs on mainnet.
 A wrong guess gives no error; the tool just shows a wrong value.
@@ -165,7 +164,7 @@ A compiler describes each variable with an [**ethdebug pointer**](https://ethdeb
 Unlike a pointer in most languages, it is not a fixed address.
 It names where the variable's bytes are, such as storage, memory, or the stack, and says how to compute their positions from the machine state a tool can observe.
 Following it, a tool might read a slot, hash a key with the slot's number, or step to the next slot.
-Shapes the compiler uses again and again, like a mapping or a string, are written once as templates and reused.
+Shapes the compiler uses again and again, like a mapping or a string, are written once as pointer templates and reused.
 
 The figure below follows the compiler's ethdebug pointer for `players`, from the slot it starts at to every byte of every player's record.
 Press ▶ to step through it, or select any other variable and step through its pointer.
@@ -218,7 +217,16 @@ That work isn't finished, and we'd welcome help.
 ## Beyond this post
 
 You can try solc's ethdebug data today.
-Compile a contract with the [experimental settings](https://docs.soliditylang.org/en/v0.8.37/using-the-compiler.html#experimental-mode) above and read what it writes next to the [ethdebug format specification](https://ethdebug.github.io/format/) to learn how these fit together.
+With solc 0.8.38, compile a contract like this:
+
+```shell
+solc --experimental --via-ir \
+  --debug-info ast-id,ethdebug \
+  --ethdebug-resources \
+  --ethdebug-program-runtime Contract.sol
+```
+
+Then read what it writes next to the [ethdebug format specification](https://ethdebug.github.io/format/) to learn how these fit together.
 
 You don't need to build a debugger to use this data.
 Think of a question about a transaction that a tool could answer from it.
