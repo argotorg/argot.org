@@ -21,20 +21,21 @@ Where compilers or the specification lag, the figures fudge a little, and they s
 
 ## What changed this year
 
-Since our [talk at the Solidity Summit](https://youtu.be/KKvkXFv-GXM) last November, [**Fe**](https://fe-lang.org/) and [**Solar**](https://github.com/paradigmxyz/solar) have started to write initial ethdebug data, and for [**solc**](https://soliditylang.org/), work now in review is the first step toward tools that read a contract's variables without guessing.
+Since our [talk at the Solidity Summit](https://youtu.be/KKvkXFv-GXM) last November, [**Fe**](https://fe-lang.org/) and [**Solar**](https://github.com/paradigmxyz/solar) have started to write initial ethdebug data.
+For [**solc**](https://soliditylang.org/), work now in review would let tools find a contract's state from solc's own data, the first step toward reading its variables.
 Walnut's [**soldb**](https://github.com/walnuthq/soldb) reads ethdebug data, and [Runtime Verification](https://runtimeverification.com/), the team behind the [**Simbolik**](https://marketplace.visualstudio.com/items?itemName=runtimeverification.simbolik) debugger, has started [a Python library for reading it](https://github.com/runtimeverification/ethdebug.py).
 
-solc has written ethdebug data since 0.8.29 in March 2025, from the Solidity team's work: each instruction and the source range it came from.
-Since May, Walnut has been extending that output, and the Solidity team reviews each stage.
+Since 0.8.29 in March 2025, solc has written ethdebug data that maps each instruction to its source range, from the Solidity team's work.
+Since May, Walnut has been extending that output in stages, each one a pull request that the Solidity team reviews.
 The stage now in review ([argotorg/solidity#16990](https://github.com/argotorg/solidity/pull/16990)) describes how a contract lays out its storage, and in our tests it matches what solc's storage layout output already says.
-Later stages, for state variables, function parameters, and return values, are in development on Walnut's fork.
+Walnut is still building the next stages, for state variables, function parameters, and return values, on their fork.
 
 Walnut has also been helping shape the format.
 Their questions led us to improve the specification ([ethdebug/format#307](https://github.com/ethdebug/format/issues/307)), and to support their solc work they wrote a conformance test suite for ethdebug ([ethdebug/format#215](https://github.com/ethdebug/format/pull/215)).
 It checks how closely compilers and debuggers follow the format.
 Today it covers just solc, soldb, and the format's own reference implementations.
 
-In released solc, this output is [experimental](https://docs.soliditylang.org/en/v0.8.38/using-the-compiler.html#experimental-mode), and it needs the IR pipeline with the optimizer off.
+In solc's latest release, 0.8.38, this output is [experimental](https://docs.soliditylang.org/en/v0.8.38/using-the-compiler.html#experimental-mode), and it needs the IR pipeline with the optimizer off.
 It maps each instruction to its source range.
 The figures in this post use a preview build with Walnut's work in progress.
 Argot and Walnut's plan goes further, to local variables and then to optimized code, which would lift the optimizer-off restriction.
