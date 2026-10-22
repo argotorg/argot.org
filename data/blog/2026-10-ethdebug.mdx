@@ -60,16 +60,14 @@ Most of the figures run on real compiler output, so explore them as you go._
 
 ## What we're solving
 
-Smart contracts are written for humans to read, but they run as machine code and keep their state in the Ethereum Virtual Machine's terms.
-A compiler turns one into the other, and the result is hard to map back to the source even without optimization.
-Optimizers make that harder still by inlining, reordering, and merging code.
+Contracts run as bytecode, and without the compiler's help, mapping that bytecode back to the source is guesswork, more so once an optimizer inlines, reorders, and merges code.
 
 Developers need the human view of a running smart contract while they build, and incident responders need it after an attack, when funds may be at risk.
 Responders work with contracts already on chain, compiled before the format existed, so they need ethdebug data written after the fact, which we come back to later.
-In the same survey, a third of developers named debugging as a recurring problem, at every level of experience.
+In the 2025 Solidity Developer Survey, a third of developers named debugging as a recurring problem, at every level of experience.
 
-Many groups have built tools for this.
-Compilers have given them enough to succeed, but only with guesswork.
+Many teams have built debuggers and other tools that show a contract in its source's terms.
+Compilers have given those tools enough to work, but only with guesswork.
 Tool authors learn the rules by watching the compiler and add special cases for each version.
 Six open-source projects, [Remix](https://remix.ethereum.org/) and [Truffle](https://github.com/trufflesuite/truffle) among them, have each built their own decoder for solc's data.
 [Truffle's](https://github.com/trufflesuite/truffle/tree/develop/packages/codec), whose lessons the format builds on, grew to 24,000 lines of rules learned from the compiler before Consensys [retired Truffle](https://consensys.com/blog/consensys-announces-the-sunset-of-truffle-and-ganache-and-new-hardhat) in 2023.
