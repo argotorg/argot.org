@@ -128,7 +128,7 @@ Walnut's soldb is a debugger written for Solidity.
 Because it reads ethdebug data, it can step through a contract written in Fe.
 soldb's code didn't change; we only had to give it the source files that Fe's output names but doesn't include.
 The figure below runs soldb right in this page, on the same game transaction compiled both ways.
-Switch between Solidity and Fe, and step through each.
+Switch between solc and Fe, and step through each.
 soldb shows no call stack here.
 Neither compiler marks function calls in its ethdebug output yet.
 
@@ -186,8 +186,7 @@ Storage is the easy case because where a value lives there doesn't change as the
 Local variables in optimized code are where debuggers usually lose track.
 An optimizer inlines calls and reuses one variable's bytes for another, and the older outputs have no way to say so.
 The format can say where each local is at each step.
-No production compiler writes local variables yet.
-Our reference compiler, bugc, does.
+While no production compiler writes local variables yet, our reference compiler, bugc, does.
 It compiles BUG, a small language we made to test the format.
 Its optimizer exists for the same reason: it inlines calls and reuses bytes the way solc's optimizer does, so we can test the format on that kind of code.
 
