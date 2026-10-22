@@ -12,7 +12,8 @@ This post covers what that looks like for tools today, how you can build on it, 
 
 The [**ethdebug format**](https://ethdebug.github.io/format/) is an open specification for compilers to use in structuring their debug output.
 Like [DWARF](https://dwarfstd.org/) for traditional computing but designed for the quirks of smart contract languages, it lets compilers explain their output to tools.
-Without it, tools reverse-engineer each compiler's choices, version by version, and can get them subtly wrong about contracts that hold real money.
+Without it, tools reverse-engineer each compiler's choices, version by version.
+A subtly wrong guess raises no error, so people can act on a wrong balance or owner without knowing it.
 
 The **ethdebug** project is part of [Argot Collective](https://www.argot.org/), and in our first post here on this blog, we're glad to share the latest progress in Ethereum debugging.
 We'll start with what changed this year, including the work [Walnut](https://www.walnut.dev/) and the Solidity team began in May to extend solc's ethdebug output.
