@@ -181,7 +181,7 @@ The same package would follow it unchanged, and no tool author would have to lea
 
 One pointer was enough for `players` because its place in storage is set once and never moves.
 A local variable's place can change as the code runs: it can move from place to place in memory, or leave the stack for a while.
-An optimizer inlines calls and reuses one variable's bytes for another, and the older outputs have no way to say so.
+An optimizer inlines calls and reuses one variable's bytes for another, and solc's source maps and storage layout output have no way to say so.
 The format can say where each local is at each step.
 While no production compiler writes local variables yet, [bugc](https://github.com/ethdebug/format/tree/main/packages/bugc), the format's reference compiler, does.
 It compiles BUG, a small language we made to test the format.
@@ -189,7 +189,8 @@ Its optimizer exists for the same reason: it inlines calls and reuses bytes the 
 
 The figure below follows three of the game's transactions, rewritten in BUG and compiled with optimizations on.
 Carol joins, Alice plays and hits, and Bob plays and misses.
-At each moment, the compiler's ethdebug pointers say where each local's bytes are: on the stack, in calldata, or in memory.
+The figure stops at a few moments in each transaction.
+At each one, the compiler's ethdebug pointers say where each local's bytes are: on the stack, in calldata, or in memory.
 Watch `mult` take over `combo`'s bytes instead of copying them.
 Step through it with ◀ ▶; each step runs through every instruction between two moments.
 
@@ -210,7 +211,7 @@ We can write those rules down once as ethdebug data, as the Vyper figure earlier
 Runtime Verification had the same idea, and earlier this year they started a tool that adds ethdebug data to existing solc output.
 That work isn't finished, and we'd welcome help.
 
-## Beyond this post
+## Next steps
 
 You can try solc's ethdebug data today.
 With solc 0.8.38, compile a contract like this:
