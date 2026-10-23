@@ -86,7 +86,8 @@ Tool authors learn the compiler's rules by studying its output and add special c
 Six open-source projects, [Remix](https://remix.ethereum.org/) and [Truffle](https://github.com/trufflesuite/truffle) among them, have each built their own decoder for solc's existing outputs.
 [Truffle's decoder](https://github.com/trufflesuite/truffle/tree/develop/packages/codec) grew to 24,000 lines of rules learned from the compiler before Consensys [retired Truffle](https://consensys.com/blog/consensys-announces-the-sunset-of-truffle-and-ganache-and-new-hardhat) in 2023.
 The format builds on its lessons.
-Even [Foundry](https://getfoundry.sh/), today's most-used toolkit, finds function names by parsing the source text, and its [tracking issue for debugger improvements](https://github.com/foundry-rs/foundry/issues/927) has been open since 2022.
+Even [Foundry](https://getfoundry.sh/), today's most-used toolkit, finds function names by parsing the source text.
+Its [tracking issue for debugger improvements](https://github.com/foundry-rs/foundry/issues/927) has been open since 2022.
 
 To show what that guesswork involves, this post uses one small example throughout: a multiplayer game where players join and make moves that can earn them points.
 This is what a development tool sees when it looks at the game's state in the middle of a transaction:
@@ -106,7 +107,8 @@ It must know [where solc puts mapping entries](https://docs.soliditylang.org/en/
 The rules change with compiler versions and optimizers.
 Old contracts stay on chain, so tools must keep every old rule too.
 Most tools support only some compiler versions and often not the optimized code that runs on mainnet.
-A wrong guess gives no error; the tool just shows a wrong value.
+A wrong guess gives no error.
+The tool just shows a wrong value.
 
 To find Alice's score, a tool hashes her address with the slot of the `players` mapping, using keccak, Ethereum's standard hash function.
 That gives the first slot of her record.
@@ -115,14 +117,16 @@ Her name is in the next slot, with its characters at one end and its length at t
 
 <EthdebugFigure scene="pitfall-nesting" size="wide">
   Alice's record, as the compiler's data describes it.
-  The gray rows are what the inspector reads to find the record.
-  Mappings don't store their keys, so the inspector takes Alice's address from the game's list of players.
-  Click around to explore, and ↺ Reset to return.
+  The gray rows are what the tool reads to find the record.
+  Mappings don't store their keys, so the tool takes Alice's address from the game's list of players.
+  Click parts of the record to explore them, and press ↺ Reset to go back.
 </EthdebugFigure>
 
-Each new language means learning these rules again, and they often differ from Solidity's in small ways that are easy to miss.
-[Vyper](https://vyperlang.org/) also hashes the key with the mapping's slot, but in the opposite order, and it puts `players` at slot 108 instead of 3.
-A tool that applies Solidity's rule to Vyper's storage finds an empty slot that looks just as valid, and reports that Alice's score is 0:
+Each new language means learning these rules again.
+The new rules often differ from Solidity's in small ways that are easy to miss.
+[Vyper](https://vyperlang.org/) also hashes the key with the mapping's slot, but in the opposite order.
+It puts `players` at slot 108, not slot 3.
+A tool that applies Solidity's rule to Vyper's storage finds an empty slot that looks just as valid, and reports that Alice's score is 0.
 
 <EthdebugFigure scene="pitfall-compiler" size="narrow">
   The same storage, read two ways.
