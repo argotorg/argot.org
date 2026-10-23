@@ -60,10 +60,12 @@ Most of the figures run on real compiler output, so explore them as you go._
 
 ## What we're solving
 
-Contracts run as bytecode, and without the compiler's help, mapping that bytecode back to the source is guesswork, more so once an optimizer inlines, reorders, and merges code.
+Contracts run as bytecode, and without the compiler's help, mapping that bytecode back to the source is guesswork.
+An optimizer makes it harder still when it inlines, reorders, and merges code.
 
 Developers need to see a running contract in its source's terms while they build, and incident responders need it after an attack, when funds may be at risk.
-Responders work with contracts already on chain, compiled before the format existed, so they need ethdebug data written after the fact, which we come back to later.
+Responders work with contracts that were compiled before the format existed, so someone has to write their ethdebug data afterward.
+"The harder cases" below comes back to how.
 In the 2025 Solidity Developer Survey, a third of developers named debugging as a recurring problem, at every level of experience.
 
 Many teams have built debuggers and other tools that show a contract in its source's terms.
@@ -86,12 +88,15 @@ This is what a development tool sees when it looks at the game's state in the mi
 </EthdebugFigure>
 
 The highlights above come from the compiler saying what each byte is.
-Without that, a tool has only the raw bytes, and it must work out the rest itself: [where solc puts mapping entries](https://docs.soliditylang.org/en/v0.8.38/internals/layout_in_storage.html#mappings-and-dynamic-arrays), how it packs small values into one slot, how it lays out a string.
+Without the compiler's data, a tool has only the raw bytes and must work out the rest itself.
+It must know [where solc puts mapping entries](https://docs.soliditylang.org/en/v0.8.38/internals/layout_in_storage.html#mappings-and-dynamic-arrays), how it packs small values into one slot, and how it lays out a string.
 The rules change with compiler versions and optimizers, and none of the old ones go away, because contracts on chain live forever.
 Most tools support only some compiler versions and often not the optimized code that runs on mainnet.
 A wrong guess gives no error; the tool just shows a wrong value.
 
-To find Alice's score in this game, a tool hashes her address with the mapping's slot (using keccak, Ethereum's standard hash function) to find her record, then picks her score out of six small fields packed into one slot.
+To find Alice's score, a tool hashes her address with the slot of the `players` mapping, using keccak, Ethereum's standard hash function.
+That gives the first slot of her record.
+The tool then picks her score out of six small fields packed into that slot.
 Her name is in the next slot, with its characters at one end and its length at the other.
 
 <EthdebugFigure scene="pitfall-nesting" size="wide">
