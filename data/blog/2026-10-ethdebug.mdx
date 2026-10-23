@@ -87,10 +87,11 @@ This is what a development tool sees when it looks at the game's state in the mi
 >
 </EthdebugFigure>
 
-The highlights above come from the compiler saying what each byte is.
+A tool can label each byte with its variable only when the compiler says what each byte is.
 Without the compiler's data, a tool has only the raw bytes and must work out the rest itself.
 It must know [where solc puts mapping entries](https://docs.soliditylang.org/en/v0.8.38/internals/layout_in_storage.html#mappings-and-dynamic-arrays), how it packs small values into one slot, and how it lays out a string.
-The rules change with compiler versions and optimizers, and none of the old ones go away, because contracts on chain live forever.
+The rules change with compiler versions and optimizers.
+Old contracts stay on chain, so tools must keep every old rule too.
 Most tools support only some compiler versions and often not the optimized code that runs on mainnet.
 A wrong guess gives no error; the tool just shows a wrong value.
 
@@ -120,7 +121,8 @@ The ethdebug format moves the rule into the compiler's output.
 The compiler already knows where it put every value, so it writes the rule down, and a tool follows whatever rule it's given.
 The right side of the figure above works this way, using ethdebug data we wrote by hand.
 
-To show Alice's real score of 30, a tool also has to know what those bytes mean, and the format can't say that well yet.
+To show Alice's real score of 30, a tool also has to know what those bytes mean.
+The format's way to describe types is not yet good enough for that.
 We're [reworking](https://github.com/ethdebug/format/issues/282) its [type schemas](https://ethdebug.github.io/format/spec/type/overview/) for the richer type systems of newer languages.
 Until then, the figures in this post read the bytes with their own code.
 
@@ -197,7 +199,8 @@ Carol joins, Alice plays and hits, and Bob plays and misses.
 The figure stops at a few moments in each transaction.
 At each one, the compiler's ethdebug pointers say where each local's bytes are: on the stack, in calldata, or in memory.
 Watch `mult` take over `combo`'s bytes instead of copying them.
-Step through it with ◀ ▶; each step runs through every instruction between two moments.
+Use ◀ ▶ to go from one moment to the next.
+Each press runs every instruction between the two.
 
 <EthdebugFigure scene="optimized-locals" size="wide" walkthrough="on-demand">
   The game in BUG, compiled at optimization level 2.
