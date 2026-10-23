@@ -209,13 +209,17 @@ The same package would follow it unchanged, and no tool author would have to lea
 
 ## The harder cases
 
-One pointer was enough for `players` because its place in storage is set once and never moves.
-A local variable's place can change as the code runs: it can move from place to place in memory, or leave the stack for a while.
-An optimizer inlines calls and reuses one variable's bytes for another, and solc's source maps and storage layout output have no way to say so.
+One ethdebug pointer was enough for `players` because its place in storage is set once and never moves.
+A local variable's location can change as the code runs.
+It can move to a different part of memory, or leave the stack for a while.
+An optimizer inlines calls and reuses one variable's bytes for another.
+solc's source maps and storage layout output have no way to say so.
 The format can say where each local is at each step.
-While no production compiler writes local variables yet, [bugc](https://github.com/ethdebug/format/tree/main/packages/bugc), the format's reference compiler, does.
+No production compiler writes local variables yet.
+[bugc](https://github.com/ethdebug/format/tree/main/packages/bugc), the format's reference compiler, does.
 It compiles BUG, a small language we made to test the format.
-Its optimizer exists for the same reason: it inlines calls and reuses bytes the way solc's optimizer does, so we can test the format on that kind of code.
+bugc's optimizer exists for the same reason.
+It inlines calls and reuses bytes the way solc's optimizer does, so we can test the format on that kind of code.
 
 The figure below follows three of the game's transactions, rewritten in BUG and compiled with optimizations on.
 Carol joins, Alice plays and hits, and Bob plays and misses.
