@@ -16,16 +16,19 @@ It lets compilers explain their output to tools.
 Without it, tools reverse-engineer each compiler's choices, version by version.
 A subtly wrong guess raises no error, so people can act on a wrong balance or owner without knowing it.
 
-The **ethdebug** project is part of [Argot Collective](https://www.argot.org/), and in our first post here on this blog, we're glad to share the latest progress in Ethereum debugging.
-We'll start with what changed this year, including the work [Walnut](https://www.walnut.dev/) and the Solidity team began in May to extend solc's ethdebug output.
+The **ethdebug** project is part of [Argot Collective](https://www.argot.org/).
+In this, our first post on the Argot blog, we share our latest progress in Ethereum debugging.
+We'll start with what changed this year, including the work that [Walnut](https://www.walnut.dev/), a team that builds Ethereum debugging tools, and the Solidity team began in May to extend solc's ethdebug data.
 Then we'll show what tools must guess without the compiler's help, and how the format removes the guesswork.
 Most of the interactive figures run on real compiler data.
 
 ## What changed this year
 
 Since our [talk at the Solidity Summit](https://youtu.be/KKvkXFv-GXM) last November, [**Fe**](https://fe-lang.org/) and [**Solar**](https://github.com/paradigmxyz/solar) have started to write initial ethdebug data.
-For [**solc**](https://soliditylang.org/), work now in review would let tools find a contract's state from solc's own data, the first step toward reading its variables.
-Walnut's [**soldb**](https://github.com/walnuthq/soldb) reads ethdebug data, and [Runtime Verification](https://runtimeverification.com/), the team behind the [**Simbolik**](https://marketplace.visualstudio.com/items?itemName=runtimeverification.simbolik) debugger, has started [a Python library for reading it](https://github.com/runtimeverification/ethdebug.py).
+For [**solc**](https://soliditylang.org/), work now in review would let tools find a contract's state from solc's own data.
+That is the first step toward reading the contract's variables.
+Walnut's [**soldb**](https://github.com/walnuthq/soldb), a debugger for Solidity, reads ethdebug data.
+[Runtime Verification](https://runtimeverification.com/), the team behind the [**Simbolik**](https://marketplace.visualstudio.com/items?itemName=runtimeverification.simbolik) debugger, has started [a Python library to read it](https://github.com/runtimeverification/ethdebug.py).
 
 Since 0.8.29 in March 2025, solc has written ethdebug data that maps each instruction to its source range, from the Solidity team's work.
 Since May, Walnut has been extending that output in stages, each one a pull request that the Solidity team reviews.
