@@ -90,7 +90,8 @@ Even [Foundry](https://getfoundry.sh/), today's most-used toolkit, finds functio
 Its [tracking issue for debugger improvements](https://github.com/foundry-rs/foundry/issues/927) has been open since 2022.
 
 To show what that guesswork involves, this post uses one small example throughout: a multiplayer game where players join and make moves that can earn them points.
-This is what a development tool sees when it looks at the game's state in the middle of a transaction:
+In the middle of a transaction, a development tool sees the game's state as raw bytes.
+The figure below shows those bytes, and then which variable each one belongs to.
 
 <EthdebugFigure
   scene="reveal"
@@ -135,8 +136,9 @@ A tool that applies Solidity's rule to Vyper's storage finds an empty slot that 
 </EthdebugFigure>
 
 The ethdebug format moves the rule into the compiler's output.
-The compiler already knows where it put every value, so it writes the rule down, and a tool follows whatever rule it's given.
-The right side of the figure above works this way, using ethdebug data we wrote by hand.
+The compiler already knows where it put every value, so it writes the rule down.
+A tool then follows whatever rule it is given.
+In the figure above, the reading that uses Vyper's layout works this way, from ethdebug data we wrote by hand.
 
 To show Alice's real score of 30, a tool also has to know what those bytes mean.
 The format's way to describe types is not yet good enough for that.
@@ -146,12 +148,12 @@ Until then, the figures in this post read the bytes with their own code.
 ## Reading compiled code
 
 The first thing a debugger needs is which piece of source each instruction came from.
-Walnut's soldb is a debugger written for Solidity.
-Because it reads ethdebug data, it can step through a contract written in Fe.
-soldb's code didn't change; we only had to collect the source files alongside Fe's ethdebug output.
-The figure below runs soldb in this page on the same game transaction, once compiled with solc and once with Fe.
+Walnut wrote soldb for Solidity, but because it reads ethdebug data, it can also step through a contract written in Fe.
+soldb's code didn't change.
+We only had to collect the source files alongside Fe's ethdebug output.
+The figure below runs soldb in this page on one of the game's transactions, compiled once with solc and once with Fe.
 Switch between the two and step through each.
-soldb shows no call stack here, because neither compiler marks function calls in its ethdebug output yet.
+soldb shows no call stack here because neither compiler marks function calls in its ethdebug data yet.
 
 <EthdebugFigure scene="real-debugger" size="narrow">
   soldb stepping one of the game's transactions, compiled from Solidity and from Fe.
