@@ -189,18 +189,20 @@ Pick an instruction below to see its entry.
 A compiler describes each variable with an [**ethdebug pointer**](https://ethdebug.github.io/format/spec/pointer/overview/).
 Unlike a pointer in most languages, it is not a fixed address.
 It says which location (storage, memory, the stack, and so on) holds the variable's bytes and how to compute their positions from the machine state a tool can observe.
-Following it, a tool might read a slot, hash a key with the slot's number, or step to the next slot.
-Shapes the compiler uses again and again, like a mapping or a string, are written once as pointer templates and reused.
+To follow the pointer, a tool might read a slot, hash a key with the slot's number, or move to the next slot.
+For pointer shapes it uses again and again, like a mapping or a string, the compiler writes a pointer template once and reuses it.
 
-The figure below follows the compiler's ethdebug pointer for `players`, from the slot it starts at to every byte of every player's record.
-Press ▶ to step through it, or select any other variable and step through its pointer.
+The figure below follows the compiler's ethdebug pointer for the `players` mapping.
+It goes from the slot where `players` starts to every byte of every player's record.
+Click ▶ to step through it, or click any other variable and step through its pointer.
 
 <EthdebugFigure scene="pointer-walkthrough" size="wide" walkthrough>
   Each step shows one piece of the compiler's ethdebug pointer for `players`, and the storage that piece reaches.
   The steps go from slot 3 to each record at keccak(key, slot 3), and then to the six packed fields and each player's name.
 </EthdebugFigure>
 
-The figure ran those steps with our TypeScript reference implementation, the [@ethdebug/pointers](https://www.npmjs.com/package/@ethdebug/pointers) npm package, which knows nothing about this game or about Solidity.
+The figure ran those steps with our TypeScript reference implementation, the [@ethdebug/pointers](https://www.npmjs.com/package/@ethdebug/pointers) npm package.
+That package knows nothing about this game or about Solidity.
 The keys came from the game's list of players, and every rule after that came from the compiler's data.
 For the Vyper version of the game, the pointer would hash the slot before the key and start at slot 108.
 The same package would follow it unchanged, and no tool author would have to learn either compiler's rules.
