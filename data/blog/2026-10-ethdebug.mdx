@@ -30,7 +30,8 @@ That is the first step toward reading the contract's variables.
 Walnut's [**soldb**](https://github.com/walnuthq/soldb), a debugger for Solidity, reads ethdebug data.
 [Runtime Verification](https://runtimeverification.com/), the team behind the [**Simbolik**](https://marketplace.visualstudio.com/items?itemName=runtimeverification.simbolik) debugger, has started [a Python library to read it](https://github.com/runtimeverification/ethdebug.py).
 
-Since 0.8.29 in March 2025, solc has written ethdebug data that maps each instruction to its source range, from the Solidity team's work.
+The Solidity team added ethdebug data to solc in 0.8.29, in March 2025.
+It maps each instruction to its source range, the part of the source code that the instruction came from.
 Since May, Walnut has been extending that output in stages, each one a pull request that the Solidity team reviews.
 The stage now in review ([argotorg/solidity#16990](https://github.com/argotorg/solidity/pull/16990)) describes how a contract lays out its storage.
 In our tests, it matches what solc's storage layout output already says.
