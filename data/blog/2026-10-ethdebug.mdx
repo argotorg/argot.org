@@ -32,16 +32,18 @@ Walnut's [**soldb**](https://github.com/walnuthq/soldb), a debugger for Solidity
 
 Since 0.8.29 in March 2025, solc has written ethdebug data that maps each instruction to its source range, from the Solidity team's work.
 Since May, Walnut has been extending that output in stages, each one a pull request that the Solidity team reviews.
-The stage now in review ([argotorg/solidity#16990](https://github.com/argotorg/solidity/pull/16990)) describes how a contract lays out its storage, and in our tests it matches what solc's storage layout output already says.
+The stage now in review ([argotorg/solidity#16990](https://github.com/argotorg/solidity/pull/16990)) describes how a contract lays out its storage.
+In our tests, it matches what solc's storage layout output already says.
 Walnut is still building the next stages, for state variables, function parameters, and return values, on their fork.
 
 Walnut has also been helping shape the format.
-Their questions led us to improve the specification ([ethdebug/format#307](https://github.com/ethdebug/format/issues/307)), and to support their solc work they wrote a conformance test suite for ethdebug ([ethdebug/format#215](https://github.com/ethdebug/format/pull/215)).
+Their questions led us to improve the format ([ethdebug/format#307](https://github.com/ethdebug/format/issues/307)).
+To support their solc work, they also wrote a conformance test suite for the format ([ethdebug/format#215](https://github.com/ethdebug/format/pull/215)).
 It checks how closely compilers and debuggers follow the format.
 Today it covers just solc, soldb, and the format's own reference implementations.
 
-In solc's latest release, 0.8.38, this output is [experimental](https://docs.soliditylang.org/en/v0.8.38/using-the-compiler.html#experimental-mode), and it needs the IR pipeline with the optimizer off.
-It maps each instruction to its source range.
+In solc's latest release, 0.8.38, its ethdebug output is [experimental](https://docs.soliditylang.org/en/v0.8.38/using-the-compiler.html#experimental-mode), and it needs the IR pipeline with the optimizer off.
+That release maps only each instruction to its source range.
 The figures in this post use a preview build with Walnut's work in progress.
 Argot and Walnut's plan goes further, to local variables and then to optimized code, which would lift the optimizer-off restriction.
 
