@@ -233,11 +233,12 @@ Each press runs every instruction between the two.
 
 <EthdebugFigure scene="optimized-locals" size="wide" walkthrough="on-demand">
   The game in BUG, compiled at optimization level 2.
-  Where each local lives at each moment comes from the compiler's ethdebug pointers.
+  Where each local variable is at each moment comes from the compiler's ethdebug pointers.
 </EthdebugFigure>
 
-Do not use BUG in production: its compiler was not built to save gas, and it has never been audited.
-The figure shows that the format can already carry these facts and that a tool can read them.
+Do not use BUG in production.
+Its compiler was not built to save gas, and it has never been audited.
+The figure shows that the format can already say where an optimizer puts each local variable, and that a tool can read it.
 We don't yet know how to describe a value that the optimizer turned into an expression instead of storing it.
 We are also still settling exactly when a call's frame starts and ends ([ethdebug/format#348](https://github.com/ethdebug/format/issues/348)).
 
