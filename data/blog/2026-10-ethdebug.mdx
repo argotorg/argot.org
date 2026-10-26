@@ -239,7 +239,7 @@ Each press runs every instruction between the two.
 Do not use BUG in production.
 Its compiler was not built to save gas, and it has never been audited.
 The figure shows that the format can already say where an optimizer puts each local variable, and that a tool can read it.
-We don't yet know how to describe a value that the optimizer turned into an expression instead of storing it.
+The format has no way yet for a compiler to say how to compute a value that isn't anywhere in the machine.
 We are also still settling exactly when a call's frame starts and ends ([ethdebug/format#348](https://github.com/ethdebug/format/issues/348)).
 
 Almost every contract on chain today was built by a compiler version that doesn't write ethdebug data, and those versions won't be updated to write it.
