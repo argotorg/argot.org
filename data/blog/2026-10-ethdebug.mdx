@@ -221,11 +221,13 @@ It compiles BUG, a small language we made to test the format.
 bugc's optimizer exists for the same reason.
 It inlines calls and reuses bytes the way solc's optimizer does, so we can test the format on that kind of code.
 
-The figure below follows three of the game's transactions, rewritten in BUG and compiled with optimizations on.
+The figure below follows three of the game's transactions, rewritten in BUG and compiled with bugc's optimizer on.
+In the game, each move is a hit or a miss, and hits in a row earn more points.
 Carol joins, Alice plays and hits, and Bob plays and misses.
 The figure stops at a few moments in each transaction.
-At each one, the compiler's ethdebug pointers say where each local's bytes are: on the stack, in calldata, or in memory.
-Watch `mult` take over `combo`'s bytes instead of copying them.
+At each one, the compiler's ethdebug pointers say where each local variable's bytes are.
+They can be on the stack, in calldata, or in memory.
+Watch `mult`, the points multiplier, take over the bytes of `combo`, the count of hits in a row, instead of copying them.
 Use ◀ ▶ to go from one moment to the next.
 Each press runs every instruction between the two.
 
