@@ -75,9 +75,9 @@ An optimizer makes it harder still when it inlines, reorders, and merges code.
 
 Developers need to see a running contract in its source's terms while they build.
 Incident responders need the same view after an attack, when funds may be at risk.
-Responders work with contracts that were compiled before the format existed, so someone has to write their ethdebug data afterward.
-"The harder cases" below comes back to how.
 In the 2025 Solidity Developer Survey, a third of developers named debugging as a recurring problem, at every level of experience.
+Responders work with contracts that were compiled before the format existed, so someone has to write their ethdebug data afterward.
+We come back to how in "The harder cases".
 
 Many teams have built debuggers and other tools that show a contract in its source's terms.
 Compilers have given those tools enough to work, but only with guesswork.
@@ -88,7 +88,8 @@ The format builds on its lessons.
 Even [Foundry](https://getfoundry.sh/), today's most-used toolkit, finds function names by parsing the source text.
 Its [tracking issue for debugger improvements](https://github.com/foundry-rs/foundry/issues/927) has been open since 2022.
 
-To show what that guesswork involves, this post uses one small example throughout: a multiplayer game where players join and make moves that can earn them points.
+To show what that guesswork involves, this post uses one small example throughout.
+It's a multiplayer game where players join and make moves that can earn them points.
 In the middle of a transaction, a development tool sees the game's state as raw bytes.
 The figure below shows those bytes, and then which variable each one belongs to.
 
@@ -106,7 +107,7 @@ Without that, a tool works out each variable's location on its own.
 It must know [where solc puts mapping entries](https://docs.soliditylang.org/en/v0.8.38/internals/layout_in_storage.html#mappings-and-dynamic-arrays), how it packs small values into one slot, and how it lays out a string.
 The rules change with compiler versions and optimizers.
 Old contracts stay on chain, so tools must keep every old rule too.
-Most tools support only some compiler versions and often not the optimized code that runs on mainnet.
+Most tools support only some compiler versions, and many can't read optimized code, which is what runs on mainnet.
 A wrong guess gives no error.
 The tool just shows a wrong value.
 
@@ -159,7 +160,8 @@ soldb shows no call stack here because neither compiler marks function calls in 
 </EthdebugFigure>
 
 The format describes compiled code as [**ethdebug programs**](https://ethdebug.github.io/format/spec/program/overview/).
-Each program covers either a contract's creation code, which deploys it, or its runtime code, which runs on each call, so a contract usually has two.
+Each program covers either a contract's creation code, which deploys it, or its runtime code, which runs on each call.
+(So a contract usually has two.)
 For each program, the compiler lists the instructions in order.
 Each instruction gives its byte offset in the bytecode, its operation, and an [**ethdebug context**](https://ethdebug.github.io/format/spec/program/concepts/#instructions-describe-high-level-context-details).
 The context says what is true after the instruction runs.
