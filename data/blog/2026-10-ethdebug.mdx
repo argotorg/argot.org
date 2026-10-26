@@ -45,7 +45,8 @@ Today it covers just solc, soldb, and the format's own reference implementations
 In solc's latest release, 0.8.38, its ethdebug output is [experimental](https://docs.soliditylang.org/en/v0.8.38/using-the-compiler.html#experimental-mode), and it needs the IR pipeline with the optimizer off.
 In that release, the data only maps each instruction to its source range.
 The figures in this post use a preview build with Walnut's work in progress.
-Argot and Walnut's plan goes further, to local variables and then to optimized code, which would lift the optimizer-off restriction.
+Next, Argot and Walnut would like to add local variables together, and then optimized code.
+Support for optimized code would lift the optimizer-off restriction.
 
 The Fe compiler, another Argot Collective project, writes ethdebug data for each instruction and its source range, with the optimizer on.
 It puts that data inside a small wrapper of its own, which a tool must remove first.
