@@ -102,8 +102,8 @@ The figure below shows those bytes, and then which variable each one belongs to.
 >
 </EthdebugFigure>
 
-A tool can label each byte with its variable only when the compiler says what each byte is.
-Without the compiler's data, a tool has only the raw bytes and must work out the rest itself.
+A tool can label each byte with its variable only when the compiler says how to find that variable's bytes.
+Without that, a tool has only the raw bytes and must work out by itself where each variable is.
 It must know [where solc puts mapping entries](https://docs.soliditylang.org/en/v0.8.38/internals/layout_in_storage.html#mappings-and-dynamic-arrays), how it packs small values into one slot, and how it lays out a string.
 The rules change with compiler versions and optimizers.
 Old contracts stay on chain, so tools must keep every old rule too.
