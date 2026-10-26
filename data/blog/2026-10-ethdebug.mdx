@@ -263,13 +263,14 @@ solc --experimental --via-ir \
   --ethdebug-program-runtime Contract.sol
 ```
 
-Then read what it writes next to the [ethdebug format specification](https://ethdebug.github.io/format/) to learn how these fit together.
+Then read its output with the [ethdebug format specification](https://ethdebug.github.io/format/) open to see how the parts fit together.
 
 You don't need to build a debugger to use this data.
 Think of a question about a transaction that a tool could answer from it.
 Which source lines did it run?
 Which variable did a storage write change?
-Then ask your AI coding tool to build that tool, and point it at the spec and your compiler's output.
+Then ask an AI coding assistant to write that tool.
+Give it the specification and your compiler's output.
 For example, [this short script](https://github.com/ethdebug/argot-post-2026-10/tree/main/demos/stepper) prints the source lines a transaction ran, from solc's output or Fe's.
 Tool builders can use our [npm packages](https://www.npmjs.com/org/ethdebug) to follow ethdebug pointers.
 Compiler writers can start with source ranges and add ethdebug pointers for state variables next.
@@ -277,7 +278,8 @@ Compiler writers can start with source ranges and add ethdebug pointers for stat
 If something in the format is missing, unclear, or wrong for your language or tool, [open an issue](https://github.com/ethdebug/format/issues).
 Some of this year's changes began as questions from implementers.
 
-The format will keep growing as more compilers write it and solc's support expands.
+The format will keep growing as more compilers write ethdebug data and solc's support expands.
 To follow along or ask a question, join [our Matrix chat](https://matrix.to/#/#ethdebug:matrix.org).
 
-Thanks to Djordje and Roman at Walnut, the Fe team, Raoul at Runtime Verification, cameel, clonker, and the Solidity team, Sourcify, and Lea at Argot for their work, their questions, and their patience.
+Thanks to Djordje and Roman at Walnut, the Solidity team (cameel and clonker in particular), the Fe team, Raoul at Runtime Verification, Sourcify, and Lea at Argot Collective for their work, their questions, and their patience.
+And thanks to Jacob for a last-minute review that made this post much better.
