@@ -242,9 +242,11 @@ The figure shows that the format can already say where an optimizer puts each lo
 The format has no way yet for a compiler to say how to compute a value that isn't anywhere in the machine.
 We are also still settling exactly when a call's frame starts and ends ([ethdebug/format#348](https://github.com/ethdebug/format/issues/348)).
 
-Almost every contract on chain today was built by a compiler version that doesn't write ethdebug data, and those versions won't be updated to write it.
-Recompiling a contract's verified source, for example from [Sourcify](https://sourcify.dev/), with a newer compiler gives different bytecode, though the storage layout usually carries over.
-The rules that today's tools use to guess layouts are also usually right.
+Almost every contract on chain today was compiled before its compiler wrote ethdebug data.
+Those old compiler versions won't be updated to write it.
+A tool can recompile a contract's verified source, for example from [Sourcify](https://sourcify.dev/), with a newer compiler.
+That gives different bytecode, though the storage layout usually carries over.
+The rules that today's tools use to guess layouts are usually right.
 We can write those rules down once as ethdebug data, as the Vyper figure earlier does by hand, so that each tool doesn't need its own copy.
 Runtime Verification had the same idea, and earlier this year they started a tool that adds ethdebug data to existing solc output.
 That work isn't finished, and we'd welcome help.
