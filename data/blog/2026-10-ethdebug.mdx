@@ -237,7 +237,7 @@ Each press runs every instruction between the two.
   Where each local variable is at each moment comes from the compiler's ethdebug pointers.
 </EthdebugFigure>
 
-The figure shows that the format can already say where an optimizer puts each local variable, and that a tool can read it.
+The figure shows that a compiler can already use the format to say where its optimizer puts each local variable, and that a tool can read it.
 The format has no way yet for a compiler to say how to compute a value that isn't anywhere in the machine.
 We're also still settling exactly when a call's frame starts and ends ([ethdebug/format#348](https://github.com/ethdebug/format/issues/348)).
 
