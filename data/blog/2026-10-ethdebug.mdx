@@ -220,6 +220,8 @@ No production compiler writes local variables yet.
 It compiles BUG, a small language we made to test the format.
 bugc's optimizer exists for the same reason.
 It inlines calls and reuses bytes the way solc's optimizer does, so we can test the format on that kind of code.
+Do not use BUG in production.
+Its compiler was not built to save gas, and it has never been audited.
 
 The figure below follows three of the game's transactions, rewritten in BUG and compiled with bugc's optimizer on.
 In the game, each move is a hit or a miss, and hits in a row earn more points.
@@ -236,8 +238,6 @@ Each press runs every instruction between the two.
   Where each local variable is at each moment comes from the compiler's ethdebug pointers.
 </EthdebugFigure>
 
-Do not use BUG in production.
-Its compiler was not built to save gas, and it has never been audited.
 The figure shows that the format can already say where an optimizer puts each local variable, and that a tool can read it.
 The format has no way yet for a compiler to say how to compute a value that isn't anywhere in the machine.
 We are also still settling exactly when a call's frame starts and ends ([ethdebug/format#348](https://github.com/ethdebug/format/issues/348)).
