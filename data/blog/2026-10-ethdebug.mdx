@@ -141,7 +141,7 @@ A tool then follows whatever rule it is given.
 In the figure above, the reading that uses Vyper's layout works this way, from ethdebug data we wrote by hand.
 
 To show Alice's real score of 30, a tool also has to know what those bytes mean.
-The format's way to describe types is not yet good enough for that.
+The format's way to describe types isn't yet good enough for that.
 We're [reworking](https://github.com/ethdebug/format/issues/282) its [type schemas](https://ethdebug.github.io/format/spec/type/overview/) for the richer type systems of newer languages.
 Until then, the figures in this post read the bytes with their own code.
 
@@ -175,19 +175,19 @@ Solar's main branch has started to write those.
 Later in this post, we show these kinds of context from a compiler we built to test the format.
 
 solc and Fe write ethdebug programs in the same basic shape, so the same code can read both.
-Pick an instruction below to see its entry.
+Click an instruction below to see its entry.
 
 <EthdebugFigure scene="program-xray" size="text">
   Part of `play()`, as solc and Fe each wrote it.
   There is one entry per instruction, with its offset, its operation, and its context.
-  Pick an instruction to see its entry and the source its range points to.
+  Click an instruction to see its entry and the source its range points to.
   Fe adds a few fields of its own.
 </EthdebugFigure>
 
 ## Finding a variable's bytes
 
 A compiler describes each variable with an [**ethdebug pointer**](https://ethdebug.github.io/format/spec/pointer/overview/).
-Unlike a pointer in most languages, it is not a fixed address.
+Unlike a pointer in most languages, it isn't a fixed address.
 It says which location (storage, memory, the stack, and so on) holds the variable's bytes and how to compute their positions from the machine state a tool can observe.
 To follow the pointer, a tool might read a slot, hash a key with the slot's number, or move to the next slot.
 For pointer shapes it uses again and again, like a mapping or a string, the compiler writes a pointer template once and reuses it.
@@ -240,7 +240,7 @@ Each press runs every instruction between the two.
 
 The figure shows that the format can already say where an optimizer puts each local variable, and that a tool can read it.
 The format has no way yet for a compiler to say how to compute a value that isn't anywhere in the machine.
-We are also still settling exactly when a call's frame starts and ends ([ethdebug/format#348](https://github.com/ethdebug/format/issues/348)).
+We're also still settling exactly when a call's frame starts and ends ([ethdebug/format#348](https://github.com/ethdebug/format/issues/348)).
 
 Almost every contract on chain today was compiled before its compiler wrote ethdebug data.
 Those old compiler versions won't be updated to write it.
@@ -276,7 +276,7 @@ Tool builders can use our [npm packages](https://www.npmjs.com/org/ethdebug) to 
 Compiler writers can start with source ranges and add ethdebug pointers for state variables next.
 
 If something in the format is missing, unclear, or wrong for your language or tool, [open an issue](https://github.com/ethdebug/format/issues).
-Some of this year's changes began as questions from implementers.
+Some of this year's changes began as questions from compiler writers and tool builders.
 
 The format will keep growing as more compilers write ethdebug data and solc's support expands.
 To follow along or ask a question, join [our Matrix chat](https://matrix.to/#/#ethdebug:matrix.org).
