@@ -213,7 +213,7 @@ A local variable's location can change as the code runs.
 It can move to a different part of memory, or leave the stack for a while.
 An optimizer inlines calls and reuses one variable's bytes for another.
 solc's source maps and storage layout output have no way to say so.
-The ethdebug format can say where each local variable is at each instruction.
+The ethdebug format lets a compiler say where each local variable is at each instruction.
 No production compiler writes local variables yet.
 [bugc](https://github.com/ethdebug/format/tree/main/packages/bugc), the format's reference compiler, does.
 It compiles BUG, a small language we made to test the format.
