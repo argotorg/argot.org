@@ -74,8 +74,8 @@ Contracts run as bytecode, and without the compiler's help, mapping that bytecod
 An optimizer makes it harder still when it inlines, reorders, and merges code.
 
 Developers need to see a running contract in its source's terms while they build.
-Incident responders need the same view after an attack, when funds may be at risk.
 In the 2025 Solidity Developer Survey, a third of developers named debugging as a recurring problem, at every level of experience.
+Incident responders need the same view after an attack, when funds may be at risk.
 Responders work with contracts that were compiled before the format existed, so someone has to write their ethdebug data afterward.
 We come back to how in "The harder cases".
 
@@ -170,8 +170,7 @@ The simplest kind of context says which range of which source file the instructi
 Every compiler that writes ethdebug data writes this kind of context today.
 It is all that soldb needed to follow the source.
 Other kinds describe variables and code the optimizer moved or merged.
-Some mark where a function call starts and ends, and they name the function.
-They do this even when the optimizer inlined the call.
+Some mark where a function call starts and ends and name the function, even when the optimizer inlined the call.
 Solar's main branch has started to write those.
 Later in this post, we show these kinds of context from a compiler we built to test the format.
 
@@ -191,7 +190,7 @@ A compiler describes each variable with an [**ethdebug pointer**](https://ethdeb
 Unlike a pointer in most languages, it isn't a fixed address.
 It says which location (storage, memory, the stack, and so on) holds the variable's bytes and how to compute their positions from the machine state a tool can observe.
 To follow the pointer, a tool might read a slot, hash a key with the slot's number, or move to the next slot.
-For pointer shapes it uses again and again, like a mapping or a string, the compiler writes a pointer template once and reuses it.
+When the compiler uses a pointer shape again and again, like a mapping or a string, it writes a pointer template once and reuses it.
 
 The figure below follows the compiler's ethdebug pointer for the `players` mapping.
 It goes from the slot where `players` starts to every byte of every player's record.
@@ -215,7 +214,7 @@ A local variable's location can change as the code runs.
 It can move to a different part of memory, or leave the stack for a while.
 An optimizer inlines calls and reuses one variable's bytes for another.
 solc's source maps and storage layout output have no way to say so.
-The format can say where each local is at each step.
+The format can say where each local variable is at each instruction.
 No production compiler writes local variables yet.
 [bugc](https://github.com/ethdebug/format/tree/main/packages/bugc), the format's reference compiler, does.
 It compiles BUG, a small language we made to test the format.
