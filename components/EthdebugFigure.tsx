@@ -208,9 +208,7 @@ function Placeholder({ late }: { late?: boolean }) {
   return (
     <div className="absolute inset-0 grid place-items-center rounded border border-anthracite-100 bg-ecru-200/50 text-sm text-anthracite-200 dark:border-anthracite-400 dark:bg-anthracite-600/50">
       {late ? (
-        <span>
-          Figure unavailable: <a href={`${POST}/companion/`}>see the companion page</a>.
-        </span>
+        <span>Figure unavailable. Reload the page to try again.</span>
       ) : (
         <span aria-hidden>Loading figure…</span>
       )}
