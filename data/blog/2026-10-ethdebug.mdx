@@ -59,7 +59,7 @@ The format also helps people who use AI to build tools.
 In the [2025 Solidity Developer Survey](https://soliditylang.org/survey-2025/), nearly nine out of ten developers said they use AI at least monthly, and nearly half said they distrust its output.
 A tool that reads ethdebug data doesn't need to know how the compiler works inside.
 So an AI that writes such a tool has less to get wrong.
-What the tool reports comes from the compiler, not from guesses.
+The tool reports what the compiler says instead of guessing.
 
 ---
 
@@ -160,7 +160,6 @@ soldb shows no call stack here because neither compiler marks function calls in 
 
 The format describes compiled code as [**ethdebug programs**](https://ethdebug.github.io/format/spec/program/overview/).
 Each program covers either a contract's creation code, which deploys it, or its runtime code, which runs on each call.
-(So a contract usually has two.)
 For each program, the compiler lists the instructions in order.
 Each instruction gives its byte offset in the bytecode, its operation, and an [**ethdebug context**](https://ethdebug.github.io/format/spec/program/concepts/#instructions-describe-high-level-context-details).
 The context says what is true after the instruction runs.
